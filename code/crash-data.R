@@ -115,17 +115,33 @@ crashes_all$cycle_casualty = ifelse(crashes_all$accident_index %in% crashes_cycl
 crashes_all$ped_casualty = ifelse(crashes_all$accident_index %in% crashes_ped$accident_index, "yes", "no")
 
 crashes_all = crashes_all %>%
-  left_join(ped_count, by = "accident_index") %>%
-  rename(number_ped_casualties = n)
-
-crashes_all = crashes_all %>%
   left_join(cycle_count, by = "accident_index") %>%
   rename(number_cycle_casualties = n)
 
+crashes_all = crashes_all %>%
+  left_join(ped_count, by = "accident_index") %>%
+  rename(number_ped_casualties = n)
+
 saveRDS(crashes_all, "crashes_all.Rds")
 
+# This only includes the crashes containing a cyclist or pedestrian casualty.
 crashes_active_casualties = crashes_all %>%
   filter(accident_index %in% casualties_active$accident_index)
+
+# There are also some crashes involving cyclists where the cyclist is not listed as a casualty (and not all of these have pedestrian casualties either)
+crashes_bicycle = crashes_all %>%
+  filter(
+    grepl('Bicycle', veh_list))
+
+crashes_bicycle_injured = crashes_all %>%
+  filter(
+    grepl('Bicycle', veh_list),
+    cycle_casualty == "yes")
+
+crashes_bicycle_uninjured = crashes_all %>%
+  filter(
+    grepl('Bicycle', veh_list),
+    cycle_casualty == "no")
 
 
 
