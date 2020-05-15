@@ -51,7 +51,10 @@ system("tippecanoe -zg -o ignored/london.mbtiles --drop-densest-as-needed ignore
 
 ### Serving
 
-#### Usee mbview repo
+#### Use mbview repo
+
+You will need node installed, geoplumber functions can help or do your
+own googling.
 
 ``` r
 mbd = "ignored/mbview"
