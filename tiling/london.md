@@ -46,7 +46,7 @@ Could run the command from R:
 ``` r
 system("tippecanoe -zg -o ignored/london.mbtiles --drop-densest-as-needed ignored/london_cyipt.geojson")
 # or in a terminal
-# tippecanoe -zg -o ignored/out.mbtiles --drop-densest-as-needed london_cyipt.geojson
+# tippecanoe -zg -o ignored/london.mbtiles --drop-densest-as-needed ignored/london_cyipt.geojson
 ```
 
 ### Serving

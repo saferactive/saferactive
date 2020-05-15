@@ -46,7 +46,7 @@ Could run the command from R:
 ```{r, eval=FALSE}
 system("tippecanoe -zg -o ignored/london.mbtiles --drop-densest-as-needed ignored/london_cyipt.geojson")
 # or in a terminal
-# tippecanoe -zg -o ignored/out.mbtiles --drop-densest-as-needed london_cyipt.geojson
+# tippecanoe -zg -o ignored/london.mbtiles --drop-densest-as-needed ignored/london_cyipt.geojson
 ```
 
 ### Serving 
@@ -68,5 +68,6 @@ setwd(cw)
 <img width="100%" alt="Screenshot 2020-05-15 at 13 18 48" src="https://user-images.githubusercontent.com/408568/82049801-e6455200-96ae-11ea-8e14-7863845aac0b.png">
 
 ### styling (json)
+
 
 ### Shiny, eatlas or custom (simple)
