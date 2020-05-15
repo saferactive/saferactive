@@ -63,9 +63,8 @@ cycle_count = crash_cas %>%
   tally()
 
 
-##################
 
-# Getting a list of vehicle types for each collision --------------------------------
+# Get a list of vehicle types for each collision --------------------------------
 
 # Simplify vehicle types
 vehicles_all$vehicle_type_simple = NULL
@@ -101,95 +100,106 @@ longform = pivot_wider(short,id_cols = accident_index,names_from = vehicle_refer
 # unique(short$vehicle_reference)
 conc = unite(longform,col = "veh_list","1":"999",na.rm = TRUE)
 
-crashes_all = inner_join(crashes_all, conc, by = "accident_index")
+crashes_joined = inner_join(crashes_all, conc, by = "accident_index")
 
-##########
 
-crashes_cycle = crashes_all %>%
-  filter(accident_index %in% casualties_cycle$accident_index)
+# Join with casualty count data -------------------------------------------
 
-crashes_ped = crashes_all %>%
-  filter(accident_index %in% casualties_ped$accident_index)
 
-crashes_all$cycle_casualty = ifelse(crashes_all$accident_index %in% crashes_cycle$accident_index, "yes", "no")
-crashes_all$ped_casualty = ifelse(crashes_all$accident_index %in% crashes_ped$accident_index, "yes", "no")
+# crashes_cycle = crashes_joined %>%
+#   filter(accident_index %in% casualties_cycle$accident_index)
+#
+# crashes_ped = crashes_joined %>%
+#   filter(accident_index %in% casualties_ped$accident_index)
+#
+# crashes_joined$cycle_casualty = ifelse(crashes_joined$accident_index %in% crashes_cycle$accident_index, "yes", "no")
+# crashes_joined$ualty = ifelse(crashes_joined$accident_index %in% crashes_ped$accident_index, "yes", "no")
 
-crashes_all = crashes_all %>%
+crashes_joined = crashes_joined %>%
   left_join(cycle_count, by = "accident_index") %>%
-  rename(number_cycle_casualties = n)
+  rename(cycle_casualties = n)
 
-crashes_all = crashes_all %>%
+crashes_joined = crashes_joined %>%
   left_join(ped_count, by = "accident_index") %>%
-  rename(number_ped_casualties = n)
+  rename(ped_casualties = n) %>%
+  mutate_at(vars(cycle_casualties:ped_casualties), ~replace(., is.na(.), 0))
 
-saveRDS(crashes_all, "crashes_all.Rds")
+# saveRDS(crashes_joined, "crashes_joined.Rds")
 
 # This only includes the crashes containing a cyclist or pedestrian casualty.
-crashes_active_casualties = crashes_all %>%
+crashes_active_casualties = crashes_joined %>%
   filter(accident_index %in% casualties_active$accident_index)
 
 # There are also some crashes involving cyclists where the cyclist is not listed as a casualty (and not all of these have pedestrian casualties either)
-crashes_bicycle = crashes_all %>%
+crashes_bicycle = crashes_joined %>%
   filter(
     grepl('Bicycle', veh_list))
 
-crashes_bicycle_injured = crashes_all %>%
+crashes_bicycle_injured = crashes_joined %>%
   filter(
     grepl('Bicycle', veh_list),
-    cycle_casualty == "yes")
+    cycle_casualties > 0)
 
-crashes_bicycle_uninjured = crashes_all %>%
+crashes_bicycle_uninjured = crashes_joined %>%
   filter(
     grepl('Bicycle', veh_list),
-    cycle_casualty == "no")
+    cycle_casualties == 0)
 
 
 
 # Data for London ---------------------------------------------------------
 
 
+table(crashes_active_casualties$police_force)
 
-
-table(casualties_active$police_force)
-casualties_active_london = casualties_active %>%
-  filter(police_force == "Metropolitan Police" | police_force == "Central") %>%
+crashes_active_london = crashes_active_casualties %>%
+  filter(police_force == "Metropolitan Police" | police_force == "City of London") %>%
   stats19::format_sf(lonlat = TRUE)
 
-saveRDS(casualties_active_london, "casualties_active_london.Rds")
-piggyback::pb_upload("casualties_active_london.Rds")
-# Aim: identify largest vehicle
+#Remove unneeded columns
+crashes_active_london = crashes_active_london %>%
+  select(c(1,5:25,31:35))
 
-# Categorisation of crash e.g.:
-# 1-car-1-cycling
-# 1-car-multi-cycling
-# multi-car-1-cycling
-# multi-car-multi-cycling
-# 1-cycle-pedestrian
-# multi-cycling-pedestrian
-# multi-cycling-multi-pedestrian
-# 1-car-1-pedestrian
-# 1-car-multi-pedestrian
-# multi-car-1-pedestrian
-# multi-car-multi-pedestrian
-# 1-cycle-pedestrian
-summary(as.factor(casualties_j2$police_force))
 
-casuaties_london = casualties_j2 %>%
-  filter(police_force == "Metropolitan Police" | police_force == "City of London")
+# library(stats19)
+# crashes_active_london_sf = format_sf(crashes_active_london)
 
-casuaties_london_active = casuaties_london %>%
-  filter(casualty_type == "Pedestrian" | casualty_type == "Cyclist")
-
-casuaties_london_active_sf = format_sf(casuaties_london_active)
-
-plot(casuaties_london_active_sf["casualty_type"])
+plot(crashes_active_london["cycle_casualties"])
 
 
 # Aggregate per borough per year ------------------------------------------
+crashes_active_london$year = lubridate::year(crashes_active_london$datetime)
 
-summary(as.factor(casuaties_london_active$local_authority_district))
-casuaties_london_active_sf$year = lubridate::year(casuaties_london_active_sf$datetime)
-summary(as.factor(casuaties_london_active_sf$year))
+# summary(as.factor(crashes_active_london$local_authority_district))
+# summary(as.factor(crashes_active_london$year))
 
-saveRDS(casuaties_london_active_sf, "casualties_london_active_sf.Rds")
-piggyback::pb_upload("casualties_london_active_sf.Rds")
+
+
+# Find the combinations of vehicles ---------------------------------------
+
+crashes_active_london = crashes_active_london %>%
+  mutate(number_bicycles = str_count(crashes_active_london$veh_list, "Bicycle"),
+         number_buses = str_count(crashes_active_london$veh_list, "Bus"),
+         number_cars = str_count(crashes_active_london$veh_list, "Car"),
+         number_HGVs = str_count(crashes_active_london$veh_list, "HGV"),
+         number_motorcycles = str_count(crashes_active_london$veh_list, "Motorcycle"),
+         number_othergoods = str_count(crashes_active_london$veh_list, "OtherGoods"),
+         number_otherunknown = str_count(crashes_active_london$veh_list, "OtherOrUnknown"),
+         number_taxis = str_count(crashes_active_london$veh_list, "Taxi")
+  )
+
+cycle_veh_freqs = crashes_active_london %>%
+  filter(accident_index %in% casualties_cycle$accident_index) %>%
+  select(c(29:36)) %>%
+  st_drop_geometry() %>%
+  colSums()
+
+ped_veh_freqs = crashes_active_london %>%
+  filter(accident_index %in% casualties_ped$accident_index) %>%
+  select(c(29:36)) %>%
+  st_drop_geometry() %>%
+  colSums()
+
+saveRDS(crashes_active_london, "crashes_active_london.Rds")
+piggyback::pb_upload("crashes_active_london.Rds")
+
