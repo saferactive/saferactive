@@ -31,13 +31,15 @@ saveRDS(agg, "agg-y-s-l-05-14.Rds")
 acc = get_stats19(year = 2015:2018)
 # acc_19 = get_stats19(year = 2019)
 # errors
-agg_1518 = aggregate(accident_index ~ accident_severity + local_authority_district,
+acc$date
+acc$date = as.Date(acc$date, "%Y-%m-%d")
+acc$year = format(acc$date, "%Y")
+
+agg_1518 = aggregate(accident_index ~ year + accident_severity + local_authority_district,
                      data = acc, FUN = length)
-agg_0518 = merge(agg, agg_1518, all.x = TRUE,
-                 by = c('accident_severity', 'local_authority_district'))
-agg_0518$accident_index = agg_0518$accident_index.x + agg_0518$accident_index.y
-agg_0518 = agg_0518[, c('accident_severity', 'local_authority_district', 'accident_index')]
-saveRDS(agg_0518, "~/code/saferactive/saferactive/ignored/agg_0518.Rds")
+agg_0518 = rbind(agg, agg_1518)
+
+saveRDS(agg_0518, "agg-y-s-l-05-18.Rds")
 library(sf)
 g = st_read("~/Downloads/ltlas.geojson")
 summary(agg$local_authority_district %in% g$lad19nm)
