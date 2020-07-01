@@ -7,7 +7,6 @@ crashes_all = get_stats19(year = years, type = "ac")
 casualties_all = get_stats19(year = years, type = "cas")
 vehicles_all = get_stats19(year = years, type = "veh")
 
-
 casualties_active = casualties_all %>%
   filter(casualty_type == "Pedestrian" | casualty_type == "Cyclist")
 
@@ -19,9 +18,7 @@ casualties_ped = casualties_all %>%
 
 saveRDS(casualties_active, "casualties_active.Rds")
 
-
 # Simplify casualty types and count active travel casualties -----------------------------------
-
 
 # Simplify casualty types
 casualties_all$casualty_type_simple = NULL
@@ -62,8 +59,6 @@ cycle_count = crash_cas %>%
   group_by(accident_index) %>%
   tally()
 
-
-
 # Get a list of vehicle types for each collision --------------------------------
 
 # Simplify vehicle types
@@ -102,9 +97,7 @@ conc = unite(longform,col = "veh_list","1":"999",na.rm = TRUE)
 
 crashes_joined = inner_join(crashes_all, conc, by = "accident_index")
 
-
 # Join with casualty count data -------------------------------------------
-
 
 # crashes_cycle = crashes_joined %>%
 #   filter(accident_index %in% casualties_cycle$accident_index)
@@ -145,10 +138,7 @@ crashes_bicycle_uninjured = crashes_joined %>%
     grepl('Bicycle', veh_list),
     cycle_casualties == 0)
 
-
-
 # Data for London ---------------------------------------------------------
-
 
 table(crashes_active_casualties$police_force)
 
@@ -160,12 +150,10 @@ crashes_active_london = crashes_active_casualties %>%
 crashes_active_london = crashes_active_london %>%
   select(c(1,5:25,31:35))
 
-
 # library(stats19)
 # crashes_active_london_sf = format_sf(crashes_active_london)
 
 plot(crashes_active_london["cycle_casualties"])
-
 
 # Aggregate per borough per year ------------------------------------------
 crashes_active_london$year = lubridate::year(crashes_active_london$datetime)

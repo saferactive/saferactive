@@ -83,14 +83,14 @@ crashes_active_london = readRDS("crashes_active_london.Rds")
 years = c("2009", "2010", "2011", "2012", "2013")
 crashes_2009_13 = filter(crashes_active_london, year %in% years)
 
-years = c("2014", "2015", "2016", "2017", "2018")
-crashes_2014_18 = filter(crashes_active_london, year %in% years)
+# years = c("2014", "2015", "2016", "2017", "2018")
+# crashes_2014_18 = filter(crashes_active_london, year %in% years)
 
-crashes_morning_peak = crashes_2009_13 %>%
-  mutate(datetime = ymd_hms(datetime),
-         time_est = as_hms(datetime)) %>%
-  filter(time_est >= hms::as_hms('07:00:00'),
-         time_est < hms::as_hms('10:00:00'))
+# crashes_morning_peak = crashes_2009_13 %>%
+#   mutate(datetime = ymd_hms(datetime),
+#          time_est = as_hms(datetime)) %>%
+#   filter(time_est >= hms::as_hms('07:00:00'),
+#          time_est < hms::as_hms('10:00:00'))
 
 crashes_peak = crashes_2009_13 %>%
   mutate(datetime = ymd_hms(datetime),
@@ -101,7 +101,7 @@ crashes_peak = crashes_2009_13 %>%
               time_est < hms::as_hms('18:30:00')))
 
 crashes_per_borough = crashes_peak %>%
-  # filter(accident_severity == "Serious" | accident_severity == "Fatal") %>%
+  filter(accident_severity == "Serious" | accident_severity == "Fatal") %>%
   group_by(local_authority_district) %>%
   summarise(cycle_casualties = sum(cycle_casualties)) %>%
   st_drop_geometry()
@@ -128,6 +128,6 @@ library(tmap)
 tmap_mode("view")
 
 tm_shape(rate_per_borough) +
-  tm_polygons()
+  tm_polygons("casualties_per_bkm")
 
-mapview(rate_per_borough)
+mapview(rate_per_borough["casualties_per_bkm"])
