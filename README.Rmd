@@ -4,7 +4,7 @@ output: github_document
 # output: word_document
 title: "SaferActive: prioritising investment in traffic calming measures for vulnerable road users"
 author: Institute for Transport Studies, University of Leeds
-bibliography: saferroads.bib
+bibliography: saferactive.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->

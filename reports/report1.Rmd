@@ -80,9 +80,6 @@ milestones = readr::read_csv("milestones.csv")
 milestones %>% knitr::kable()
 ```
 
-
-
-
 # Progress
 
 # Developments since project inception
