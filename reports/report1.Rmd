@@ -70,12 +70,16 @@ Milestones are shown in the table below.
 # milestones_original = readODS::read_ods("~/onedrive/projects-all/saferactive/submitted-application/submitted-deliverables.ods")
 # names(milestones_original)
 # milestones = milestones_original %>%
-#   rename(Date = "") %>% 
-#   dplyr::filter(!is.na(Deliverable)) %>% 
+#   rename(Date = "") %>%
+#   dplyr::filter(!is.na(Deliverable)) %>%
 #   select(Month, Date, Deliverable)
-# readr::write_csv(milestones, "reports/milestones.csv")
 # milestones$Date[1] = "2020-07-24"
+# milestones$Date[2] = "2020-09-25"
+# milestones$Date[3] = "2020-12-04"
+# milestones$Date[4] = "2020-03-05"
+# milestones$Date[5] = "2020-06-11"
 # milestones$Deliverable[1] = "Report 1: on input data and methodology (delayed)"
+# readr::write_csv(milestones, "reports/milestones.csv")
 milestones = readr::read_csv("milestones.csv")
 milestones %>% knitr::kable()
 ```
