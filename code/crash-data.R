@@ -4,7 +4,7 @@ library(tidyverse)
 
 years = 2009:2018
 crashes_all = get_stats19(year = years, type = "ac")
-casualties_all = get_stats19(year = years, type = "cas")
+casualties_all = readRDS("casualties_adjusted.Rds")
 vehicles_all = get_stats19(year = years, type = "veh")
 
 casualties_active = casualties_all %>%
@@ -36,6 +36,9 @@ casualties_all$casualty_type_simple[is.na(casualties_all$casualty_type_simple)] 
 ########## Join casualties to crashes using accident index
 crash_cas = inner_join(crashes_all, casualties_all, by = "accident_index")
 
+crash_cas = crash_cas %>%
+  mutate_at(vars(Adjusted_Serious:Adjusted_Slight), ~replace(., is.na(.), 0))
+
 # # Find frequency of different types of casualty
 # cas_freq = table(crash_cas$casualty_type)
 # cas_freq_simple = table(crash_cas$casualty_type_simple)
@@ -47,17 +50,79 @@ crash_cas = inner_join(crashes_all, casualties_all, by = "accident_index")
 # sum(cas_freq_simple)
 
 # Count the number of active casualties in each crash
-ped_count = crash_cas %>%
-  filter(casualty_type_simple == "Pedestrian") %>%
-  select(accident_index, casualty_type_simple) %>%
+# Adapted to include fatal casualties, and to base figures on casualty severity, not accident severity
+ped_count_f = crash_cas %>%
+  filter(casualty_type_simple == "Pedestrian",
+         casualty_severity == "Fatal") %>%
+  select(accident_index) %>%
   group_by(accident_index) %>%
   tally()
 
-cycle_count = crash_cas %>%
-  filter(casualty_type_simple == "Cyclist") %>%
-  select(accident_index, casualty_type_simple) %>%
+ped_count2 = crash_cas %>%
+  filter(casualty_type_simple == "Pedestrian") %>%
+  select(accident_index, Adjusted_Serious, Adjusted_Slight) %>%
+  group_by(accident_index) %>%
+  summarise(Adjusted_Serious = sum(Adjusted_Serious),
+            Adjusted_Slight = sum(Adjusted_Slight))
+
+ped_count = right_join(ped_count_f, ped_count2) %>%
+  mutate_at(vars(n), ~replace(., is.na(.), 0)) %>%
+  rename(ped_fatal = n)
+
+f = sum(ped_count$ped_fatal) #1064
+se = sum(ped_count$Adjusted_Serious) #41422.94
+sl = sum(ped_count$Adjusted_Slight) #143961.1
+se + sl #242373
+f + se + sl #246777
+
+# dim(ped_count) # 238538
+# length(unique(ped_count$accident_index))
+
+
+# cycle_count = crash_cas %>%
+#   filter(casualty_type_simple == "Cyclist") %>%
+#   select(accident_index, casualty_type_simple) %>%
+#   group_by(accident_index) %>%
+#   tally()
+#
+# sum(cycle_count$n) #186472
+
+cycle_count_f = crash_cas %>%
+  filter(casualty_type_simple == "Cyclist",
+         casualty_severity == "Fatal") %>%
+  select(accident_index) %>%
   group_by(accident_index) %>%
   tally()
+
+# sum(cycle_count_f$n) #1064
+
+# b = crash_cas %>%
+#   filter(casualty_type_simple == "Cyclist")
+# sum(b$Adjusted_Serious) #41434.62
+# sum(b$Adjusted_Slight) #143973.4
+# 41434.64 + 143973.4 #185408
+
+cycle_count2 = crash_cas %>%
+  filter(casualty_type_simple == "Cyclist") %>%
+  select(accident_index, Adjusted_Serious, Adjusted_Slight) %>%
+  group_by(accident_index) %>%
+  summarise(Adjusted_Serious = sum(Adjusted_Serious),
+            Adjusted_Slight = sum(Adjusted_Slight))
+
+# sum(cycle_count2$Adjusted_Serious) #41434.64
+# sum(cycle_count2$Adjusted_Slight) #143973.4
+
+cycle_count = right_join(cycle_count_f, cycle_count2) %>%
+  mutate_at(vars(n), ~replace(., is.na(.), 0)) %>%
+  rename(cycle_fatal = n)
+
+# f = sum(cycle_count$cycle_fatal) #1064
+# se = sum(cycle_count$Adjusted_Serious) #41422.94
+# sl = sum(cycle_count$Adjusted_Slight) #143961.1
+# se + sl #185408
+# f + se + sl #186472
+
+# this result is lower than the original cycle_count tally, it seems to be missing some casualties
 
 # Get a list of vehicle types for each collision --------------------------------
 
@@ -110,12 +175,14 @@ crashes_joined = inner_join(crashes_all, conc, by = "accident_index")
 
 crashes_joined = crashes_joined %>%
   left_join(cycle_count, by = "accident_index") %>%
-  rename(cycle_casualties = n)
+  rename(cycle_adjusted_serious = Adjusted_Serious,
+         cycle_adjusted_slight = Adjusted_Slight)
 
 crashes_joined = crashes_joined %>%
   left_join(ped_count, by = "accident_index") %>%
-  rename(ped_casualties = n) %>%
-  mutate_at(vars(cycle_casualties:ped_casualties), ~replace(., is.na(.), 0))
+  rename(ped_adjusted_serious = Adjusted_Serious,
+         ped_adjusted_slight = Adjusted_Slight) %>%
+  mutate_at(vars(cycle_fatal:ped_adjusted_slight), ~replace(., is.na(.), 0))
 
 # saveRDS(crashes_joined, "crashes_joined.Rds")
 
@@ -146,14 +213,14 @@ crashes_active_london = crashes_active_casualties %>%
   filter(police_force == "Metropolitan Police" | police_force == "City of London") %>%
   stats19::format_sf(lonlat = TRUE)
 
-#Remove unneeded columns
-crashes_active_london = crashes_active_london %>%
-  select(c(1,5:25,31:35))
+# #Remove unneeded columns
+# crashes_active_london = crashes_active_london %>%
+#   select(c(1,4:25,31:37))
 
 # library(stats19)
 # crashes_active_london_sf = format_sf(crashes_active_london)
 
-plot(crashes_active_london["cycle_casualties"])
+plot(crashes_active_london["cycle_adjusted_serious"])
 
 # Aggregate per borough per year ------------------------------------------
 crashes_active_london$year = lubridate::year(crashes_active_london$datetime)
@@ -178,13 +245,13 @@ crashes_active_london = crashes_active_london %>%
 
 cycle_veh_freqs = crashes_active_london %>%
   filter(accident_index %in% casualties_cycle$accident_index) %>%
-  select(c(29:36)) %>%
+  select(c(number_bicycles:number_taxis)) %>%
   st_drop_geometry() %>%
   colSums()
 
 ped_veh_freqs = crashes_active_london %>%
   filter(accident_index %in% casualties_ped$accident_index) %>%
-  select(c(29:36)) %>%
+  select(c(number_bicycles:number_taxis)) %>%
   st_drop_geometry() %>%
   colSums()
 
