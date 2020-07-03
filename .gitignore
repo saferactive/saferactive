@@ -4,3 +4,6 @@
 .Ruserdata
 
 /ignored
+*.tex
+*.pdf
+*.docx
