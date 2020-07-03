@@ -49,7 +49,7 @@ piggyback::pb_upload(f)
 
 # Introduction
 
-The report summarises progress on the SaferActive project, funded by the Department for Transport in support of aims outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@department_for_transport_cycling_2017] **whilst simultaneously reducing the number of people killed and seriously injured while cycling year-on-year**.
+The report summarises progress on the SaferActive project, funded by the Department for Transport in support of aims outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@departmentfortransport_cycling_2017] **whilst simultaneously reducing the number of people killed and seriously injured while cycling year-on-year**.
 
 A follow-on report reviewed the safety elements of the CWIS, emphasising the importance of safety for enabling active travel and advocating measuring safety in terms of "the number of fatalities and serious injuries per billion miles" [@nathan_cycling_2019].
 In this report we outline methods of estimating safety in the more commonly used units of killed and seriously injured per billion km (KSI/bkm).
