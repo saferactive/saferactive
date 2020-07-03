@@ -22,8 +22,9 @@ output: bookdown::word_document2
 #     number_sections: true
 #     latex_engine: xelatex
 bibliography:
-  - ../saferroads.bib
-  - report1.bib
+  # - ../saferroads.bib
+  # - report1.bib
+  - ../saferactive.bib
 ---
 
 ```{r, eval=FALSE, echo=FALSE}
@@ -46,11 +47,7 @@ f = list.files(path = ".", pattern = "lovelace|jamson|beech|hama", ignore.case =
 piggyback::pb_upload(f)
 ```
 
-<!-- *Information on the following should be provided and uploaded in a separate document (****no more than four sides of A4 with Appendices****):* -->
-
 # Introduction
-
-<!-- *Please refer to relevant research and literature (where available) and any gaps in knowledge and explain how the proposal develops or adds to learning. Please also describe the extent of current provision or implementation of the measures the proposal seeks to develop and current evidence (if any) for their effectiveness.* -->
 
 The report summarises progress on the SaferActive project, funded by the Department for Transport in support of aims outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@department_for_transport_cycling_2017] **whilst simultaneously reducing the number of people killed and seriously injured while cycling year-on-year**.
 
@@ -59,7 +56,7 @@ In this report we outline methods of estimating safety in the more commonly used
 
 A range of traffic calming measures can reduce casualty rates, a topic that has received much interest in the academic literature.
 Less attention has been paid to the question of how road safety measures can simultaneously reduce casualty rates *and increase levels of cycling and walking*.
-Road safety interventions that could support the CWIS include '20 mph limits' (implemented only via signalling) and '20 mph zones' (which can include optional measures including speed cameras) [@maher_20mph_2018; @rospa_guide_2019], 'filtered permeability' interventions including and rising and fixed bollards, and a range of speed humps, plus a range of additional traffic calming measures [@department_for_transport_traffic_2007].
+Road safety interventions that could support the CWIS include '20 mph limits' (implemented only via signalling) and '20 mph zones' (which can include optional measures including speed cameras) [@maher_20mph_2018; @rospa_guide_2019], 'filtered permeability' interventions including and rising and fixed bollards, and a range of speed humps, plus a range of additional traffic calming measures [@departmentfortransport_traffic_2007].
 
 The context is shown in graphs showing historic walking and cycling rates and casualty numbers visualised in the initial bid document which can now be seen at [github.com/saferactive/](https://github.com/saferactive/saferactive), where we will host open data and code developed for the project.
 <!-- (any secure data used for the project will be saved securely). -->
@@ -67,17 +64,21 @@ The context is shown in graphs showing historic walking and cycling rates and ca
 # Timelines
 
 The project runs from April 2020 until the end of June 2021.
-Milestones are shown in Figure \@ref(fig:milestones).
+Milestones are shown in the table below.
 
-```{r}
+```{r, message=FALSE}
 milestones_original = readODS::read_ods("~/onedrive/projects-all/saferactive/submitted-application/submitted-deliverables.ods")
-names(milestones_original)
+# names(milestones_original)
 milestones = milestones_original %>%
   rename(Date = "") %>% 
   dplyr::filter(!is.na(Deliverable)) %>% 
-  select(Month, Deliverable)
+  select(Month, Date, Deliverable)
+milestones$Date[1] = "2020-07-24"
+milestones$Deliverable[1] = "Report 1: on input data and methodology (delayed)"
 milestones %>% knitr::kable()
 ```
+
+
 
 
 # Progress
