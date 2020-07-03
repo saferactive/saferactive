@@ -86,7 +86,7 @@ milestones %>% knitr::kable()
 # Developments since project inception
 
 We will direct users towards guidance on integrated planning for urban transport contained in the *Design Manual for Urban Roads* [@lahart_design_2013] and the recent book by John Parkin on designing for cycle traffic [@parkin_designing_2018] to ensure interventions are done as part of joined-up transport plans.
-On specific road traffic measures, we will direct people towards the Local Transport Note 01/07 [@department_for_transport_traffic_2007], the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons Briefing paper CBP00468. 
+On specific road traffic measures, we will direct people towards the Local Transport Note 01/07 [@departmentfortransport_traffic_2007], the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons Briefing paper CBP00468. 
 The DMRB also contains new guidance of designing for cycle traffic with minimum recommended widths and other guidance for cycleway design [@highwaysengland_cd_2020].
 
 # References
