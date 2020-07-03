@@ -67,14 +67,16 @@ The project runs from April 2020 until the end of June 2021.
 Milestones are shown in the table below.
 
 ```{r, message=FALSE}
-milestones_original = readODS::read_ods("~/onedrive/projects-all/saferactive/submitted-application/submitted-deliverables.ods")
+# milestones_original = readODS::read_ods("~/onedrive/projects-all/saferactive/submitted-application/submitted-deliverables.ods")
 # names(milestones_original)
-milestones = milestones_original %>%
-  rename(Date = "") %>% 
-  dplyr::filter(!is.na(Deliverable)) %>% 
-  select(Month, Date, Deliverable)
-milestones$Date[1] = "2020-07-24"
-milestones$Deliverable[1] = "Report 1: on input data and methodology (delayed)"
+# milestones = milestones_original %>%
+#   rename(Date = "") %>% 
+#   dplyr::filter(!is.na(Deliverable)) %>% 
+#   select(Month, Date, Deliverable)
+# readr::write_csv(milestones, "reports/milestones.csv")
+# milestones$Date[1] = "2020-07-24"
+# milestones$Deliverable[1] = "Report 1: on input data and methodology (delayed)"
+milestones = readr::read_csv("milestones.csv")
 milestones %>% knitr::kable()
 ```
 
