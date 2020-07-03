@@ -20,22 +20,23 @@ and transport-related social exclusion (Lucas 2004; Johansson et al.
 the government has ambitious targets for active transport, as outlined
 in the Cycling and Walking Investment Strategy (CWIS): to double the
 number of stages cycled compared with the baseline year of 2013, and
-“reverse the decline in walking” (Department for Transport 2017).
+“reverse the decline in walking”
+(<span class="citeproc-not-found" data-reference-id="department_for_transport_cycling_2017">**???**</span>).
 Notably, the government aims to double cycling *whilst simultaneously
 reducing the number of people killed and seriously injured while cycling
 year-on-year*.
 
 Data on cycling rates and future investment plans suggest that the
-cycling uptake target will be difficult to achieve (Road Safety GB
-2019). Much research funded in support of the CWIS, such as the
-Propensity to Cycle Tool (Lovelace et al. 2017), has focussed on
-boosting walking and cycling levels, with relatively little attention
-paid to safety, despite the fact that cycling and walking casualties
-have not fallen since the CWIS baseline year of 2013 (see Figure 1).
-Safety is a major barrier to greater uptake of cycling and walking
-(Horton 2016; Jacobsen, Racioppi, and Rutter 2009), with fear of
-collisions and “too much traffic” being the top two reasons cited in DfT
-research (Nathan 2019). <!-- ^[ -->
+cycling uptake target will be difficult to achieve
+(<span class="citeproc-not-found" data-reference-id="road_safety_gb_government_2019">**???**</span>).
+Much research funded in support of the CWIS, such as the Propensity to
+Cycle Tool (Lovelace et al. 2017), has focussed on boosting walking and
+cycling levels, with relatively little attention paid to safety, despite
+the fact that cycling and walking casualties have not fallen since the
+CWIS baseline year of 2013 (see Figure 1). Safety is a major barrier to
+greater uptake of cycling and walking (Horton 2016; Jacobsen, Racioppi,
+and Rutter 2009), with fear of collisions and “too much traffic” being
+the top two reasons cited in DfT research (Nathan 2019). <!-- ^[ -->
 <!-- https://www.rospa.com/rospaweb/docs/events/past-events/road-safety-conference-2019/jai-nathan.pdf -->
 <!-- ] -->
 
@@ -52,11 +53,12 @@ optional measures including speed cameras) (Maher 2018; ROSPA 2019),
 ‘filtered permeability’ interventions including and rising and fixed
 bollards, and a range of speed humps. A range of additional traffic
 calming measures is described in the DfT’s Local Transport Note (LTN)
-01/07 (Department for Transport 2007). The focus of this study will be
-on three types of intervention, because these have received attention
-from the perspective of active travel (Mulvaney et al. 2015), and
-because data on their spatial (and in some cases date of implementation)
-is relatively abundant:
+01/07
+(<span class="citeproc-not-found" data-reference-id="department_for_transport_traffic_2007">**???**</span>).
+The focus of this study will be on three types of intervention, because
+these have received attention from the perspective of active travel
+(Mulvaney et al. 2015), and because data on their spatial (and in some
+cases date of implementation) is relatively abundant:
 
   - 20 mph zones, which are well documented in a recent study by Maher
     (2018), and local case studies published for Bristol (Bornioli et
@@ -67,7 +69,8 @@ is relatively abundant:
     implementation of 20 mph zones will be collated from a range of
     sources, including via .gov.uk websites, newspaper articles and
     OpenStreetMap, building on research estimating the accuracy of
-    crowd-sourced road data (Barrington-Leigh and Millard-Ball 2017).
+    crowd-sourced road data
+    (<span class="citeproc-not-found" data-reference-id="barrington-leigh_worlds_2017">**???**</span>).
     <!-- ^[ -->
     <!-- The road charity Brake has informally offered to support the project with data provision. -->
     <!-- ] -->
@@ -145,9 +148,10 @@ guidance on integrated planning for urban transport contained in the
 by John Parkin on designing for cycle traffic (Parkin 2018) to ensure
 interventions are done as part of joined-up transport plans. On specific
 road traffic measures, we will direct people towards the Local Transport
-Note 01/07 (Department for Transport 2007), the Design Manual for Roads
-and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons
-Briefing paper CBP00468.
+Note 01/07
+(<span class="citeproc-not-found" data-reference-id="department_for_transport_traffic_2007">**???**</span>),
+the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph
+zones in the House of Commons Briefing paper CBP00468.
 
 # Ethical and Privacy Issues
 
@@ -256,7 +260,8 @@ A recent conference paper by three of the team members shows we have a
 track record of collaboration on data science for road safety
 research.\[1\] We have also collaborated on writing a peer-reviewed R
 package called **stats19** for increasing public access to reproducible
-road safety research (Lovelace et al. 2019).
+road safety research
+(<span class="citeproc-not-found" data-reference-id="lovelace_stats19:_2019">**???**</span>).
 
 # Innovation
 
@@ -332,35 +337,13 @@ stats19.geoplumber.com for interactive version.
 
 <div id="refs" class="references hanging-indent">
 
-<div id="ref-barrington-leigh_worlds_2017">
-
-Barrington-Leigh, Christopher, and Adam Millard-Ball. 2017. “The World’s
-User-Generated Road Map Is More Than 80% Complete.” *PLOS ONE* 12 (8):
-e0180698. <https://doi.org/10.1371/journal.pone.0180698>.
-
-</div>
-
 <div id="ref-bornioli_effectiveness_2018">
 
 Bornioli, Anna, Isabelle Bray, Paul Pilkington, and Emma L. Bird. 2018.
 “The Effectiveness of a 20 Mph Speed Limit Intervention on Vehicle
 Speeds in Bristol, UK: A Non-Randomised Stepped Wedge Design.” *Journal
 of Transport & Health* 11: 47–55.
-
-</div>
-
-<div id="ref-department_for_transport_traffic_2007">
-
-Department for Transport. 2007. *Traffic Calming*. Local Transport Note,
-1/07. London: TSO.
-
-</div>
-
-<div id="ref-department_for_transport_cycling_2017">
-
-———. 2017. “Cycling and Walking Investment Strategy.” London: Department
-for Transport.
-<https://www.gov.uk/government/publications/cycling-and-walking-investment-strategy>.
+<https://doi.org/10.1016/j.jth.2018.09.009>.
 
 </div>
 
@@ -376,6 +359,7 @@ Routledge.
 Jacobsen, Peter L., Francesca Racioppi, and Harry Rutter. 2009. “Who
 Owns the Roads? How Motorised Traffic Discourages Walking and
 Bicycling.” *Injury Prevention* 15 (6): 369–73.
+<https://doi.org/10.1136/ip.2009.022566>.
 
 </div>
 
@@ -408,14 +392,6 @@ Transport and Land Use* 10 (1). <https://doi.org/10.5198/jtlu.2016.862>.
 
 </div>
 
-<div id="ref-lovelace_stats19:_2019">
-
-Lovelace, Robin, Malcolm Morgan, Layik Hama, and Mark Padgham. 2019.
-“Stats19: A Package for Working with Open Road Crash Data.” *Journal
-of Open Source Software*. <https://doi.org/10.21105/joss.01181>.
-
-</div>
-
 <div id="ref-lovelace_who_2016">
 
 Lovelace, Robin, Hannah Roberts, and Ian Kellar. 2016. “Who, Where,
@@ -436,7 +412,6 @@ and Environmental Justice*. Bristol, UK: Policy.
 <div id="ref-maher_20mph_2018">
 
 Maher, Mike. 2018. “20mph Research Study.” Department for Transport.
-<https://www.gov.uk/government/publications/20-mph-speed-limits-on-roads>.
 
 </div>
 
@@ -461,15 +436,6 @@ Safety Review.” Department for Transport.
 
 Parkin, John. 2018. *Designing for Cycle Traffic: International
 Principles and Practice*. ICE Publishing.
-<https://www.icevirtuallibrary.com/isbn/9780727763495>.
-
-</div>
-
-<div id="ref-road_safety_gb_government_2019">
-
-Road Safety GB. 2019. “Government Urged to Increase Funding for Walking
-and Cycling.”
-<http://roadsafetygb.org.uk/news/government-urged-to-increase-funding-for-walking-and-cycling/>.
 
 </div>
 
@@ -477,7 +443,6 @@ and Cycling.”
 
 ROSPA. 2019. “A Guide to 20mph Limits.” The Royal Society for the
 Prevention of Accidents.
-<https://www.rospa.com/rospaweb/docs/advice-services/road-safety/employers/guide-to-20mph-limits.pdf>.
 
 </div>
 
