@@ -1,57 +1,95 @@
 ---
 title: "SaferActive Progress Report 1"
 author: 
-- Robin Lovelace
-- Joey Talbot
+- Institute for Transport Studies, University of Leeds
 date: "`r Sys.Date()`"
-output: 
-  memor::pdf_memo:
-    use_profile: false
-    logo: "uol-logo.png"
-    short_title: short title
-    watermark: Draft
-    confidential: false
-    libertine: false
-    chinese: false
-    logo_height: 1.2cm
-    watermark_color: gray
-    footer_on_first_page: true
-    toc: false
-    lot: false
-    lof: false
-    number_sections: true
-    latex_engine: xelatex
+output: bookdown::word_document2
+# output: 
+#   memor::pdf_memo:
+#     use_profile: false
+#     logo: "uol-logo.png"
+#     short_title: short title
+#     watermark: Draft
+#     confidential: false
+#     libertine: false
+#     chinese: false
+#     logo_height: 1.2cm
+#     watermark_color: gray
+#     footer_on_first_page: true
+#     toc: false
+#     lot: false
+#     lof: false
+#     number_sections: true
+#     latex_engine: xelatex
+bibliography:
+  - ../saferroads.bib
+  - report1.bib
 ---
 
 ```{r, eval=FALSE, echo=FALSE}
 browseURL("reports/report1.pdf")
+citr::tidy_bib_file(rmd_file = "reports/report1.Rmd", messy_bibliography = "~/uaf/allrefs.bib", file = "report1.bib")
+file.rename("report1.bib", "reports/report1.bib")
 ```
 
-
-```{r setup}
-library(knitr)
-library(kableExtra)
-library(ggplot2)
-opts_chunk$set(warning = FALSE, message = FALSE)
+```{r, include = FALSE}
+remotes::install_github("Robinlovelace/gitgantt")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  out.width = "100%"
+)
+library(tidyverse)
+library(stats19)
+f = list.files(path = ".", pattern = "lovelace|jamson|beech|hama", ignore.case = TRUE)
+piggyback::pb_upload(f)
 ```
 
-# Section 1
-Here is a table
+<!-- *Information on the following should be provided and uploaded in a separate document (****no more than four sides of A4 with Appendices****):* -->
+
+# Introduction
+
+<!-- *Please refer to relevant research and literature (where available) and any gaps in knowledge and explain how the proposal develops or adds to learning. Please also describe the extent of current provision or implementation of the measures the proposal seeks to develop and current evidence (if any) for their effectiveness.* -->
+
+The report summarises progress on the SaferActive project, funded by the Department for Transport in support of aims outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@department_for_transport_cycling_2017] **whilst simultaneously reducing the number of people killed and seriously injured while cycling year-on-year**.
+
+A follow-on report reviewed the safety elements of the CWIS, emphasising the importance of safety for enabling active travel and advocating measuring safety in terms of "the number of fatalities and serious injuries per billion miles" [@nathan_cycling_2019].
+In this report we outline methods of estimating safety in the more commonly used units of killed and seriously injured per billion km (KSI/bkm).
+
+A range of traffic calming measures can reduce casualty rates, a topic that has received much interest in the academic literature.
+Less attention has been paid to the question of how road safety measures can simultaneously reduce casualty rates *and increase levels of cycling and walking*.
+Road safety interventions that could support the CWIS include '20 mph limits' (implemented only via signalling) and '20 mph zones' (which can include optional measures including speed cameras) [@maher_20mph_2018; @rospa_guide_2019], 'filtered permeability' interventions including and rising and fixed bollards, and a range of speed humps, plus a range of additional traffic calming measures [@department_for_transport_traffic_2007].
+
+The context is shown in graphs showing historic walking and cycling rates and casualty numbers visualised in the initial bid document which can now be seen at [github.com/saferactive/](https://github.com/saferactive/saferactive), where we will host open data and code developed for the project.
+<!-- (any secure data used for the project will be saved securely). -->
+
+# Timelines
+
+The project runs from April 2020 until the end of June 2021.
+Milestones are shown in Figure \@ref(fig:milestones).
 
 ```{r}
-kable(mtcars[1:5, 1:5], booktabs = T, caption = "a table") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position"), position = "left")
+milestones_original = readODS::read_ods("~/onedrive/projects-all/saferactive/submitted-application/submitted-deliverables.ods")
+names(milestones_original)
+milestones = milestones_original %>%
+  rename(Date = "") %>% 
+  dplyr::filter(!is.na(Deliverable)) %>% 
+  select(Month, Deliverable)
+milestones %>% knitr::kable()
 ```
 
-\clearpage 
 
-# Section 2
-Here is a plot.
+# Progress
 
-```{r}
-ggplot(mtcars, aes(x = mpg, y = wt)) +
-  geom_point()
-```
+# Developments since project inception
+
+We will direct users towards guidance on integrated planning for urban transport contained in the *Design Manual for Urban Roads* [@lahart_design_2013] and the recent book by John Parkin on designing for cycle traffic [@parkin_designing_2018] to ensure interventions are done as part of joined-up transport plans.
+On specific road traffic measures, we will direct people towards the Local Transport Note 01/07 [@department_for_transport_traffic_2007], the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons Briefing paper CBP00468. 
+The DMRB also contains new guidance of designing for cycle traffic with minimum recommended widths and other guidance for cycleway design [@highwaysengland_cd_2020].
+
+# References
+
 
 
 <!-- Reporting schedule: -->
