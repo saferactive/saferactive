@@ -1,0 +1,5 @@
+crashes = readRDS(url("https://github.com/saferactive/saferactive/releases/download/0.1/crashes_active_london.Rds"))
+names(crashes)
+crash_table = table(crashes$veh_list)
+crash_table_ordered = sort(crash_table, decreasing = TRUE)
+head(crash_table_ordered)

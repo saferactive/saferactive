@@ -8,3 +8,5 @@
 *.docx
 casualty-adjustment.csv
 casualties_adjusted.Rds
+*.geojson
+*.html
