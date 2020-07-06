@@ -100,10 +100,12 @@ crashes_peak = crashes_2009_13 %>%
            (time_est >= hms::as_hms('16:30:00') &
               time_est < hms::as_hms('18:30:00')))
 
+# changed to use adjusted casualty severity, not accident severity
 crashes_per_borough = crashes_peak %>%
-  filter(accident_severity == "Serious" | accident_severity == "Fatal") %>%
   group_by(local_authority_district) %>%
-  summarise(cycle_casualties = sum(cycle_casualties)) %>%
+  summarise(cycle_fatal = sum(cycle_fatal),
+            cycle_adjusted_serious = sum(cycle_adjusted_serious),
+            cycle_adjusted_slight = sum(cycle_adjusted_slight)) %>%
   st_drop_geometry()
 
 # Calculate casualties per billion km
@@ -113,7 +115,10 @@ crashes_per_borough = crashes_peak %>%
 # For smaller geographic areas, we will have to use all crashes not KSI
 
 rate_per_borough = inner_join(crashes_per_borough, summed, by = c("local_authority_district" = "Name")) %>%
-  mutate(casualties_per_bkm = (cycle_casualties/365/5/2)/(km_cycled/1000000000))
+  mutate(fatal_per_bkm = (cycle_fatal/365/5/2)/(km_cycled/1000000000),
+         serious_per_bkm = (cycle_adjusted_serious/365/5/2)/(km_cycled/1000000000),
+         slight_per_bkm = (cycle_adjusted_slight/365/5/2)/(km_cycled/1000000000),
+         KSI_per_bkm = ((cycle_fatal/365/5/2)+(cycle_adjusted_serious/365/5/2))/(km_cycled/1000000000))
 
 rate_per_borough = inner_join(lads, rate_per_borough, by = c("Name" = "local_authority_district")) %>%
   select(-Level)
@@ -128,6 +133,8 @@ library(tmap)
 tmap_mode("view")
 
 tm_shape(rate_per_borough) +
-  tm_polygons("casualties_per_bkm")
+  tm_polygons("KSI_per_bkm")
 
-mapview(rate_per_borough["casualties_per_bkm"])
+mapview(rate_per_borough["KSI_per_bkm"])
+
+plot(rate_per_borough$KSI_per_bkm ~ rate_per_borough$km_cycled) # strong exponential decay curve

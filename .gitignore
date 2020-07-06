@@ -2,8 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
-
 /ignored
 *.tex
 *.pdf
 *.docx
+casualty-adjustment.csv
+casualties_adjusted.Rds
