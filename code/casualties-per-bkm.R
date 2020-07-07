@@ -137,4 +137,6 @@ tm_shape(rate_per_borough) +
 
 mapview(rate_per_borough["KSI_per_bkm"])
 
-plot(rate_per_borough$KSI_per_bkm ~ rate_per_borough$km_cycled) # strong exponential decay curve
+plot(KSI_per_bkm ~ km_cycled, data = rate_per_borough, xlab = "km cycled", ylab = "KSI per bkm 2009 - 2013", ylim = c(500,4100)) # strong exponential decay curve
+text(KSI_per_bkm ~ km_cycled, data = rate_per_borough, labels = rate_per_borough$Name, cex = 0.6, font = 2, pos = 3)
+

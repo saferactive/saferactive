@@ -70,12 +70,12 @@ Less attention has been paid to the question of how road safety measures can sim
 
 Objective 3 of the CWIS is to "reduce the rate of cyclists killed or seriously injured on England's roads,
 measured as the number of fatalities and serious injuries per billion miles cycled." 
-Metrics to support this objective include: KSI/bkm and slightly casualties, urban/rural/regional split of crashes, and proportion of cyclists/drivers stating that it's too dangerous to cycle.
+Metrics to support this objective include: KSI/bkm, slight injuries per bkm, urban/rural/regional split of crashes, and proportion of cyclists/drivers stating that it's too dangerous to cycle.
 There is no parallel target for pedestrian safety.
 <!-- To check -->
 
 A rapid evidence assessment was commissioned by the Department for Transport in 2018 to identify promising intervention types in support of walking and cycling safety [@natcen_cycling_2018].
-Section 6.1, focussed on infrastructure and road signs interventions, found that there is evidence for the effectiveness of a range of interventions can be effective in reducing casualty rates, including 'pedestrian refuge islands', speed humps and speed cameras.
+Section 6.1, focusing on infrastructure and road signs interventions, found that there is evidence for the effectiveness of a range of interventions can be effective in reducing casualty rates, including 'pedestrian refuge islands', speed humps and speed cameras.
 Evidence was also reviewed of the effectiveness of cycleways, junction/roundabout design, signal controls, street lighting and 'safe routes to school'.
 Section 6.2 found evidence of legislative changes, particularly speed limit reductions and expenditure on road safety policing.
 Again, no UK-specific studies were identified.
@@ -84,7 +84,7 @@ A 2 year road safety action plan was set out in 2019, although the emphasis of t
 
 The CWIS Safety Review provides the most detailed government document to date on road safety measures specifically designed to support walking and cycling and contained much evidence and a number of case studies of effective interventions [@departmentfortransport_cycling_2018].
 Chapter 5 of this review focusses on infrastructure, with comments on cycling design guidance which have since been incorporated into the widely used Design Manual for Roads and Bridges in May 2020 [@highwaysengland_cd_2020].
-There are still no legally binding national standards local authorities meaning that many cycleways do not meet guidance such as a 1.5 m minimum cycleway width.
+There are still no legally binding national standards for local authorities meaning that many cycleways do not meet guidance such as a 1.5 m minimum cycleway width.
 
 **An issue with the policy and research landscapes is that available evidence on road safety interventions is not easily actionable.** 
 An aim of this project is to make available evidence more actionable, while simultaneously generating more evidence of the effectiveness of different interventions.
@@ -94,18 +94,31 @@ An aim of this project is to make available evidence more actionable, while simu
 A wide range of interventions can be undertaken to support road safety objectives.
 Interventions that have been mentioned in the research and policy contexts above are outlined below, with reference to data availability.
 
-- Speed limit reductions include '20 mph limits' (implemented only via signalling) and '20 mph zones' (which can include optional measures including speed cameras) [@maher_20mph_2018; @rospa_guide_2019]
+- Speed limit reductions include '20 mph limits' (implemented only via signage) and '20 mph zones' (which involve physical traffic calming measures and can include optional measures such as speed cameras) [@maher_20mph_2018; @rospa_guide_2019]
   - Data on the prevalence of 20 mph zones can be obtained from OpenStreetMap, although it is not always clear when interventions took place.
   - The Ordnance Survey has data on legal speed limits and real world traffic speeds and we are in conversation with them to obtain these datasets for use in our work.
 - A related intervention is the installation of speed cameras. 
   - We are not aware of any national dataset on speed cameras that could be used for this study.
-- Traffic Regulation Orders reporting interventions such as one-way cycleway and other changes
+- Traffic Regulation Orders report interventions such as contraflow cycleways and other changes
   - Data on TROs should be available open access from https://www.thegazette.co.uk
-- The location and nature of physical infrastructure, including 'filtered permeability' interventions including and rising and fixed bollards, and a range of speed humps, plus a range of additional traffic calming measures [@departmentfortransport_traffic_2007]. These can be obtained from multiple sources, including:
+- The location and nature of physical traffic calming infrastructure, including various types of speed humps and raised junctions, plus a range of additional traffic calming measures [@departmentfortransport_traffic_2007]. These can be obtained from multiple sources, including:
   - Traffic calming infrastructure in OSM
   - The Cycling Infrastructure Database in London
   - Ordnance Survey Topo layer
+  
+## Other types of intervention
 
+Other interventions may not have been implemented primarily for road safety reasons, but may nevertheless reduce cycle and pedestrian casualty rates alongside other aims such as increasing cycling levels or reducing road traffic.
+
+- The installation of cycle superhighways or cycle lanes. 
+- 'Filtered permeability' interventions including point closures of roads, for example by rising and fixed bollards.
+- Larger scale interventions, including Mini-Holland schemes.
+
+Again, data sources for these measures will include:
+  - TfL Cycling Action Plan
+  - Cycling infrastructure in OSM
+  - The Cycling Infrastructure Database in London
+  - Ordnance Survey Topo layer
 
 **Todo: any more?**
 
@@ -202,10 +215,19 @@ Todo: Roger's bit here.
 
 # Analyis
 
-We have developed a methodology to estimate the crash rate per billion km for walking and cycling
+We have developed a methodology to estimate the casualty rate per billion km for walking and cycling.
 
-Todo: Joey's bit here
+Casualty data is available from stats19, broken down into fatal, serious and slight casualties. We have filtered these by mode of travel, identifying cyclist and pedestrian casualties. 
 
+To obtain KSI/bkm for cycle casualties, we have estimated the number of kilometers cycled in each London Borough. Using 2011 census data for travel to work and Cyclestreets.net 'fast' routing options, we create a route network. Each road segment within the route network is assigned to a London Borough based on its centroid location. Multiplying the number of cyclists using each segment by the length of the segment thus gives the number of km cycled within each Borough. 
+
+To obtain sufficient sample size we used stats19 casualty data for the years 2009 - 2013. However, our estimate of km cycled only covers one-way commuter journeys on a single day in 2011. Therefore we filter the stats19 data to include only accidents taking place during the rush hour peak periods (07:30-09:30 and 16:30-18:30). We then divided the number of casualties by two (to represent one-way journeys), then by five and again by 365 (to represent a single year and a single day). 
+
+Corrections were also made to account for changes in accident reporting systems. In recent years, police forces across the UK have switched to injury-based reporting systems. This has altered the proportions of casualties recorded as having 'severe' and 'slight' injuries. To control for these changes, casualty-level correction values were used, as recommended in XX.
+
+Initial results show some clear patterns. There is a strong negative correlation between km cycled and KSI/bkm. Inner London Boroughs have greater km cycled and lower KSI/bkm, despite having a higher total number of casualties. By contrast, Outer London Boroughs have fewer km cycled and higher KSI/bkm. The results for slight casualties closely mirror those for serious casualties and fatalities.
+
+We plan to use a similar method to estimate walking levels and KSI/bkm in each London Borough. This will also be based on travel to work 2011 census data.
 
 
 # References
