@@ -26,6 +26,7 @@ bibliography:
   # - ../saferroads.bib
   # - report1.bib
   - ../saferactive.bib
+  - ../saferactive1.bib
 ---
 
 ```{r, eval=FALSE, echo=FALSE}
@@ -223,12 +224,19 @@ To obtain KSI/bkm for cycle casualties, we have estimated the number of kilomete
 
 To obtain sufficient sample size we used stats19 casualty data for the years 2009 - 2013. However, our estimate of km cycled only covers one-way commuter journeys on a single day in 2011. Therefore we filter the stats19 data to include only accidents taking place during the rush hour peak periods (07:30-09:30 and 16:30-18:30). We then divided the number of casualties by two (to represent one-way journeys), then by five and again by 365 (to represent a single year and a single day). 
 
-Corrections were also made to account for changes in accident reporting systems. In recent years, police forces across the UK have switched to injury-based reporting systems. This has altered the proportions of casualties recorded as having 'severe' and 'slight' injuries. To control for these changes, casualty-level correction values were used, as recommended in XX.
+Corrections were also made to account for changes in accident reporting systems. In recent years, many police forces across the UK have switched to injury based reporting systems. This has altered the proportions of casualties recorded as having 'severe' and 'slight' injuries. To control for these changes, casualty-level correction values were used, as recommended in [@department_for_transport_annex_2019].
 
 Initial results show some clear patterns. There is a strong negative correlation between km cycled and KSI/bkm. Inner London Boroughs have greater km cycled and lower KSI/bkm, despite having a higher total number of casualties. By contrast, Outer London Boroughs have fewer km cycled and higher KSI/bkm. The results for slight casualties closely mirror those for serious casualties and fatalities.
 
+```{r fig1, fig.cap = "KSI and slight casualties per bkm for London Boroughs 2009 - 2013"}
+knitr::include_graphics("../figures/KSI-per-bkm.png")
+```
+
 We plan to use a similar method to estimate walking levels and KSI/bkm in each London Borough. This will also be based on travel to work 2011 census data.
 
+```{r fig2, fig.cap = "Relationship between KSI/bkm and number of km cycled in each Borough"}
+knitr::include_graphics("../figures/km-cycled-KSI.png")
+```
 
 # References
 

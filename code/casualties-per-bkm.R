@@ -1,4 +1,5 @@
 # Get pct commute data for London. Ensure journeys to/from outside London are included
+
 library(pct)
 library(tidyverse)
 library(mapview)
@@ -132,11 +133,35 @@ write_rds(rate_per_borough, "rate_per_borough.Rds")
 library(tmap)
 tmap_mode("view")
 
-tm_shape(rate_per_borough) +
-  tm_polygons("KSI_per_bkm")
+map1 = tm_shape(rate_per_borough) +
+  tm_polygons("KSI_per_bkm", title = "KSI/bkm")
+map2 = tm_shape(rate_per_borough) +
+  tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000), title = "Slight casualties/bkm")
+map3 = tm_shape(rate_per_borough) +
+  tm_polygons("km_cycled")
+map4 = tm_shape(rate_per_borough) +
+  tm_polygons("")
+tmap_arrange(map1, map2)
 
 mapview(rate_per_borough["KSI_per_bkm"])
 
+# Exponential decay graph
+
+# library(drc)
+# library(aomisc)
+#
+# negex = drm(KSI_per_bkm ~ km_cycled, data = rate_per_borough, fct = DRC.expoDecay())
+#
+# plot(negex)
+
 plot(KSI_per_bkm ~ km_cycled, data = rate_per_borough, xlab = "km cycled", ylab = "KSI per bkm 2009 - 2013", ylim = c(500,4100)) # strong exponential decay curve
 text(KSI_per_bkm ~ km_cycled, data = rate_per_borough, labels = rate_per_borough$Name, cex = 0.6, font = 2, pos = 3)
+
+# ggplot(df, aes(resp, trt)) +
+#   geom_point() +
+#   geom_text(aes(label = paste0("(", resp, ")")), nudge_y = -0.25) +
+#   xlim(1, 3.6)
+#
+# ggplot(rate_per_borough, aes(km_cycled, KSI_per_bkm)) +
+#   geom_point()
 
