@@ -204,6 +204,10 @@ We have explored visualisation options and we are using a state of the art R sol
 knitr::include_graphics("https://user-images.githubusercontent.com/408568/86475297-4e71f500-bd3c-11ea-921c-e4cca9683201.png")
 ```
 
+```{r vis, fig.cap="Using vector tiles to visualise large amounts of ata which can be cached and used offline in the browser and ability to interact with it"}
+knitr::include_graphics("figures/vector_tiles.png")
+```
+
 
 ## Heat map
 
