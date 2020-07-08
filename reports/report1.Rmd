@@ -235,13 +235,18 @@ Corrections were also made to account for changes in accident reporting systems.
 
 Initial results show some clear patterns. There is a strong negative correlation between km cycled and KSI/bkm. Inner London Boroughs have greater km cycled and lower KSI/bkm, despite having a higher total number of casualties. By contrast, Outer London Boroughs have fewer km cycled and higher KSI/bkm. The results for slight casualties closely mirror those for serious casualties and fatalities.
 
-```{r fig1, fig.cap = "KSI and slight casualties per bkm for London Boroughs 2009 - 2013"}
+```{r fig1, fig.cap = "Total km cycled (one-way commuter journeys from 2011 census) and total KSI (2009 - 2013) using casualty severity adjustments for non-injury based reporting systems"}
+knitr::include_graphics("../figures/total-km-KSI.png")
+```
+
+```{r fig2, fig.cap = "KSI and slight casualties per bkm for London Boroughs 2009 - 2013"}
 knitr::include_graphics("../figures/KSI-per-bkm.png")
 ```
 
+
 We plan to use a similar method to estimate walking levels and KSI/bkm in each London Borough. This will also be based on travel to work 2011 census data.
 
-```{r fig2, fig.cap = "Relationship between KSI/bkm and number of km cycled in each Borough"}
+```{r fig3, fig.cap = "Relationship between KSI/bkm and number of km cycled in each Borough"}
 knitr::include_graphics("../figures/km-cycled-KSI.png")
 ```
 

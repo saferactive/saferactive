@@ -119,10 +119,13 @@ rate_per_borough = inner_join(crashes_per_borough, summed, by = c("local_authori
   mutate(fatal_per_bkm = (cycle_fatal/365/5/2)/(km_cycled/1000000000),
          serious_per_bkm = (cycle_adjusted_serious/365/5/2)/(km_cycled/1000000000),
          slight_per_bkm = (cycle_adjusted_slight/365/5/2)/(km_cycled/1000000000),
-         KSI_per_bkm = ((cycle_fatal/365/5/2)+(cycle_adjusted_serious/365/5/2))/(km_cycled/1000000000))
+         KSI_per_bkm = ((cycle_fatal/365/5/2)+(cycle_adjusted_serious/365/5/2))/(km_cycled/1000000000),
+         total_KSI = cycle_fatal + cycle_adjusted_serious)
 
 rate_per_borough = inner_join(lads, rate_per_borough, by = c("Name" = "local_authority_district")) %>%
   select(-Level)
+
+rate_per_borough
 
 View(rate_per_borough)
 
@@ -138,10 +141,11 @@ map1 = tm_shape(rate_per_borough) +
 map2 = tm_shape(rate_per_borough) +
   tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000), title = "Slight casualties/bkm")
 map3 = tm_shape(rate_per_borough) +
-  tm_polygons("km_cycled")
+  tm_polygons("km_cycled", title = "Km cycled", breaks = c(0, 5000, 10000, 20000, 40000, 60000))
 map4 = tm_shape(rate_per_borough) +
-  tm_polygons("")
+  tm_polygons("total_KSI", title = "Total KSI")
 tmap_arrange(map1, map2)
+tmap_arrange(map3, map4)
 
 mapview(rate_per_borough["KSI_per_bkm"])
 
