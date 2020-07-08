@@ -139,7 +139,7 @@ tmap_mode("view")
 map1 = tm_shape(rate_per_borough) +
   tm_polygons("KSI_per_bkm", title = "KSI/bkm")
 map2 = tm_shape(rate_per_borough) +
-  tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000), title = "Slight casualties/bkm")
+  tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000), title = "Slight injuries/bkm")
 map3 = tm_shape(rate_per_borough) +
   tm_polygons("km_cycled", title = "Km cycled", breaks = c(0, 5000, 10000, 20000, 40000, 60000))
 map4 = tm_shape(rate_per_borough) +
