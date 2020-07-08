@@ -197,9 +197,12 @@ traffic_calming_osm_london %>%
 
 ## Interactive visualisation
 
-We have explored visualisation options.
+We have explored visualisation options and we are using a state of the art R solution to power our production web application. The technicalities of the solution can be added somewhere else in the project but the solution is a modern front with a RESETful API which would mean the data is available for the users for transparency and reuse. The other scalable front end solution we are currently developing for the purpose of this project is inspired the smartphone ecosystem.
 
-Todo: Layik's bit on geoplumber here...
+```{r vis, fig.cap="Using R to develop the fron-end using Turing eAtlas npm package"}
+knitr::include_graphics("https://user-images.githubusercontent.com/408568/86475297-4e71f500-bd3c-11ea-921c-e4cca9683201.png")
+```
+
 
 ## Heat map
 
