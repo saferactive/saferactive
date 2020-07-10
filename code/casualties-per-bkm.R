@@ -193,7 +193,7 @@ tmap_mode("view")
 map1 = tm_shape(rate_per_borough) +
   tm_polygons("KSI_per_bkm", title = "KSI/bkm")
 map2 = tm_shape(rate_per_borough) +
-  tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000), title = "Slight injuries/bkm")
+  tm_polygons("slight_per_bkm", breaks = c(0, 4000, 8000, 12000, 16000, 20000, 24000), title = "Slight injuries/bkm")
 map3 = tm_shape(rate_per_borough) +
   tm_polygons("km_cycled", title = "Km cycled", breaks = c(0, 5000, 10000, 20000, 40000, 60000))
 map4 = tm_shape(rate_per_borough) +
@@ -226,6 +226,10 @@ mapview(rate_per_borough["KSI_per_bkm"])
 
 plot(KSI_per_bkm ~ km_cycled, data = rate_per_borough, xlab = "km cycled", ylab = "KSI per bkm 2009 - 2013", ylim = c(500,4100)) # strong exponential decay curve
 text(KSI_per_bkm ~ km_cycled, data = rate_per_borough, labels = rate_per_borough$Name, cex = 0.6, font = 2, pos = 3)
+
+
+plot(w_KSI_per_bkm ~ km_walked, data = rate_per_borough, xlab = "km walked", ylab = "KSI per bkm 2009 - 2013", ylim = c(500,4100)) # strong exponential decay curve
+text(w_KSI_per_bkm ~ km_walked, data = rate_per_borough, labels = rate_per_borough$Name, cex = 0.6, font = 2, pos = 3)
 
 # ggplot(df, aes(resp, trt)) +
 #   geom_point() +
