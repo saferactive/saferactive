@@ -1,0 +1,23 @@
+"","casualty_type","casualty_type_simple","number_of_casualties"
+"1","Bus or coach occupant (17 or more pass seats)","BusOccupant",50976
+"2","Car occupant","CarOccupant",1127719
+"3","Cyclist","Cyclist",186472
+"4","Goods vehicle (7.5 tonnes mgw and over) occupant","HGVOccupant",8526
+"5","Goods vehicle (over 3.5t. and under 7.5t.) occupant","HGVOccupant",4200
+"6","Goods vehicle (unknown weight) occupant","HGVOccupant",878
+"7","Minibus (8 - 16 passenger seats) occupant","MinibusOccupant",5078
+"8","Electric motorcycle rider or passenger","MotorcycleOccupant",183
+"9","Motorcycle - unknown cc rider or passenger","MotorcycleOccupant",1144
+"10","Motorcycle 125cc and under rider or passenger","MotorcycleOccupant",73523
+"11","Motorcycle 50cc and under rider or passenger","MotorcycleOccupant",23897
+"12","Motorcycle over 125cc and up to 500cc rider or  passenger","MotorcycleOccupant",22307
+"13","Motorcycle over 500cc rider or passenger","MotorcycleOccupant",70988
+"14","Agricultural vehicle occupant","OtherOrUnknown",1026
+"15","Horse rider","OtherOrUnknown",1033
+"16","Mobility scooter rider","OtherOrUnknown",1120
+"17","Other vehicle occupant","OtherOrUnknown",8281
+"18","Tram occupant","OtherOrUnknown",113
+"19",NA,"OtherOrUnknown",10
+"20","Pedestrian","Pedestrian",246777
+"21","Taxi/Private hire car occupant","TaxiOccupant",28583
+"22","Van / Goods vehicle (3.5 tonnes mgw or under) occupant","VanOccupant",44943

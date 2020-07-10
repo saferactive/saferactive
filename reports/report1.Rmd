@@ -223,6 +223,21 @@ Todo: Roger's bit here.
 
 # Analyis
 
+## Simplification of vehicle types
+
+We have obtained UK road safety data from stats19 . In this dataset, vehicles and their occupants are identified using a detailed vehicle type classification. We have created a simplified form of this classification, to more clearly and simply represent the types of vehicles involved in collisions with cyclists or pedestrians. This reclassification system is codified as a function in our new `traffiCalmr` R package.
+
+The assignment of vehicles and casualties to simplified vehicle types and the numbers in each category are shown in Table 1 below.
+
+```{r table1, message = FALSE}
+readr::read_csv() %>%
+  kableExtra::kable(caption = "Original and simplified vehicle type categories and the number of vehicles and casualties assigned to each category, over the period 2009-2018", booktabs = T)
+```
+
+
+
+## Estimation of casualty rates per billion km
+
 We have developed a methodology to estimate the casualty rate per billion km for walking and cycling.
 
 Casualty data is available from stats19, broken down into fatal, serious and slight casualties. We have filtered these by mode of travel, identifying cyclist and pedestrian casualties. 
@@ -245,12 +260,14 @@ There is a strong negative relationship between km cycled and KSI/bkm. Inner Lon
 knitr::include_graphics("../figures/KSI-per-bkm.png")
 ```
 
-
-We plan to use a similar method to estimate walking levels and KSI/bkm in each London Borough. This will also be based on travel to work 2011 census data.
+Further analyses will examine the nature of the relationship between km cycled and KSI/bkm. Initial findings suggest that this may be a exponential decay relationship, as seen in Figure 3.
 
 ```{r fig3, fig.cap = "Relationship between KSI/bkm and number of km cycled in each Borough"}
 knitr::include_graphics("../figures/km-cycled-KSI.png")
 ```
+
+We plan to use a similar method to estimate walking levels and KSI/bkm in each London Borough. This will also be based on travel to work 2011 census data.
+
 
 # References
 

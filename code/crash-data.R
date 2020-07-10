@@ -16,7 +16,7 @@ casualties_cycle = casualties_all %>%
 casualties_ped = casualties_all %>%
   filter(casualty_type == "Pedestrian")
 
-saveRDS(casualties_active, "casualties_active.Rds")
+# saveRDS(casualties_active, "casualties_active.Rds")
 
 # Simplify casualty types and count active travel casualties -----------------------------------
 
@@ -27,11 +27,22 @@ casualties_all$casualty_type_simple[grepl("Pedestrian",casualties_all$casualty_t
 casualties_all$casualty_type_simple[grepl("otorcyc",casualties_all$casualty_type)] = "MotorcycleOccupant"
 casualties_all$casualty_type_simple[grepl("7.5",casualties_all$casualty_type)] = "HGVOccupant"
 casualties_all$casualty_type_simple[casualties_all$casualty_type == "Car occupant"] = "CarOccupant"
-casualties_all$casualty_type_simple[grepl("weight",casualties_all$casualty_type)] = "OtherGoodsOccupant"
+casualties_all$casualty_type_simple[grepl("weight",casualties_all$casualty_type)] = "HGVOccupant"
 casualties_all$casualty_type_simple[grepl("coach",casualties_all$casualty_type)] = "BusOccupant"
-casualties_all$casualty_type_simple[grepl("Van",casualties_all$casualty_type)] = "OtherGoodsOccupant"
+casualties_all$casualty_type_simple[grepl("Van",casualties_all$casualty_type)] = "VanOccupant"
 casualties_all$casualty_type_simple[grepl("Taxi",casualties_all$casualty_type)] = "TaxiOccupant"
+casualties_all$casualty_type_simple[grepl("Minibus",casualties_all$casualty_type)] = "MinibusOccupant"
 casualties_all$casualty_type_simple[is.na(casualties_all$casualty_type_simple)] = "OtherOrUnknown"
+
+casualty_types = casualties_all %>%
+  group_by(casualty_type, casualty_type_simple) %>%
+  tally()
+
+cas_table = casualty_types %>%
+  rename(number_of_casualties = n) %>%
+  arrange(casualty_type_simple)
+
+write.csv(cas_table, "cas_table.csv")
 
 ########## Join casualties to crashes using accident index
 crash_cas = inner_join(crashes_all, casualties_all, by = "accident_index")
@@ -132,11 +143,23 @@ vehicles_all$vehicle_type_simple[grepl("otorcyc",vehicles_all$vehicle_type)] = "
 vehicles_all$vehicle_type_simple[grepl("7.5",vehicles_all$vehicle_type)] = "HGV"
 vehicles_all$vehicle_type_simple[grepl("Pedal",vehicles_all$vehicle_type)] = "Bicycle"
 vehicles_all$vehicle_type_simple[vehicles_all$vehicle_type == "Car"] = "Car"
-vehicles_all$vehicle_type_simple[grepl("weight",vehicles_all$vehicle_type)] = "OtherGoods"
+vehicles_all$vehicle_type_simple[grepl("weight",vehicles_all$vehicle_type)] = "HGV"
 vehicles_all$vehicle_type_simple[grepl("coach",vehicles_all$vehicle_type)] = "Bus"
-vehicles_all$vehicle_type_simple[grepl("Van",vehicles_all$vehicle_type)] = "OtherGoods"
+vehicles_all$vehicle_type_simple[grepl("Van",vehicles_all$vehicle_type)] = "Van"
 vehicles_all$vehicle_type_simple[grepl("Taxi",vehicles_all$vehicle_type)] = "Taxi"
+vehicles_all$vehicle_type_simple[grepl("Minibus",vehicles_all$vehicle_type)] = "Minibus"
 vehicles_all$vehicle_type_simple[is.na(vehicles_all$vehicle_type_simple)] = "OtherOrUnknown"
+
+# Table of vehicle types
+vehicle_types = vehicles_all %>%
+  group_by(vehicle_type, vehicle_type_simple) %>%
+  tally()
+
+veh_table = vehicle_types %>%
+  rename(number_of_vehicles = n) %>%
+  arrange(vehicle_type_simple)
+
+write.csv(veh_table, "veh_table.csv")
 
 # Join vehicles to crashes using accident index
 crash_veh = inner_join(crashes_all, vehicles_all, by = "accident_index")
