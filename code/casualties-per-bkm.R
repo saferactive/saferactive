@@ -86,17 +86,19 @@ bike_sum = c_london %>%
 
 # Walking to work ---------------------------------------------------------
 
-walk = pct::get_pct_routes_fast(region = "london", purpose = "commute", geography = "lsoa")
+# walk = pct::get_pct_routes_fast(region = "london", purpose = "commute", geography = "lsoa")
+#
+# walk_lim = walk %>%
+#   select(1:12) %>%
+#   filter(foot > 0)
+#
+# write_rds(walk_lim, "walk.Rds")
+#
+# walk_net = stplanr::overline2(x = walk_lim, "foot")
+#
+# write_rds(walk_net, "walk_net.Rds")
 
-walk_lim = walk %>%
-  select(1:12) %>%
-  filter(foot > 0)
-
-write_rds(walk_lim, "walk.Rds")
-
-walk_net = stplanr::overline2(x = walk_lim, "foot")
-
-write_rds(walk_net, "walk_net.Rds")
+walk_net = readRDS("walk_net.Rds")
 
 walk_net$lengths = walk_net %>% st_transform(27700) %>%
   st_length() %>%
@@ -120,6 +122,8 @@ walk_sum = w_london %>%
 
 ##
 summed = inner_join(bike_sum, walk_sum, by = "Name")
+
+
 
 # Count cycle casualties within each London Borough
 crashes_active_london = readRDS("crashes_active_london.Rds")
