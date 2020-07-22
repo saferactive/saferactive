@@ -280,4 +280,5 @@ ped_veh_freqs = crashes_active_london %>%
 
 saveRDS(crashes_active_london, "crashes_active_london.Rds")
 piggyback::pb_upload("crashes_active_london.Rds")
-
+sf::write_sf(crashes_active_london, "crashes_active_london.geojson")
+piggyback::pb_upload("crashes_active_london.geojson")
