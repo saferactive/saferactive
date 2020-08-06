@@ -67,8 +67,7 @@ is relatively abundant:
     implementation of 20 mph zones will be collated from a range of
     sources, including via .gov.uk websites, newspaper articles and
     OpenStreetMap, building on research estimating the accuracy of
-    crowd-sourced road data
-    (<span class="citeproc-not-found" data-reference-id="barrington-leigh_worlds_2017">**???**</span>).
+    crowd-sourced road data (Barrington-Leigh and Millard-Ball 2017).
     <!-- ^[ -->
     <!-- The road charity Brake has informally offered to support the project with data provision. -->
     <!-- ] -->
@@ -146,10 +145,9 @@ guidance on integrated planning for urban transport contained in the
 by John Parkin on designing for cycle traffic (Parkin 2018) to ensure
 interventions are done as part of joined-up transport plans. On specific
 road traffic measures, we will direct people towards the Local Transport
-Note 01/07
-(<span class="citeproc-not-found" data-reference-id="department_for_transport_traffic_2007">**???**</span>),
-the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph
-zones in the House of Commons Briefing paper CBP00468.
+Note 01/07 (Department for Transport 2007), the Design Manual for Roads
+and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons
+Briefing paper CBP00468.
 
 # Ethical and Privacy Issues
 
@@ -333,6 +331,14 @@ stats19.geoplumber.com for interactive version.
 # References
 
 <div id="refs" class="references hanging-indent">
+
+<div id="ref-barrington-leigh_world_2017">
+
+Barrington-Leigh, Christopher, and Adam Millard-Ball. 2017. “The World’s
+User-Generated Road Map Is More Than 80% Complete.” *PLOS ONE* 12 (8):
+e0180698. <https://doi.org/10.1371/journal.pone.0180698>.
+
+</div>
 
 <div id="ref-bornioli_effectiveness_2018">
 

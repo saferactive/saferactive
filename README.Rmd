@@ -70,7 +70,7 @@ The focus of this study will be on three types of intervention, because these ha
 <!-- Geographic data has been made available on the distribrution of Glasgow's extensive 20 mph zones.^[ -->
 <!-- See http://www.gosafeglasgow.com/news/20-mph-zones. -->
 <!-- ] -->
-Data on the spatial extent, attributes and time of implementation of 20 mph zones will be collated from a range of sources, including via .gov.uk websites, newspaper articles and OpenStreetMap, building on research estimating the accuracy of crowd-sourced road data [@barrington-leigh_worlds_2017].
+Data on the spatial extent, attributes and time of implementation of 20 mph zones will be collated from a range of sources, including via .gov.uk websites, newspaper articles and OpenStreetMap, building on research estimating the accuracy of crowd-sourced road data [@barrington-leigh_world_2017].
 <!-- ^[ -->
 <!-- The road charity Brake has informally offered to support the project with data provision. -->
 <!-- ] -->
@@ -182,7 +182,7 @@ SaferActive will be a digital technology project using open data, with no direct
 We have good knowledge of guidance and the relevant regulations regarding road and street design and will use this to inform the scenarios of change represented in the application.
 Furthermore, users of the SaferActive web application should be aware of the relevant guidance.
 We will direct users towards guidance on integrated planning for urban transport contained in the *Design Manual for Urban Roads* [@lahart_design_2013] and the recent book by John Parkin on designing for cycle traffic [@parkin_designing_2018] to ensure interventions are done as part of joined-up transport plans.
-On specific road traffic measures, we will direct people towards the Local Transport Note 01/07 [@department_for_transport_traffic_2007], the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons Briefing paper CBP00468. 
+On specific road traffic measures, we will direct people towards the Local Transport Note 01/07 [@departmentfortransport_traffic_2007], the Design Manual for Roads and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons Briefing paper CBP00468. 
 
 
 
