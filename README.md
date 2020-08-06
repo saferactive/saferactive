@@ -26,16 +26,16 @@ reducing the number of people killed or seriously injured per billion km
 cycled year-on-year*.
 
 Data on cycling rates and future investment plans suggest that the
-cycling uptake target will be difficult to achieve
-(<span class="citeproc-not-found" data-reference-id="road_safety_gb_government_2019">**???**</span>).
-Much research funded in support of the CWIS, such as the Propensity to
-Cycle Tool (Lovelace et al. 2017), has focussed on boosting walking and
-cycling levels, with relatively little attention paid to safety, despite
-the fact that cycling and walking casualties have not fallen since the
-CWIS baseline year of 2013 (see Figure 1). Safety is a major barrier to
-greater uptake of cycling and walking (Horton 2016; Jacobsen, Racioppi,
-and Rutter 2009), with fear of collisions and “too much traffic” being
-the top two reasons cited in DfT research (Nathan 2019). <!-- ^[ -->
+cycling uptake target will be difficult to achieve (Road Safety GB
+2019). Much research funded in support of the CWIS, such as the
+Propensity to Cycle Tool (Lovelace et al. 2017), has focussed on
+boosting walking and cycling levels, with relatively little attention
+paid to safety, despite the fact that cycling and walking casualties
+have not fallen since the CWIS baseline year of 2013 (see Figure 1).
+Safety is a major barrier to greater uptake of cycling and walking
+(Horton 2016; Jacobsen, Racioppi, and Rutter 2009), with fear of
+collisions and “too much traffic” being the top two reasons cited in DfT
+research (Nathan 2019). <!-- ^[ -->
 <!-- https://www.rospa.com/rospaweb/docs/events/past-events/road-safety-conference-2019/jai-nathan.pdf -->
 <!-- ] -->
 
@@ -455,6 +455,13 @@ Safety Review.” Department for Transport.
 
 Parkin, John. 2018. *Designing for Cycle Traffic: International
 Principles and Practice*. ICE Publishing.
+
+</div>
+
+<div id="ref-roadsafetygb_government_2019">
+
+Road Safety GB. 2019. “Government Urged to Increase Funding for Walking
+and Cycling.”
 
 </div>
 

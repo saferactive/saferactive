@@ -50,7 +50,7 @@ Active transport can tackle some of the most pressing issues of the 21^st^ centu
 Recognising these wide ranging benefits, the government has ambitious targets for active transport, as outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@departmentfortransport_cycling_2017].
 Notably, the government aims to double cycling *whilst simultaneously reducing the number of people killed or seriously injured per billion km cycled year-on-year*.
 
-Data on cycling rates and future investment plans suggest that the cycling uptake target will be difficult to achieve [@road_safety_gb_government_2019].
+Data on cycling rates and future investment plans suggest that the cycling uptake target will be difficult to achieve [@roadsafetygb_government_2019].
 Much research funded in support of the CWIS, such as the Propensity to Cycle Tool [@lovelace_propensity_2017], has focussed on boosting walking and cycling levels, with relatively little attention paid to safety, despite the fact that cycling and walking casualties have not fallen since the CWIS baseline year of 2013 (see Figure 1).
 Safety is a major barrier to greater uptake of cycling and walking [@horton_fear_2016; @jacobsen_who_2009], with fear of collisions and "too much traffic" being the top two reasons cited in DfT research [@nathan_cycling_2019].
 <!-- ^[ -->
