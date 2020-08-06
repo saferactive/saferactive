@@ -20,11 +20,10 @@ and transport-related social exclusion (Lucas 2004; Johansson et al.
 the government has ambitious targets for active transport, as outlined
 in the Cycling and Walking Investment Strategy (CWIS): to double the
 number of stages cycled compared with the baseline year of 2013, and
-“reverse the decline in walking”
-(<span class="citeproc-not-found" data-reference-id="department_for_transport_cycling_2017">**???**</span>).
+“reverse the decline in walking” (Department for Transport 2017).
 Notably, the government aims to double cycling *whilst simultaneously
-reducing the number of people killed and seriously injured while cycling
-year-on-year*.
+reducing the number of people killed or seriously injured per billion km
+cycled year-on-year*.
 
 Data on cycling rates and future investment plans suggest that the
 cycling uptake target will be difficult to achieve
@@ -53,12 +52,11 @@ optional measures including speed cameras) (Maher 2018; ROSPA 2019),
 ‘filtered permeability’ interventions including and rising and fixed
 bollards, and a range of speed humps. A range of additional traffic
 calming measures is described in the DfT’s Local Transport Note (LTN)
-01/07
-(<span class="citeproc-not-found" data-reference-id="department_for_transport_traffic_2007">**???**</span>).
-The focus of this study will be on three types of intervention, because
-these have received attention from the perspective of active travel
-(Mulvaney et al. 2015), and because data on their spatial (and in some
-cases date of implementation) is relatively abundant:
+01/07 (Department for Transport 2007). The focus of this study will be
+on three types of intervention, because these have received attention
+from the perspective of active travel (Mulvaney et al. 2015), and
+because data on their spatial (and in some cases date of implementation)
+is relatively abundant:
 
   - 20 mph zones, which are well documented in a recent study by Maher
     (2018), and local case studies published for Bristol (Bornioli et
@@ -260,8 +258,7 @@ A recent conference paper by three of the team members shows we have a
 track record of collaboration on data science for road safety
 research.\[1\] We have also collaborated on writing a peer-reviewed R
 package called **stats19** for increasing public access to reproducible
-road safety research
-(<span class="citeproc-not-found" data-reference-id="lovelace_stats19:_2019">**???**</span>).
+road safety research (Lovelace et al. 2019).
 
 # Innovation
 
@@ -347,6 +344,20 @@ of Transport & Health* 11: 47–55.
 
 </div>
 
+<div id="ref-departmentfortransport_traffic_2007">
+
+Department for Transport. 2007. *Traffic Calming*. Local Transport Note,
+1/07. London: TSO.
+
+</div>
+
+<div id="ref-departmentfortransport_cycling_2017">
+
+———. 2017. “Cycling and Walking Investment Strategy.” London: Department
+for Transport.
+
+</div>
+
 <div id="ref-horton_fear_2016">
 
 Horton, Dave. 2016. “Fear of Cycling.” In *Cycling and Society*, 149–68.
@@ -389,6 +400,14 @@ Lovelace, Robin, Anna Goodman, Rachel Aldred, Nikolai Berkoff, Ali
 Abbas, and James Woodcock. 2017. “The Propensity to Cycle Tool: An Open
 Source Online System for Sustainable Transport Planning.” *Journal of
 Transport and Land Use* 10 (1). <https://doi.org/10.5198/jtlu.2016.862>.
+
+</div>
+
+<div id="ref-lovelace_stats19_2019">
+
+Lovelace, Robin, Malcolm Morgan, Layik Hama, and Mark Padgham. 2019.
+“Stats19: A Package for Working with Open Road Crash Data.” *Journal
+of Open Source Software*. <https://doi.org/10.21105/joss.01181>.
 
 </div>
 

@@ -47,8 +47,8 @@ pdftools::pdf_combine(input = c(
 <!-- *Please refer to relevant research and literature (where available) and any gaps in knowledge and explain how the proposal develops or adds to learning. Please also describe the extent of current provision or implementation of the measures the proposal seeks to develop and current evidence (if any) for their effectiveness.* -->
 
 Active transport can tackle some of the most pressing issues of the 21^st^ century, including air pollution, the obesity epidemic, and transport-related social exclusion [@lucas_running_2004; @johansson_impacts_2017; @saunders_what_2013].
-Recognising these wide ranging benefits, the government has ambitious targets for active transport, as outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@department_for_transport_cycling_2017].
-Notably, the government aims to double cycling *whilst simultaneously reducing the number of people killed and seriously injured while cycling year-on-year*.
+Recognising these wide ranging benefits, the government has ambitious targets for active transport, as outlined in the Cycling and Walking Investment Strategy (CWIS): to double the number of stages cycled compared with the baseline year of 2013, and "reverse the decline in walking" [@departmentfortransport_cycling_2017].
+Notably, the government aims to double cycling *whilst simultaneously reducing the number of people killed or seriously injured per billion km cycled year-on-year*.
 
 Data on cycling rates and future investment plans suggest that the cycling uptake target will be difficult to achieve [@road_safety_gb_government_2019].
 Much research funded in support of the CWIS, such as the Propensity to Cycle Tool [@lovelace_propensity_2017], has focussed on boosting walking and cycling levels, with relatively little attention paid to safety, despite the fact that cycling and walking casualties have not fallen since the CWIS baseline year of 2013 (see Figure 1).
@@ -63,7 +63,7 @@ Safety is a major barrier to greater uptake of cycling and walking [@horton_fear
 The research outlined in the previous paragraph suggests that road safety measures can be an effective way of meeting both the active travel uptake *and* the road safety targets in the CWIS.
 This raises the question: which road safety measures work best to protect pedestrians and cyclists?
 Recent research has found that a range of traffic calming measures can reduce casualty rates, including '20 mph limits' (implemented only via signalling) and '20 mph zones' (which can include optional measures including speed cameras) [@maher_20mph_2018; @rospa_guide_2019], 'filtered permeability' interventions including and rising and fixed bollards, and a range of speed humps.
-A range of additional traffic calming measures is described in the DfT's Local Transport Note (LTN) 01/07 [@department_for_transport_traffic_2007].
+A range of additional traffic calming measures is described in the DfT's Local Transport Note (LTN) 01/07 [@departmentfortransport_traffic_2007].
 The focus of this study will be on three types of intervention, because these have received attention from the perspective of active travel [@mulvaney_cycling_2015], and because data on their spatial (and in some cases date of implementation) is relatively abundant:
 
 - 20 mph zones, which are well documented in a recent study by @maher_20mph_2018, and local case studies published for Bristol [@bornioli_effectiveness_2018] and Greater London [@sarkar_street_2018]. 
@@ -287,7 +287,7 @@ He will be the technical lead, using cutting edge technology to deploy the resul
 A recent conference paper by three of the team members shows we have a track record of collaboration on data science for road safety research.^[
 See https://github.com/Robinlovelace/stats19-gisruk.
 ]
-We have also collaborated on writing a peer-reviewed R package called **stats19** for increasing public access to reproducible road safety research [@lovelace_stats19:_2019].
+We have also collaborated on writing a peer-reviewed R package called **stats19** for increasing public access to reproducible road safety research [@lovelace_stats19_2019].
 
 # Innovation
 <!-- *Innovative ideas with much potential road safety benefit are particularly sought by the Trust. Plans to roll out or scale up innovative approaches which have been successfully trialled and tested are also encouraged. The programme is not designed to cover the delivery costs of existing schemes but could cover the costs of evaluating an existing programme.* -->
