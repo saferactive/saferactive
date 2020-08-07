@@ -12,40 +12,7 @@ library(lubridate)
 # Count length of journeys within each London Borough
 lads = readRDS("lads.Rds")
 
-boroughs = c(
-  "Camden",
-  "Greenwich",
-  "Hackney",
-  "Hammersmith and Fulham",
-  "Islington",
-  "Kensington and Chelsea",
-  "Lambeth",
-  "Lewisham",
-  "Southwark",
-  "Tower Hamlets",
-  "Wandsworth",
-  "Westminster",
-  "Barking and Dagenham",
-  "Barnet",
-  "Bexley",
-  "Brent",
-  "Bromley",
-  "Croydon",
-  "Ealing",
-  "Enfield",
-  "Haringey",
-  "Harrow",
-  "Havering",
-  "Hillingdon",
-  "Hounslow",
-  "Kingston upon Thames",
-  "Merton",
-  "Newham",
-  "Redbridge",
-  "Richmond upon Thames",
-  "Sutton",
-  "Waltham Forest",
-  "City of London")
+boroughs = as.character(spData::lnd$NAME)
 
 lads = lads %>%
   filter(Name %in% boroughs)
@@ -70,6 +37,8 @@ r$lengths = r %>% st_transform(27700) %>%
 cent = r %>% st_transform(27700) %>%
   st_centroid() %>%
   st_transform(4326)
+
+saveRDS(cent, "cent.Rds")
 
 c_london = st_join(lads, cent, by = st_within)
 # mapview(c_london)
@@ -143,10 +112,10 @@ crashes_2009_13 = filter(crashes_active_london, year %in% years)
 crashes_peak = crashes_2009_13 %>%
   mutate(datetime = ymd_hms(datetime),
          time_est = as_hms(datetime)) %>%
-  filter((time_est >= hms::as_hms('07:30:00') &
-         time_est < hms::as_hms('09:30:00')) |
-           (time_est >= hms::as_hms('16:30:00') &
-              time_est < hms::as_hms('18:30:00')),
+  filter((time_est >= hms::as_hms('07:00:00') &
+         time_est < hms::as_hms('10:00:00')) |
+           (time_est >= hms::as_hms('16:00:00') &
+              time_est < hms::as_hms('19:00:00')),
          day_of_week != "Saturday",
          day_of_week != "Sunday")
 
@@ -189,6 +158,8 @@ View(rate_per_borough)
 plot(rate_per_borough)
 
 write_rds(rate_per_borough, "rate_per_borough.Rds")
+
+rate_per_borough = read_rds("rate_per_borough.Rds")
 
 library(tmap)
 tmap_mode("view")
