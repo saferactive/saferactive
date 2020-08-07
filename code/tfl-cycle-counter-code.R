@@ -2,7 +2,7 @@
 
 # To run this script and document the results...
 # # setwd("code"); knitr::spin(hair = "tfl-cycle-counter-code.R"); setwd("..")
-# rmarkdown::render("code/tfl-cycle-counter-code.R", output_file = "tfl-cycle-counter-code.md")
+# rmarkdown::render("code/tfl-cycle-counter-code.R", output_format = "github_document")
 
 base_url = "https://cycling.data.tfl.gov.uk/"
 central_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Central%20London%20(area).xlsx"
