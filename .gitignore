@@ -11,3 +11,6 @@ casualties_adjusted.Rds
 *.geojson
 *.html
 lads.Rds
+*.gif
+*.csv
+raw*
