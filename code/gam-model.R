@@ -24,16 +24,18 @@ theme_set(theme_bw())
 
 traffic_london = readRDS("traffic_london.Rds")
 
-
+# using bidirectional flows to match PCT, but since these are 7am-7pm this doesn't really reduce the increased residuals (+ve and -ve) at high predicted values (ie extreme variance in central london cycle flows)
 traffic_london_points = traffic_london %>%
-  select(year, count_date, local_authority_name, count_point_id, direction_of_travel, easting, northing, pedal_cycles) %>%
-  group_by(year, count_date, local_authority_name, count_point_id, direction_of_travel, easting, northing) %>%
+  select(year, count_date, local_authority_name, count_point_id, easting, northing, pedal_cycles) %>%
+  group_by(year, count_date, local_authority_name, count_point_id, easting, northing) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>%
   ungroup()
 
 traffic_london_bam = transform(traffic_london_points,
                        count_point_id = factor(count_point_id),
                        DoY = as.numeric(lubridate::yday(count_date)))
+
+summary(traffic_london_bam$pedal_cycles)
 
 # Investigate count point placements per year
 
@@ -91,24 +93,37 @@ M = list(c(1, 0.5), NA)
 # plot(m$terms)
 # termplot(m, terms = c("DoY", "I(DoY^2)"))
 
-m4 = bam(pedal_cycles ~
+# i think the model should be changed to negative binomial, so mean and variance don't need to be equal
+m = bam(pedal_cycles ~
            s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
            s(year) +
-           s(easting, northing, bs = 'ds', m = c(1, 0.5)) +
+           s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
            ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
                m = M),
          data = traffic_london_bam, method = 'fREML',
          nthreads = 4, discrete = TRUE)
-summary(m4)
-AIC(m, m4)
+summary(m)
 
-plot(m4, pages = 1, scheme = 2, shade = TRUE, scale = 0)
-plot(m4, pages = 1, scheme = 2, shade = TRUE)
+m2 = bam(pedal_cycles ~
+          s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+          s(year, k = 5) +
+          s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+          ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
+             m = M),
+        family = poisson(link = "log"),
+        data = traffic_london_bam, method = 'fREML',
+        nthreads = 4, discrete = TRUE)
+AIC(m, m2)
+
+plot(m2, pages = 1, scheme = 2, shade = TRUE, scale = 0)
+plot(m2, pages = 1, scheme = 2, shade = TRUE)
 
 # check model fit
-gam.check(m4)
-plot(traffic_london_bam$DoY, residuals(m4))
-plot(traffic_london_bam$year, residuals(m4))
+gam.check(m2)
+plot(traffic_london_bam$DoY, residuals(m2))
+plot(traffic_london_bam$year, residuals(m2))
+plot(traffic_london_bam$easting, residuals(m2))
+plot(traffic_london_bam$northing, residuals(m2))
 
 # rsd = residuals(m4,type="deviance")
 # gam(rsd~s(year,k=10)-1,data=traffic_london_bam,select=TRUE)
@@ -128,7 +143,7 @@ pdata = with(traffic_london_bam,
                           easting = seq(min(easting), max(easting), length = 100),
                           northing  = seq(min(northing), max(northing), length = 100)))
 # make predictions according to the GAM model
-fit = predict(m4, pdata)
+fit = predict(m2, pdata)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                        traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
