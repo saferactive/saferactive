@@ -34,6 +34,7 @@ traffic_london_points = traffic_london %>%
 
 traffic_london_bam = transform(traffic_london_points,
                        count_point_id = factor(count_point_id),
+                       local_authority_name = factor(local_authority_name),
                        DoY = as.numeric(lubridate::yday(count_date)))
 
 summary(traffic_london_bam$pedal_cycles)
@@ -120,16 +121,39 @@ m$family$getTheta(TRUE)
 #         data = traffic_london_bam, method = 'fREML',
 #         nthreads = 4, discrete = TRUE)
 
+## attempt to get random effects of borough
+# m3 = gamm(pedal_cycles ~
+#           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+#           s(year, k = 5),
+#           random = list(local_authority_name=~1)
+#          # + ti(local_authority_name, year, d = c(1,1), bs = c('re','tp'))
+#          ,
+#         family = negbin(theta = 0.9415, link = "log"),
+#         data = traffic_london_bam, method = 'fREML')
+# summary(m3)
+
+m4 = bam(pedal_cycles ~
+            s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+            s(year, k = 5) +
+            s(local_authority_name, bs = "re") +
+            ti(local_authority_name, year, d = c(1,1), bs = c('re','tp')),
+          family = nb(link = "log"),
+          data = traffic_london_bam, method = 'fREML')
+summary(m4)
+
+
 
 plot(m, pages = 1, scheme = 2, shade = TRUE, scale = 0)
-plot(m, pages = 1, scheme = 2, shade = TRUE)
+plot(m4, pages = 1, scheme = 2, shade = TRUE)
 
 # check model fit
-gam.check(m)
-plot(traffic_london_bam$DoY, residuals(m))
-plot(traffic_london_bam$year, residuals(m))
-plot(traffic_london_bam$easting, residuals(m))
-plot(traffic_london_bam$northing, residuals(m))
+gam.check(m4)
+plot(traffic_london_bam$DoY, residuals(m4))
+plot(traffic_london_bam$year, residuals(m4))
+plot(traffic_london_bam$easting, residuals(m4))
+plot(traffic_london_bam$northing, residuals(m4))
+
+plot(traffic_london_bam$local_authority_name, residuals(m4))
 
 # rsd = residuals(m4,type="deviance")
 # gam(rsd~s(year,k=10)-1,data=traffic_london_bam,select=TRUE)
@@ -179,3 +203,32 @@ ggplot(pred, aes(x = easting, y = northing)) +
 #
 # gganimate(p, 'london.gif', interval = .2, ani.width = 500, ani.height = 800)
 
+## Make predictions for individual locations
+pdata = with(traffic_london_bam,
+              expand.grid(DoY = 170,
+                          year = seq(min(year), max(year), length = 500),
+                          easting = 540000,
+                          northing  = 188000))
+fit <- data.frame(predict(m, newdata = pdata, se.fit = TRUE))
+fit <- transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit))
+pred <- cbind(pdata, fit)
+ggplot(pred, aes(x = year, y = fit)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
+  geom_line() +
+  labs(x = NULL, y = "Pedal cycles")
+
+## Make predictions for individual boroughs
+pdata = with(traffic_london_bam,
+             expand.grid(DoY = 170,
+                         year = seq(min(year), max(year), length = 19), # can change length to a higher number for smoother graphs
+                         local_authority_name = "Waltham Forest"))
+fit <- data.frame(predict(m4, newdata = pdata, se.fit = TRUE))
+fit <- transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
+pred <- cbind(pdata, fit)
+ggplot(pred, aes(x = year, y = fit)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
+  geom_line() +
+  labs(x = NULL, y = "Pedal cycles")
+
+# View the predictions
+pred$fit
