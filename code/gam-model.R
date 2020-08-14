@@ -19,6 +19,7 @@ library('mgcv')
 library('ggplot2')
 library('viridis')
 theme_set(theme_bw())
+library(gganimate)
 
 
 
@@ -86,6 +87,7 @@ M = list(c(1, 0.5), NA)
 #             s(easting, northing, bs = 'ds', m = c(1, 0.5)) +
 #             ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
 #                m = M),
+#             family = nb(link = "log"),
 #           data = traffic_london_bam, method = 'fREML',
 #           nthreads = 4, discrete = TRUE)
 # summary(m)
@@ -93,37 +95,41 @@ M = list(c(1, 0.5), NA)
 # plot(m$terms)
 # termplot(m, terms = c("DoY", "I(DoY^2)"))
 
-# i think the model should be changed to negative binomial, so mean and variance don't need to be equal
+# i think the model should be negative binomial, so mean and variance don't need to be equal
 m = bam(pedal_cycles ~
            s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
-           s(year) +
+           s(year, k = 5) +
            s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
            ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
                m = M),
+         family = nb(link = "log"),
          data = traffic_london_bam, method = 'fREML',
          nthreads = 4, discrete = TRUE)
 summary(m)
 
-m2 = bam(pedal_cycles ~
-          s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
-          s(year, k = 5) +
-          s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
-          ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
-             m = M),
-        family = poisson(link = "log"),
-        data = traffic_london_bam, method = 'fREML',
-        nthreads = 4, discrete = TRUE)
-AIC(m, m2)
+print(m)k
+m$family$getTheta(TRUE)
 
-plot(m2, pages = 1, scheme = 2, shade = TRUE, scale = 0)
-plot(m2, pages = 1, scheme = 2, shade = TRUE)
+# m2 = bam(pedal_cycles ~
+#           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+#           s(year, k = 5) +
+#           s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+#           ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
+#              m = M),
+#         family = poisson(link = "log"),
+#         data = traffic_london_bam, method = 'fREML',
+#         nthreads = 4, discrete = TRUE)
+
+
+plot(m, pages = 1, scheme = 2, shade = TRUE, scale = 0)
+plot(m, pages = 1, scheme = 2, shade = TRUE)
 
 # check model fit
-gam.check(m2)
-plot(traffic_london_bam$DoY, residuals(m2))
-plot(traffic_london_bam$year, residuals(m2))
-plot(traffic_london_bam$easting, residuals(m2))
-plot(traffic_london_bam$northing, residuals(m2))
+gam.check(m)
+plot(traffic_london_bam$DoY, residuals(m))
+plot(traffic_london_bam$year, residuals(m))
+plot(traffic_london_bam$easting, residuals(m))
+plot(traffic_london_bam$northing, residuals(m))
 
 # rsd = residuals(m4,type="deviance")
 # gam(rsd~s(year,k=10)-1,data=traffic_london_bam,select=TRUE)
@@ -143,7 +149,7 @@ pdata = with(traffic_london_bam,
                           easting = seq(min(easting), max(easting), length = 100),
                           northing  = seq(min(northing), max(northing), length = 100)))
 # make predictions according to the GAM model
-fit = predict(m2, pdata)
+fit = predict(m, pdata)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                        traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
@@ -160,4 +166,16 @@ ggplot(pred, aes(x = easting, y = northing)) +
         axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank())
+
+# ## Animated predictions
+#
+# p <- ggplot(pred, aes(x = easting, y = northing, frame = year)) +
+#   geom_raster(aes(fill = Fitted)) +
+#   scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+#                      na.value = 'transparent') +
+#   coord_quickmap() +
+#   theme(legend.position = 'top', legend.key.width = unit(2, 'cm'))+
+#   labs(x = 'easting', y = 'northing')
+#
+# gganimate(p, 'london.gif', interval = .2, ani.width = 500, ani.height = 800)
 
