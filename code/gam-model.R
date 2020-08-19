@@ -15,10 +15,12 @@
 # out(seasonallyadjusted)
 
 library(tidyverse)
-library('mgcv')
-library('ggplot2')
-library('viridis')
+library(mgcv)
+library(ggplot2)
+library(viridis)
+library(mapview)
 theme_set(theme_bw())
+library(ggpubr)
 
 
 
@@ -38,7 +40,8 @@ traffic_london_bam = transform(traffic_london_points,
 
 summary(traffic_london_bam$pedal_cycles)
 
-# Investigate count point placements per year
+
+#  Investigate count point numbers and placements per/across the year ----------------
 
 traffic_london_bam %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
@@ -54,13 +57,13 @@ traffic_london_bam %>%
   group_by(year) %>%
   count()
 
-library(ggpubr)
+
 
 # sampling by day of year. It starts slowly in march and goes on to november, very few counts in final weeks. No counts in August.
 ggdensity(traffic_london_bam, x = "DoY",
           fill = "#0073C2FF", color = "#0073C2FF",
           rug = TRUE)
-gghistogram(traffic_london_bam, x = "DoY", bins = 30,
+gghistogram(traffic_london_bam, x = "DoY", bins = 314,
             fill = "#0073C2FF", color = "#0073C2FF",
             rug = TRUE,
             xlab = "Day of Year",
@@ -77,7 +80,35 @@ gghistogram(traffic_london_bam, x = "year",
 ## plot density of sampling points across london spatially
 
 
-## Fit GAM model
+# Pre-process to remove multiple counts within the same grid square----------------------
+
+traffic_london_bam2 = traffic_london_bam %>%
+  mutate(grid_location = paste(signif(traffic_london_bam$easting, digits = 3),signif(traffic_london_bam$northing, digits = 3)))
+
+dim(traffic_london_bam2)
+length(unique(traffic_london_bam2$grid_location))
+
+sampleWithoutSurprises = function(x) {
+  if (length(x) <= 1) {
+    return(x)
+  } else {
+    return(sample(x,1))
+  }
+}
+
+#this simply takes the first row in each grid square. I should randomise which row is taken
+first_row = traffic_london_bam2 %>%
+  distinct(year, local_authority_name, grid_location, .keep_all = TRUE)
+
+traffic_london_bam = first_row
+
+
+
+
+# but how do I deal with the fact that nearby counts could be made on different dates?
+
+# Fit GAM model -----------------------------------------------------------
+
 
 M = list(c(1, 0.5), NA)
 
@@ -97,17 +128,17 @@ M = list(c(1, 0.5), NA)
 
 # i think the model should be negative binomial, so mean and variance don't need to be equal
 # should i constrict the knots for the interaction term?
+# m = bam(pedal_cycles ~
+#            s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+#            s(year, k = 5) +
+#            s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+#            ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
+#                m = M),
+#          family = nb(link = "log"),
+#          data = traffic_london_bam, method = 'fREML',
+#          nthreads = 4, discrete = TRUE)
+# summary(m)
 m = bam(pedal_cycles ~
-           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
-           s(year, k = 5) +
-           s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
-           ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
-               m = M),
-         family = nb(link = "log"),
-         data = traffic_london_bam, method = 'fREML',
-         nthreads = 4, discrete = TRUE)
-summary(m)
-m2 = bam(pedal_cycles ~
           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
           s(year, k = 5) +
           s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
@@ -160,7 +191,7 @@ plot(m, pages = 1, scheme = 2, shade = TRUE, scale = 0)
 plot(m4, pages = 1, scheme = 2, shade = TRUE)
 
 # check model fit
-gam.check(m)
+gam.check(m4)
 plot(traffic_london_bam$DoY, residuals(m4))
 plot(traffic_london_bam$year, residuals(m4))
 plot(traffic_london_bam$easting, residuals(m4))
@@ -177,7 +208,10 @@ plot(traffic_london_bam$local_authority_name, residuals(m4))
 
 
 
-## Make annual predictions for a set DoY (late June)
+# Easting/northing model predictions --------------------------------------
+
+
+## Make annual predictions for a set DoY (18th/19th June)
 
 # assign the framework that will be used as a basis for predictions
 pdata = with(traffic_london_bam,
@@ -197,7 +231,8 @@ pred = cbind(pdata, Fitted = fit)
 pred %>% filter(! is.na(Fitted)) %>% head()
 
 
-# Do these four years at a time and add in london borough boundaries
+# All years plotted together
+# Could try these four years at a time and add in london borough boundaries
 ggplot(pred, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
   scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
@@ -227,13 +262,17 @@ pdata = with(traffic_london_bam,
                           year = seq(min(year), max(year), length = 500),
                           easting = 540000,
                           northing  = 188000))
-fit <- data.frame(predict(m, type = "response", newdata = pdata, se.fit = TRUE))
-fit <- transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit))
-pred <- cbind(pdata, fit)
+fit = data.frame(predict(m, type = "response", newdata = pdata, se.fit = TRUE))
+fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit))
+pred = cbind(pdata, fit)
 ggplot(pred, aes(x = year, y = fit)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
   geom_line() +
   labs(x = NULL, y = "Pedal cycles")
+
+
+
+# Borough model predictions -----------------------------------------------
 
 ## Make predictions for individual boroughs
 boroughs = as.character(spData::lnd$NAME)
@@ -242,9 +281,9 @@ pdata = with(traffic_london_bam,
              expand.grid(DoY = 170,
                          year = seq(min(year), max(year), length = 19), # can change length to a higher number for smoother graphs
                         local_authority_name = "Southwark"))
-fit <- data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
-fit <- transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
-pred <- cbind(pdata, fit)
+fit = data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
+fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
+pred = cbind(pdata, fit)
 ggplot(pred, aes(x = year, y = fit)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
   geom_line() +
@@ -257,9 +296,9 @@ pdata = with(traffic_london_bam,
              expand.grid(DoY = 170,
                          year = seq(min(year), max(year), length = 19), # can change length to a higher number for smoother graphs
                          local_authority_name = boroughs))
-fit2 <- data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
-fit <- transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
-pred_all_boroughs <- cbind(pdata, fit)
+fit = data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
+fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
+pred_all_boroughs = cbind(pdata, fit)
 # (y axis has log10 scale)
 ggplot(pred_all_boroughs, aes(x = year, y = fit)) +
   scale_y_log10() +
@@ -307,5 +346,42 @@ View(adjust_join)
 
 
 # Compare GAM predictions to TfL cycle count predictions ------------------
+
+tfl_counts = read_csv("tfl-counter-results-london-boroughs-2015-2019.csv")
+
+ggplot(tfl_counts, aes(x = year, y = relative_to_2015)) +
+  geom_line(aes(color = Borough))
+
+dft_and_tfl = inner_join(pred_all_boroughs, tfl_counts, by = c("year", "local_authority_name" = "Borough"))
+
+plot(fit ~ mean_counts, data = dft_and_tfl, xlab = "TfL mean counts", ylab = "GAM model prediction from DfT counts")
+text(fit ~ mean_counts, data = dft_and_tfl, labels = local_authority_name, cex = 0.8)
+text(fit ~ mean_counts, data = dft_and_tfl, labels = year, cex = 0.8)
+
+
+# Compare DfT raw counts with TfL counts ----------------------------------
+
+raw_borough_counts = traffic_london_bam %>%
+  group_by(local_authority_name, year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+
+dft_raw_and_tfl = inner_join(raw_borough_counts, tfl_counts, by = c("year", "local_authority_name" = "Borough"))
+
+plot(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, xlab = "TfL mean counts", ylab = "DfT mean raw counts")
+text(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, labels = local_authority_name, cex = 0.8)
+text(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, labels = year, cex = 0.8)
+
+# there are not many counts per borough per year (eg City of London 2018), and these can be skewed by date and choice of count location, so the model predictions seem better than the raw counts as a basis for comparisons with other data
+# traffic_london_bam %>%
+#   filter(year == 2018,
+#          local_authority_name == "City of London")
+
+# Investigate Southwark counts --------------------------------------------
+
+# DfT counts are very heavily skewed towards the northern (central London) fringe of Southwark
+traffic_london_bam %>%
+  filter(local_authority_name == "Southwark") %>%
+  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
+  mapview::mapview()
 
 
