@@ -147,6 +147,8 @@ p2 = ggplot(active_long) +
   ylab("Distance (bkm)")
 library(patchwork)
 p1 + p2 + plot_layout(ncol = 1, heights = c(3, 1.6))
+ggsave(filename = "figures/casualties-2013-2018.png", width = 8, height = 6, dpi = 100)
+magick::image_read("figures/casualties-2013-2018.png")
 ```
 
 ```{r}
