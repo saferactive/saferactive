@@ -14,16 +14,25 @@ summary(traffic_data_original$longitude)
 summary(traffic_data_original$northing)
 summary(traffic_data_original$easting)
 
+# Kirkstall Road Leeds example
 counter_16598 = traffic_data_original %>%
   filter(count_point_id == "16598")
 
 counter_16598 %>%
   filter(year == 2016) %>%
-  summarise(pedal_cycles = sum(pedal_cycles)) # 326 why not 366???
+  summarise(pedal_cycles = sum(pedal_cycles)) # 326 why not 366 like in https://roadtraffic.dft.gov.uk/manualcountpoints/16598? this is because of adjustments made to the raw data
 counter_16598$link_length_km
 
-##London Boroughs
+# Remove unnecessary variables
+traffic_data_national = traffic_data_original %>%
+  select(count_point_id, direction_of_travel, year, count_date, hour, local_authority_id, local_authority_name, easting, northing, pedal_cycles)
 
+saveRDS(traffic_data_national, "traffic_data_national.Rds")
+
+# Select London data ------------------------------------------------------
+
+
+##London Boroughs
 lads = readRDS("lads.Rds")
 boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%

@@ -1,3 +1,5 @@
+
+
 library(tidyverse)
 library(mgcv)
 library(ggplot2)
@@ -19,8 +21,8 @@ traffic_london = readRDS("traffic_london.Rds")
 
 
 traffic_london_points = traffic_london %>%
-  select(year, count_date, local_authority_name, count_point_id, easting, northing, pedal_cycles) %>%
-  group_by(year, count_date, local_authority_name, count_point_id, easting, northing) %>%
+  select(year, count_date, hour, local_authority_name, count_point_id, easting, northing, pedal_cycles) %>%
+  group_by(year, count_date, hour, local_authority_name, count_point_id, easting, northing) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>%
   ungroup()
 
@@ -31,36 +33,47 @@ traffic_london_bam = transform(traffic_london_points,
 
 summary(traffic_london_bam$pedal_cycles)
 
+# Assign count points to 1km grid squares
+traffic_london_bam = traffic_london_bam %>%
+  mutate(grid_location = paste(signif(traffic_london_bam$easting, digits = 3),signif(traffic_london_bam$northing, digits = 3)))
+
+dim(traffic_london_bam)
+length(unique(traffic_london_bam$grid_location))
+
 
 #  Investigate count point numbers and placements per/across the year ----------------
+traffic_london_days = traffic_london_bam %>%
+  group_by(year, count_date, DoY, local_authority_name, count_point_id, easting, northing, grid_location) %>%
+  summarise(pedal_cycles = sum(pedal_cycles))
 
-traffic_london_bam %>%
+traffic_london_days %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
   filter(year == 2011) %>%
   mapview()
 
-traffic_london_bam %>%
+traffic_london_days %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
   filter(year == 2018) %>%
   mapview()
 
-traffic_london_bam %>%
+traffic_london_days %>%
   group_by(year) %>%
   count()
 
 
 
 # sampling by day of year. It starts slowly in march and goes on to november, very few counts in final weeks. No counts in August.
-ggdensity(traffic_london_bam, x = "DoY",
+ggdensity(traffic_london_days, x = "DoY",
           fill = "#0073C2FF", color = "#0073C2FF",
           rug = TRUE)
-gghistogram(traffic_london_bam, x = "DoY", bins = 314,
+gghistogram(traffic_london_days, x = "DoY", bins = 314,
             fill = "#0073C2FF", color = "#0073C2FF",
             # rug = TRUE,
             xlab = "Day of Year",
             ylab = "Number of cycle counts")
 
-counts_per_day = traffic_london_bam %>%
+# Get vector of days for which we have at least 10 counts
+counts_per_day = traffic_london_days %>%
   group_by(DoY) %>%
   tally()
 days_to_use = counts_per_day %>%
@@ -68,7 +81,7 @@ days_to_use = counts_per_day %>%
 days_to_use = days_to_use$DoY
 
 # sampling by year - there were more counts in 2008 and 2009 than other years
-gghistogram(traffic_london_bam, x = "year",
+gghistogram(traffic_london_days, x = "year",
             fill = "#0073C2FF", color = "#0073C2FF",
             bins = 19,
             rug = TRUE,
@@ -76,16 +89,19 @@ gghistogram(traffic_london_bam, x = "year",
             ylab = "Number of cycle counts")
 
 ## plot density of sampling points across london spatially
+grid_density = traffic_london_days %>%
+  group_by(year, grid_location) %>%
+  summarise(n = length(unique(count_point_id)))
 
+# ggplot(traffic_london_days, aes(x = easting, y = northing)) +
+#   geom_raster(aes(fill = grid_density$n)) +
+#   # facet_wrap(~ year, ncol = 5) +
+#   scale_fill_viridis(name = "Number of count points", option = 'plasma',
+#                      na.value = 'transparent') +
+#   coord_fixed(ratio = 1)
 
 # Pre-process for borough model to remove multiple counts within the same grid square----------------
 # this avoids the problem that nearby counts could be made on different dates
-
-traffic_london_bam = traffic_london_bam %>%
-  mutate(grid_location = paste(signif(traffic_london_bam$easting, digits = 3),signif(traffic_london_bam$northing, digits = 3)))
-
-dim(traffic_london_bam)
-length(unique(traffic_london_bam$grid_location))
 
 # sampleWithoutSurprises = function(x) {
 #   if (length(x) <= 1) {
@@ -147,16 +163,19 @@ M = list(c(1, 0.5), NA)
 
 # i think the model should be negative binomial, so mean and variance don't need to be equal
 # should i constrict the knots for the interaction term?
-# m2 = bam(pedal_cycles ~
-#            s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
-#            s(year, k = 10) +
-#            s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
-#            ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
-#                m = M, k = c(25, 10)),
-#          family = nb(link = "log"),
-#          data = traffic_london_bam, method = 'fREML',
-#          nthreads = 4, discrete = TRUE)
-# summary(m2)
+m = bam(pedal_cycles ~
+           s(hour) + #added in term for hour of day
+           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
+           s(year, k = 5) +
+           s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+           ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
+               m = M, k = c(25, 5)) +
+           ti(easting, northing, hour, d = c(2,1), bs = c('ds','tp'),
+              m = M, k = c(25, 5)),
+         family = nb(link = "log"),
+         data = traffic_london_bam, method = 'fREML',
+         nthreads = 4, discrete = TRUE)
+summary(m)
 
 m = bam(pedal_cycles ~
           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
@@ -171,13 +190,14 @@ m = bam(pedal_cycles ~
 print(m)
 m$family$getTheta(TRUE)
 
-AIC(m,m2)
+AIC(m,m3)
 
 plot(m, pages = 1, scheme = 2, shade = TRUE, scale = 0)
 plot(m, pages = 1, scheme = 2, shade = TRUE)
 
 # check model fit
 gam.check(m, pages = 1)
+plot(traffic_london_bam$hour, residuals(m))
 plot(traffic_london_bam$DoY, residuals(m))
 plot(traffic_london_bam$year, residuals(m))
 plot(traffic_london_bam$easting, residuals(m))
@@ -235,7 +255,7 @@ plot(one_per_square$local_authority_name, residuals(m4))
 
 # assign the framework that will be used as a basis for predictions
 pdata = with(traffic_london_bam,
-              expand.grid(
+              expand.grid(hour = seq(min(hour), max(hour), by = 1),
                 # DoY = 170,
                 DoY = days_to_use,
                           year = seq(min(year), max(year), by = 1),
@@ -252,6 +272,7 @@ pred_all_points = cbind(pdata, Fitted = fit)
 pred_all_points = pred_all_points %>%
   drop_na()
 
+saveRDS(pred_all_points, "pred_all_points.Rds")
 
 # All years plotted together
 # Could try these four years at a time and add in london borough boundaries
@@ -373,7 +394,7 @@ saveRDS(pred_all_boroughs, "borough-annual-predictions.Rds")
 # there is no linear relationship between `km_cycled` and `fit` because `fit` is the (gam modelled) estimate of the average daily cycle count for points within a borough, while `km_cycled` depends on the length of roads within the borough (and is for peak hour commutes only)
 
 # I multiply the model predicted counts by the total length of the PCT route network in each borough. This should be more a appropriate measure of exposure.
-
+# The count points have a link_length_km field, which could be used instead to make calculations base on specific road lengths. But there are so many smaller and residential roads without count points that this is likely to further skew results towards the main roads (which are likely to have longer link lengths)
 
 # find PCT route network length in each borough
 cent = readRDS("cent.Rds")
