@@ -57,6 +57,7 @@ summary(traffic_london$longitude)
 ## the latitude data has errors and should not be used. Eastings and northings are accurate.
 
 saveRDS(traffic_london, "traffic_london.Rds")
+piggyback::pb_upload("traffic_london.Rds")
 traffic_london = readRDS("traffic_london.Rds")
 
 traffic_london = traffic_london %>%
