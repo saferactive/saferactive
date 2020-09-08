@@ -351,19 +351,38 @@ saveRDS(pred_all_points_DoY, "predictions-by-DoY.Rds")
 # Assign raster cells to boroughs -----------------------------------------
 
 ## Get borough geometry and join with pred_all_points
-borough_geom = read_rds("rate_per_borough.Rds") %>%
+lads = readRDS("lads.Rds")
+boroughs = as.character(spData::lnd$NAME)
+lads = lads %>%
+  filter(Name %in% boroughs)
+
+borough_geom = lads %>%
   dplyr::select(Name) %>%
   st_transform(27700)
-pred_sf = pred_all_points %>%
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 point_to_borough = st_join(x = pred_sf, y = borough_geom)
-
 ## Calculate mean annual predictions for each borough
-pb_preds = point_to_borough %>%
+pb_preds_year = point_to_borough %>%
   drop_na() %>%
-  group_by(Name, year) %>%
+  group_by(Name, year, hour, DoY) %>%
   summarise(borough_mean_cycles = mean(Fitted))
-View(pb_preds)
+View(pb_preds_year)
+saveRDS(pb_preds_year, "predictions-borough-year.Rds")
+
+## Assign to borough for predictions by hour
+pred_sf = pred_all_points_hour %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean hourly predictions for each borough
+pb_preds_hour = point_to_borough %>%
+  drop_na() %>%
+  group_by(Name, hour, year, DoY) %>%
+  summarise(borough_mean_cycles = mean(Fitted))
+View(pb_preds_hour)
+saveRDS(pb_preds_hour, "predictions-borough-hour.Rds")
 
 # Borough model predictions -----------------------------------------------
 
@@ -420,10 +439,6 @@ saveRDS(pred_all_boroughs, "borough-annual-predictions.Rds")
 
 # find PCT route network length in each borough
 cent = readRDS("cent.Rds")
-lads = readRDS("lads.Rds")
-boroughs = as.character(spData::lnd$NAME)
-lads = lads %>%
-  filter(Name %in% boroughs)
 
 c_london = st_join(lads, cent, by = st_within)
 
