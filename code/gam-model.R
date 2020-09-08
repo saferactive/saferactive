@@ -471,9 +471,10 @@ text(fit_km ~ km_cycled, data = dft_and_pct, labels = local_authority_name, cex 
 
 cor(dft_and_pct$fit_km, dft_and_pct$km_cycled) #0.964
 
-# same for raster model predictions
+### same for raster model predictions
+
 # join route network length with model predictions
-pred_with_lengths_rast = pb_preds %>%
+pred_with_lengths_rast = pb_preds_year %>%
   st_drop_geometry() %>%
   mutate(Name = as.character(Name)) %>%
   inner_join(borough_network_length, by = "Name") %>%
@@ -482,7 +483,6 @@ pred_with_lengths_rast = pb_preds %>%
 pred_2011_rast = pred_with_lengths_rast %>%
   filter(year == 2011)
 
-
 # join model results for 2011 with PCT data
 rate_per_borough = read_rds("rate_per_borough.Rds") %>%
   st_drop_geometry()
@@ -490,10 +490,11 @@ rate_per_borough = read_rds("rate_per_borough.Rds") %>%
 dft_and_pct_rast = inner_join(pred_2011_rast, rate_per_borough, by = "Name")
 
 
-plot(fit_km ~ km_cycled, data = dft_and_pct_rast, log = "xy")
+plot(fit_km ~ km_cycled, data = dft_and_pct_rast, log = "xy", ylab = "Grid-derived GAM prediction (km)", xlab = "2011 census cycle commutes (km)")
 text(fit_km ~ km_cycled, data = dft_and_pct_rast, labels = Name, cex = 0.7, pos = 1)
 
-cor(dft_and_pct_rast$fit_km, dft_and_pct_rast$km_cycled) #0.980
+cor(dft_and_pct_rast$fit_km, dft_and_pct_rast$km_cycled) #0.990
+# cor was 0.980 in model without hour, and westminster was an outlier with lower fitted values. In model with hour this is no longer the case.
 
 
 # Get adjustment factors to use with annual stats19 data -------------------
