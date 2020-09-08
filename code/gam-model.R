@@ -46,15 +46,21 @@ traffic_london_days = traffic_london_bam %>%
   group_by(year, count_date, DoY, local_authority_name, count_point_id, easting, northing, grid_location) %>%
   summarise(pedal_cycles = sum(pedal_cycles))
 
+#Get London Borough boundaries for maps
+lads = readRDS("lads.Rds")
+boroughs = as.character(spData::lnd$NAME)
+lads = lads %>%
+  filter(Name %in% boroughs)
+
 traffic_london_days %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
-  filter(year == 2011) %>%
-  mapview()
+  # filter(year == 2011) %>%
+  mapview() + mapview(lads)
 
 traffic_london_days %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
   filter(year == 2018) %>%
-  mapview()
+  mapview() + mapview(lads)
 
 traffic_london_days %>%
   group_by(year) %>%
@@ -251,42 +257,28 @@ plot(one_per_square$local_authority_name, residuals(m4))
 # Easting/northing model predictions --------------------------------------
 
 
-## Make annual predictions for a set DoY (18th/19th June)
+## Make annual predictions while keeping DoY and hour constant
 
 # assign the framework that will be used as a basis for predictions
 pdata = with(traffic_london_bam,
-              expand.grid(hour = seq(min(hour), max(hour), by = 1),
-                # DoY = 170,
-                DoY = days_to_use,
+              expand.grid(hour = 10, DoY = 150,
                           year = seq(min(year), max(year), by = 1),
                           easting = seq(signif(min(easting), digits = 3), signif(max(easting), digits = 3), by = 1000), # changed this to make regular 1km grid squares
                           northing  = seq(signif(min(northing), digits = 3), signif(max(northing), digits = 3), by = 1000)))
 # make predictions according to the GAM model
-fit = predict(m, pdata, type = "response")
+fit_excl_DoYhour = predict(m, newdata = pdata, type = "response", exclude = c("DoY", "hour"), newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                        traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
-fit[ind] = NA
+fit_excl_DoYhour[ind] = NA
 # join the predictions with the framework data
-pred_all_points = cbind(pdata, Fitted = fit)
-pred_all_points = pred_all_points %>%
+pred_all_points_year = cbind(pdata, Fitted = fit_excl_DoYhour)
+pred_all_points_year = pred_all_points_year %>%
   drop_na()
 
-saveRDS(pred_all_points, "pred_all_points.Rds")
+saveRDS(pred_all_points_year, "predictions-by-year.Rds")
 
-# All years plotted together
-# Could try these four years at a time and add in london borough boundaries
-# library(tmap)
-# tmap_mode("view")
-# pred_tmap = pred_all_points %>%
-#   st_as_sf(coords = c("easting", "northing"), crs = 27700)
-#
-# tm_shape(pred_tmap) +
-#   tm_dots(col = "Fitted") +
-#   tm_facets(by = "year") +
-#   tmap_options(limits = c(facets.view = 19))
-
-ggplot(pred_all_points, aes(x = easting, y = northing)) +
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
   scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
                      na.value = 'transparent') +
@@ -298,31 +290,61 @@ ggplot(pred_all_points, aes(x = easting, y = northing)) +
         axis.text = element_blank(),
         axis.ticks = element_blank())
 
-# ## Animated predictions
-#
-# p <- ggplot(pred, aes(x = easting, y = northing, frame = year)) +
-#   geom_raster(aes(fill = Fitted)) +
-#   scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
-#                      na.value = 'transparent') +
-#   coord_quickmap() +
-#   theme(legend.position = 'top', legend.key.width = unit(2, 'cm'))+
-#   labs(x = 'easting', y = 'northing')
-#
-# gganimate(p, 'london.gif', interval = .2, ani.width = 500, ani.height = 800)
+## make predictions by hour
 
-## Make predictions for individual locations
 pdata = with(traffic_london_bam,
-              expand.grid(DoY = 170,
-                          year = seq(min(year), max(year), length = 500),
-                          easting = 540000,
-                          northing  = 188000))
-fit = data.frame(predict(m, type = "response", newdata = pdata, se.fit = TRUE))
-fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit))
-pred = cbind(pdata, fit)
-ggplot(pred, aes(x = year, y = fit)) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
-  geom_line() +
-  labs(x = NULL, y = "Pedal cycles")
+             expand.grid(hour = seq(min(hour), max(hour), by = 1),
+                         DoY = 150,
+                         year = 2011,
+                         easting = seq(signif(min(easting), digits = 3), signif(max(easting), digits = 3), by = 1000), # changed this to make regular 1km grid squares
+                         northing  = seq(signif(min(northing), digits = 3), signif(max(northing), digits = 3), by = 1000)))
+# make predictions according to the GAM model
+fit_hour = predict(m, pdata, type = "response", exclude = c("DoY", "year"))
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
+fit_hour[ind] = NA
+# join the predictions with the framework data
+pred_all_points_hour = cbind(pdata, Fitted = fit_hour)
+pred_all_points_hour = pred_all_points_hour %>%
+  drop_na()
+
+saveRDS(pred_all_points_hour, "predictions-by-hour.Rds")
+
+## make predictions by DoY
+
+pdata = with(traffic_london_bam,
+             expand.grid(hour = 10,
+                         DoY = days_to_use,
+                         year = 2011,
+                         easting = 530000,
+                         northing  = 180000))
+# make predictions according to the GAM model
+fit_DoY = predict.gam(m, pdata, type = "response", exclude = c("year", "hour", "easting", "northing"))
+# join the predictions with the framework data
+pred_all_points_DoY = cbind(pdata, Fitted = fit_DoY)
+
+# # `exclude` doesn't seem to be doing anything. Why is this?
+# fit_DoY2 = predict.gam(m, pdata, type = "response")
+# # join the predictions with the framework data
+# pred_all_points_DoY2 = cbind(pdata, Fitted = fit_DoY2)
+# identical(fit_DoY, fit_DoY2)
+
+saveRDS(pred_all_points_DoY, "predictions-by-DoY.Rds")
+
+# ## Make predictions for individual locations
+# pdata = with(traffic_london_bam,
+#               expand.grid(DoY = 170,
+#                           year = seq(min(year), max(year), length = 500),
+#                           easting = 540000,
+#                           northing  = 188000))
+# fit = data.frame(predict(m, type = "response", newdata = pdata, se.fit = TRUE))
+# fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit))
+# pred = cbind(pdata, fit)
+# ggplot(pred, aes(x = year, y = fit)) +
+#   geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
+#   geom_line() +
+#   labs(x = NULL, y = "Pedal cycles")
 
 
 
@@ -526,6 +548,9 @@ cor(dft_raw_and_tfl$pedal_cycles, dft_raw_and_tfl$mean_counts) #0.860
 traffic_london_bam %>%
   filter(local_authority_name == "Southwark") %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
-  mapview::mapview()
+  mapview::mapview() +
+lads %>%
+  filter(Name == "Southwark") %>%
+  mapview()
 
 
