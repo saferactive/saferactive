@@ -2,14 +2,17 @@
 remotes::install_github("itsleeds/osmextract")
 library(osmextract)
 library(dplyr)
-osm_lines = oe_get("Greater London", extra_tags = c("ref", "maxspeed"))
-names(osm_lines)
-waterloo = osm_lines %>%
-  filter(name == "Waterloo Bridge")
-
-waterloo_buffer = waterloo %>%
-  sf::st_union() %>%
-  stplanr::geo_buffer(dist = 1000)
+library(progress)
+#osm_lines = oe_get("Greater London", extra_tags = c("ref", "maxspeed"))
+osm_lines = oe_read("E:/OneDrive - University of Leeds/wheretolive/data/otp/graphs/wy/wy.osm.pbf",
+                    extra_tags = c("ref", "maxspeed"))
+# names(osm_lines)
+# waterloo = osm_lines %>%
+#   filter(name == "Waterloo Bridge")
+#
+# waterloo_buffer = waterloo %>%
+#   sf::st_union() %>%
+#   stplanr::geo_buffer(dist = 5000)
 
 
 
@@ -41,62 +44,136 @@ osm_get_junctions <- function(x){
   points <- sf::st_cast(x,"MULTIPOINT")
   points <- points$geometry
   points <- sf::st_cast(points,"POINT")
-  points <- points[duplicated(points)]
-  points <- points[!duplicated(points)]
+  dup <- duplicated(points)
+  points <- points[dup]
+  points <- points[!dup]
   points
 }
 
 # TODP: TRY BUFFER AND UNION
+# cluster_junction <- function(x){
+#   buff <- sf::st_buffer(x, 15)
+#   ints <- sf::st_intersects(buff)
+#   ints_lths <- lengths(ints)
+#   buff_single <- buff[lengths(ints) == 1]
+#   buff_many <- buff[lengths(ints) > 1]
+#   buff_many <- sf::st_buffer(sf::st_union(buff_many), 2)
+#   buff_many <- sf::st_cast(buff_many, "POLYGON")
+#   buff_many <- sf::st_simplify(buff_many, dTolerance = 5)
+#   res <- c(buff_single, buff_many)
+#   return(res)
+# }
+
 cluster_junction <- function(x){
-  buff <- sf::st_buffer(x, 15)
+  buff <- sf::st_buffer(x, dist = 15, nQuadSegs = 15)
   ints <- sf::st_intersects(buff)
-  ints_lths <- lengths(ints)
-  buff_single <- buff[lengths(ints) == 1]
-  buff_many <- buff[lengths(ints) > 1]
-  buff_many <- sf::st_buffer(sf::st_union(buff_many), 2)
-  buff_many <- sf::st_cast(buff_many, "POLYGON")
-  buff_many <- sf::st_simplify(buff_many, dTolerance = 5)
-  res <- c(buff_single, buff_many)
-  return(res)
-  mapview::mapview(buff_many)
+  message("Clustering Junctions")
+  ints_clus <- cluster_ints(ints)
+  ints_clus <- ints_clus[lengths(ints_clus) > 0]
 
-  # nn <- nngeo::st_nn(x, x, maxdist = 50, k = length(x))
-  # nn <- nn[lengths(nn) > 3]
-  #
-  # foo <- x[unique(unlist(nn))]
-  # mapview::mapview(foo)
-  # points <- leaderCluster::leaderCluster(sf::st_coordinates(sf::st_transform(foo, 4326)), radius = 0.1, distance = "haversine")
+  message("Creating Geometries")
+  geoms <- list()
+  pb <- progress_bar$new(total = length(ints_clus))
+  for(i in seq_len(length(ints_clus))){
+    pb$tick()
+    sub <- buff[ints_clus[[i]]]
+    if(length(sub) == 1){
+      geoms[[i]] <- sub[[1]]
+    } else {
+      geoms[[i]] <- sf::st_union(sub)[[1]]
+    }
 
-
-  # clust <- points$cluster_centroids
-  # clust <- as.data.frame(clust)
-  # names(clust) <- c("X","Y")
-  # clust <- sf::st_as_sf(clust, coords = c("X","Y"), crs = 4326)
-  # clust <- sf::st_buffer(clust, 0.0005)
-  #
-  # clust <- sf::st_sf(data.frame(id = points$cluster_id, geometry = foo), crs = 27700, stringsAsFactors = FALSE)
-  # clust_count <- clust$id[duplicated(clust$id)]
-  # clust_one <- clust[!clust$id %in% clust_count,]
-  # clust_many <- clust[clust$id %in% clust_count,]
-  #
-  # clust_many <- dplyr::group_by(clust_many, id)
-  # clust_many <- dplyr::summarise(clust_many)
-  # clust_many <- sf::st_convex_hull(clust_many)
-  # clust_many <- sf::st_buffer(clust_many, 10)
-  # mapview::mapview(clust_many)
-  #
-  # mapview::mapview(clust) + mapview::mapview(junctions, color = "red")
+  }
+  attributes(geoms) <- attributes(buff)
+  return(geoms)
 }
 
 
-osm_case_study = osm_lines[waterloo_buffer, , op = sf::st_within]
-mapview::mapview(osm_case_study)
+# bench::mark(simp = sf::st_union(buff[ints_clus[[3]]]),
+#             comp = {if(length(ints_clus[[3]]) == 1){
+#               buff[ints_clus[[3]]]
+#             }})
 
-osm_case_study <- sf::st_transform(osm_case_study, 27700)
-osm_case_study <- osm_main_roads(osm_case_study)
-osm_case_study <- osm_consolidate(osm_case_study)
-junctions <- osm_get_junctions(osm_case_study)
+
+
+cluster_ints <- function(x){
+  res <- list()
+  pb <- progress_bar$new(total = length(x))
+  for(i in seq_len(length(x))){
+    pb$tick()
+    if(length(x[[i]]) == 1){
+      if(!is.na(x[[i]])){
+        # Single Junction
+        res[[i]] <- x[[i]]
+      }
+      # Else move on
+    } else {
+      # Multi-Junction Cluster
+      sub <- recursive_ints(x[[i]], x = x)
+      res[[i]] <- sub
+      x[sub] <- NA
+    }
+  }
+  return(res)
+}
+
+
+
+
+
+recursive_ints <- function(sub, x){
+  sub <- unique(sub)
+  sub <- sub[order(sub)]
+
+  sub2 <- unique(unlist(x[sub]))
+  sub2 <- sub2[order(sub2)]
+
+  if(identical(sub, sub2)){
+    return(sub)
+  } else {
+    return(recursive_ints(sub2, x = x))
+  }
+
+}
+
+
+osm <- osm_main_roads(osm_lines)
+osm <- sf::st_transform(osm, 27700)
+osm <- osm_consolidate(osm)
+junctions <- osm_get_junctions(osm)
 junctions <- cluster_junction(junctions)
-mapview::mapview(osm_case_study) + mapview::mapview(junctions)
 
 
+stats19::dl_stats19(2018, type = "Accidents")
+crash <- stats19::get_stats19(2018, type = "Accidents", output_format = "sf")
+crash <- crash[crash$police_force == "West Yorkshire", ]
+
+
+# Match Crash to road and junction
+
+
+crash_road <- crash[crash$junction_detail %in% c("Not at junction or within 20 metres",
+                                                 "Private drive or entrance"),]
+crash_junction <- crash[!crash$junction_detail %in% c("Not at junction or within 20 metres",
+                                                 "Private drive or entrance"),]
+
+# Need nearest line not heares centroid of line
+
+
+nn_line <- function(point, lines){
+  cents <- sf::st_centroid(lines)
+  nn <- nngeo::st_nn(point, cents, k = 10)
+
+  res <- list()
+  for(i in seq_len(nrow(point))){
+    nnsub <- nn[[i]]
+    sub <- unlist(nngeo::st_nn(point$geometry[i], lines$geometry[nnsub], progress = FALSE))
+    res[[i]] <- nnsub[sub]
+  }
+  return(res)
+
+}
+
+
+system.time(bar <- nn_line(crash_road[1:2,], osm)) # fast
+system.time(foo <- nngeo::st_nn(crash_road[1:2], osm)) # slow
