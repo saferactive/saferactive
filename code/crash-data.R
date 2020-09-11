@@ -31,7 +31,6 @@ casualties_all$casualty_type_simple[grepl("weight",casualties_all$casualty_type)
 casualties_all$casualty_type_simple[grepl("coach",casualties_all$casualty_type)] = "BusOccupant"
 casualties_all$casualty_type_simple[grepl("Van",casualties_all$casualty_type)] = "VanOccupant"
 casualties_all$casualty_type_simple[grepl("Taxi",casualties_all$casualty_type)] = "TaxiOccupant"
-casualties_all$casualty_type_simple[grepl("Minibus",casualties_all$casualty_type)] = "MinibusOccupant"
 casualties_all$casualty_type_simple[is.na(casualties_all$casualty_type_simple)] = "OtherOrUnknown"
 
 casualty_types = casualties_all %>%
@@ -42,7 +41,7 @@ cas_table = casualty_types %>%
   rename(number_of_casualties = n) %>%
   arrange(casualty_type_simple)
 
-write.csv(cas_table, "cas_table.csv")
+write_csv(cas_table, "cas_table.csv")
 
 ########## Join casualties to crashes using accident index
 crash_cas = inner_join(crashes_all, casualties_all, by = "accident_index")
@@ -147,7 +146,6 @@ vehicles_all$vehicle_type_simple[grepl("weight",vehicles_all$vehicle_type)] = "H
 vehicles_all$vehicle_type_simple[grepl("coach",vehicles_all$vehicle_type)] = "Bus"
 vehicles_all$vehicle_type_simple[grepl("Van",vehicles_all$vehicle_type)] = "Van"
 vehicles_all$vehicle_type_simple[grepl("Taxi",vehicles_all$vehicle_type)] = "Taxi"
-vehicles_all$vehicle_type_simple[grepl("Minibus",vehicles_all$vehicle_type)] = "Minibus"
 vehicles_all$vehicle_type_simple[is.na(vehicles_all$vehicle_type_simple)] = "OtherOrUnknown"
 
 # Table of vehicle types
@@ -159,7 +157,7 @@ veh_table = vehicle_types %>%
   rename(number_of_vehicles = n) %>%
   arrange(vehicle_type_simple)
 
-write.csv(veh_table, "veh_table.csv")
+write_csv(veh_table, "veh_table.csv")
 
 # Join vehicles to crashes using accident index
 crash_veh = inner_join(crashes_all, vehicles_all, by = "accident_index")
@@ -194,7 +192,7 @@ crashes_joined = inner_join(crashes_all, conc, by = "accident_index")
 #   filter(accident_index %in% casualties_ped$accident_index)
 #
 # crashes_joined$cycle_casualty = ifelse(crashes_joined$accident_index %in% crashes_cycle$accident_index, "yes", "no")
-# crashes_joined$ualty = ifelse(crashes_joined$accident_index %in% crashes_ped$accident_index, "yes", "no")
+# crashes_joined$ped_casualty = ifelse(crashes_joined$accident_index %in% crashes_ped$accident_index, "yes", "no")
 
 crashes_joined = crashes_joined %>%
   left_join(cycle_count, by = "accident_index") %>%
@@ -207,7 +205,8 @@ crashes_joined = crashes_joined %>%
          ped_adjusted_slight = Adjusted_Slight) %>%
   mutate_at(vars(cycle_fatal:ped_adjusted_slight), ~replace(., is.na(.), 0))
 
-# saveRDS(crashes_joined, "crashes_joined.Rds")
+saveRDS(crashes_joined, "crashes_joined.Rds")
+piggyback::pb_upload("crashes_joined.Rds")
 
 # This only includes the crashes containing a cyclist or pedestrian casualty.
 crashes_active_casualties = crashes_joined %>%
@@ -221,12 +220,12 @@ crashes_bicycle = crashes_joined %>%
 crashes_bicycle_injured = crashes_joined %>%
   filter(
     grepl('Bicycle', veh_list),
-    cycle_casualties > 0)
+    (cycle_fatal > 0 | cycle_adjusted_serious > 0 | cycle_adjusted_slight >0))
 
 crashes_bicycle_uninjured = crashes_joined %>%
   filter(
     grepl('Bicycle', veh_list),
-    cycle_casualties == 0)
+    (cycle_fatal == 0 & cycle_adjusted_serious == 0 & cycle_adjusted_slight == 0))
 
 # Data for London ---------------------------------------------------------
 
@@ -261,7 +260,7 @@ crashes_active_london = crashes_active_london %>%
          number_cars = str_count(crashes_active_london$veh_list, "Car"),
          number_HGVs = str_count(crashes_active_london$veh_list, "HGV"),
          number_motorcycles = str_count(crashes_active_london$veh_list, "Motorcycle"),
-         number_othergoods = str_count(crashes_active_london$veh_list, "OtherGoods"),
+         number_vans = str_count(crashes_active_london$veh_list, "Van"),
          number_otherunknown = str_count(crashes_active_london$veh_list, "OtherOrUnknown"),
          number_taxis = str_count(crashes_active_london$veh_list, "Taxi")
   )
