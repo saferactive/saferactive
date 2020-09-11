@@ -206,6 +206,7 @@ crashes_joined = crashes_joined %>%
   mutate_at(vars(cycle_fatal:ped_adjusted_slight), ~replace(., is.na(.), 0))
 
 saveRDS(crashes_joined, "crashes_joined.Rds")
+piggyback::pb_upload("crashes_joined.Rds")
 
 # This only includes the crashes containing a cyclist or pedestrian casualty.
 crashes_active_casualties = crashes_joined %>%
