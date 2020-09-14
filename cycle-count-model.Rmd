@@ -86,6 +86,8 @@ Using this model we generate predictions for the full range of each parameter fo
 
 With cycle count data from a given locality, these predictions can be used to produce correction factors. It is then possible to predict the expected counts at different points in time. For example, given count data from 08:00 - 09:00 on a day in April 2010, the expected number of cyclists passing the same location at 15:00 - 16:00 in September 2015 could be inferred.
 
+## Estimation of confidence intervals
+
 <!-- ## R function -->
 
 <!-- We have written an R function that computes these predictions.  -->
