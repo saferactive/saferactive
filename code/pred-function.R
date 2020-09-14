@@ -46,16 +46,16 @@ joined_hour = joined_hour %>%
   mutate(predicted_bicycles = correction_factor_hour*Fitted)
 # View(joined_hour)
 hour_adjustment = joined_hour %>%
-  mutate(predicted_bicycles = predicted_bicycles/existing_count$bicycles) %>%
-  select(hour, predicted_bicycles)
+  mutate(predict_hour = predicted_bicycles/existing_count$bicycles) %>%
+  select(hour, predict_hour)
 
 joined_DoY = left_join(new_DoY, existing_count, by = c("DoY", "year", "hour", "easting", "northing"))
 joined_DoY = joined_DoY %>%
   mutate(predicted_bicycles = correction_factor_DoY*Fitted)
 # View(joined_DoY)
 DoY_adjustment = joined_DoY %>%
-  mutate(predicted_bicycles = predicted_bicycles/existing_count$bicycles) %>%
-  select(DoY, predicted_bicycles)
+  mutate(predict_DoY = predicted_bicycles/existing_count$bicycles) %>%
+  select(DoY, predict_DoY)
 
 joined_year = left_join(new_year, existing_count, by = c("DoY", "year", "hour", "easting", "northing"))
 joined_year = joined_year %>%
@@ -63,12 +63,10 @@ joined_year = joined_year %>%
 # View(joined_year)
 # year_adjustment = joined_year$predicted_bicycles/existing_count$bicycles
 year_adjustment = joined_year %>%
-  mutate(predicted_bicycles = predicted_bicycles/existing_count$bicycles) %>%
-  select(year, predicted_bicycles)
+  mutate(predict_year = predicted_bicycles/existing_count$bicycles) %>%
+  select(year, predict_year)
 
 # get the full new predictions
-full_predictions = data.frame(hour = desired_hour, DoY = desired_DoY, year = desired_year, predicted_bicycles = NA)
-
 existing_hour = existing_count %>%
   select(hour, bicycles) %>%
   rename(count_hour = bicycles)
@@ -77,14 +75,21 @@ existing_DoY = existing_count %>%
   select(DoY, bicycles) %>%
   rename(count_DoY = bicycles)
 
-left_join(full_predictions, existing_hour, by = c("hour"))
-left_join(full_predictions, existing_DoY, by = c("DoY"))
+existing_year = existing_count %>%
+  select(year, bicycles) %>%
+  rename(count_year = bicycles)
+
+full_predictions = data.frame(hour = desired_hour, DoY = desired_DoY, year = desired_year) %>%
+  inner_join(hour_adjustment, by = "hour") %>%
+  inner_join(DoY_adjustment, by = "DoY") %>%
+  inner_join(year_adjustment, by = "year") %>%
+  left_join(existing_hour, by = "hour") %>%
+  left_join(existing_DoY, by = "DoY") %>%
+  left_join(existing_year, by = "year")
+full_predictions$original = existing_count$bicycles
+
+full_predictions = full_predictions %>%
+  mutate(final_prediction = original * predict_hour * predict_DoY * predict_year) %>%
+  select(hour, DoY, year, final_prediction)
 
 
-full_predictions$predicted_bicycles =
-
-
-# joined %>%
-#   filter(DoY == 150, year == 2011, hour == 10, easting == 531000, northing == 180000) %>%
-#   View()
-# View(joined)
