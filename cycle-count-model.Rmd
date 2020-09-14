@@ -1,0 +1,49 @@
+---
+title: "Predicting cycle flows through time and space"
+author: "Joey Talbot"
+date: "08/09/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+Using cycle count data from the UK's Department for Transport, we develop a GAM model to predict temporal and spatial variation in cyclist numbers on UK roads. 
+Our model predictions closely correlate with an independent set of cycle count data. 
+These results can be used as correction factors to compare counts taken at different times.
+
+# Introduction
+
+In view of the major global challenges of climate change, poor health, air pollution and traffic congestion, cycling is increasingly seen as important solution. 
+To 
+
+# Methodology
+
+We use a GAM model with a negative binomial distribution.
+
+A set of smooth terms are used within the model to represent the temporal and spatial variation of the cycle counts.
+The temporal parameters are year, day of year (a measure of seasonality) and hour of day.
+
+Hour and year use thin plate splines, while day of year has a cubic regression spline.
+The cubic regression spline is characterised by a relatively low number of knots, evenly spread through the covariate values.
+This prevents overfitting, which can be an issue with GAM models.
+The data we used contained very few counts from the the final week of the season, and other forms of spline tended to overfit to these counts in particular.
+We used three knots for this spline.
+
+A two-dimensional duchon spline is used as a spatial parameter, measured as British National Grid eastings and northings. 
+
+The model includes tensor product interaction smooths, for variables which the main effect  between year and space, and between hour and space. 
+To maintain simplicity, an interaction term between day of year and space was not included.
+
+The partial correlations with each 
+
+This model generates predictions 
+
+# Results
+
+
+
+# Discussion
