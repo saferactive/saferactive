@@ -1,9 +1,14 @@
 ---
-title: "Predicting cycle flows through time and space"
+# title ideas here: to comment out and discuss
+# title: "Predicting cycle flows through time and space"
+title: "Estimating annual, daily and peak cycle flows from sporadic cycle counters: a nationally scalable approach"
+# title: "UpCycle: a nationally scalable approach for modelling active transport flows based on open count data"
 author: "Joey Talbot"
 date: "08/09/2020"
 output: bookdown::pdf_document2
 ---
+
+<!-- Strategy: submit it to Transportation Research Part D -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -19,10 +24,37 @@ These results can be used as correction factors to compare counts taken at diffe
 
 In view of the major global challenges of climate change, poor health, air pollution and traffic congestion, cycling is increasingly seen as important solution. 
 
-Much of the literature on analysis and modelling of cycle count data comes from transport planning institutions.
-@lindsey_minnesota_2013, for example,
+# Open cycle counter datasets
+
+## Department for Transport road traffic statistics 
+
+The UK's Department for Transport maintains a database of road traffic statistics based on manual hourly point counts, which it makes available in an interactive map and for [bulk download](https://roadtraffic.dft.gov.uk/downloads)
+<!-- , in .zip and .csv formats, -->
+at [roadtraffic.dft.gov.uk](https://roadtraffic.dft.gov.uk).
+
+
+## Transport for London
+
+## Local cycle counter schemes
+
+**Bristol**...
 
 # Methodology
+
+
+<!-- ## Exploratory data analysis -->
+
+
+<!-- ## Univariate models -->
+
+
+<!-- ## Multivariate -->
+
+
+<!-- ## Time series analysis -->
+
+## General additive models
+
 
 We use a GAM model with a negative binomial distribution.
 
@@ -49,16 +81,26 @@ knitr::include_graphics("figures/cycle-KSI-bkm.png")
 
 Using this model we generate predictions for the full range of each parameter for which data is available. 
 
+
 With cycle count data from a given locality, these predictions can be used to produce correction factors. It is then possible to predict the expected counts at different points in time. For example, given count data from 08:00 - 09:00 on a day in April 2010, the expected number of cyclists passing the same location at 15:00 - 16:00 in September 2015 could be inferred.
 
-## R function
+## Estimation of confidence intervals
 
-We have written an R function that computes these predictions. 
+<!-- ## R function -->
 
-The input to this is cycle count data from a given location and time period, covering at least one hour. The function if flexible as to the number of hours of data to be inputted. Each hour of input data contributes to mean correction factors, which are then used to estimate  
+<!-- We have written an R function that computes these predictions.  -->
+
+<!-- The input to this is cycle count data from a given location and time period, covering at least one hour. The function if flexible as to the number of hours of data to be inputted. Each hour of input data contributes to mean correction factors, which are then used to estimate   -->
 
 # Results
 
 
+# Implementation
+
+The aim was to enable anyone in the UK (and beyond) to translate sporadic and relatively low value counts into standard units such as annual, daily and peak hour flows.
+These in turn can be converted into real-world outputs such as design standards (e.g. minimum width) [@parkin_designing_2018] and estimated health impacts used to prioritise schemes.
+
 
 # Discussion
+
+# References
