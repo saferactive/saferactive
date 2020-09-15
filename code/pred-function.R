@@ -5,7 +5,7 @@ pred_hour = readRDS("predictions-by-hour.Rds")
 pred_year = readRDS("predictions-by-year.Rds")
 pred_DoY = readRDS("predictions-by-DoY.Rds")
 
-existing_count = data.frame(DoY = 150, year = 2015, hour = 12, easting = 531000, northing = 180000, bicycles = 5)
+existing_count = data.frame(DoY = 100, year = 2010, hour = c(9:12), easting = 531000, northing = 180000, bicycles = 20)
 # View(existing_count)
 
 desired_hour = c(7:18)
@@ -17,27 +17,31 @@ pred_hour_cols = pred_hour %>%
   select(hour, easting, northing, Fitted)
 to_correct_hour = inner_join(pred_hour_cols, existing_count, by = c("hour", "easting", "northing"))
 correction_factor_hour = to_correct_hour$bicycles/to_correct_hour$Fitted
+# Use a single average hourly correction factor instead of separate ones for each hour there is count data for
+correction_factor_hour = mean(correction_factor_hour)
 
 pred_DoY_cols = pred_DoY %>%
   select(DoY, Fitted)
 to_correct_DoY = inner_join(pred_DoY_cols, existing_count, by = c("DoY"))
 correction_factor_DoY = to_correct_DoY$bicycles/to_correct_DoY$Fitted
+correction_factor_DoY = mean(correction_factor_DoY)
 
 pred_year_cols = pred_year %>%
   select(year, easting, northing, Fitted)
 to_correct_year = inner_join(pred_year_cols, existing_count, by = c("year", "easting", "northing"))
 correction_factor_year = to_correct_year$bicycles/to_correct_year$Fitted
+correction_factor_year = mean(correction_factor_year)
 
 # criteria for which new predictions are desired
 new_hour = pred_hour %>%
-  filter(easting == existing_count$easting, northing == existing_count$northing,
+  filter(easting == existing_count$easting[1], northing == existing_count$northing[1],
          hour == desired_hour)
 
 new_DoY = pred_DoY %>%
   filter(DoY == desired_DoY)
 
 new_year = pred_year %>%
-  filter(easting == existing_count$easting, northing == existing_count$northing,
+  filter(easting == existing_count$easting[1], northing == existing_count$northing[1],
          year == desired_year)
 
 # get adjustments for each parameter
@@ -91,5 +95,7 @@ full_predictions$original = existing_count$bicycles
 full_predictions = full_predictions %>%
   mutate(final_prediction = original * predict_hour * predict_DoY * predict_year) %>%
   select(hour, DoY, year, final_prediction)
-
-
+full_predictions
+# find the simple model predictions for this grid cell for comparison
+pred_hour %>%
+  filter(easting == existing_count$easting, northing == existing_count$northing)
