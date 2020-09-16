@@ -2,9 +2,10 @@
 
 library(tidyverse)
 library(sf)
-remotes::install_github("saferactive/traffiCalmr")
+remotes::install_github("saferactive/trafficalmr")
 
-d = traffiCalmr::tc_get_osm(bbox = "Greater London")
+d = trafficalmr::tc_get_osm(bbox = "Greater London")
+nrow(d)
 plot(d["traffic_calming"])
 library(tmap)
 tmap_mode("view")
