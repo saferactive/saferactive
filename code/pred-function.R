@@ -1,3 +1,5 @@
+library(dplyr)
+
 get_predictions = function{}
 
 # Inputs
@@ -5,14 +7,14 @@ pred_hour = readRDS("predictions-by-hour.Rds")
 pred_year = readRDS("predictions-by-year.Rds")
 pred_DoY = readRDS("predictions-by-DoY.Rds")
 
-existing_count = data.frame(DoY = 100, year = 2010, hour = c(9:12), easting = 531000, northing = 180000, bicycles = 20)
+existing_count = data.frame(DoY = c(100:107), year = 2010, hour = 9, easting = 531000, northing = 180000, bicycles = c(53,34,65,23,67,22,100,85))
 # View(existing_count)
 
 desired_hour = c(7:18)
 desired_DoY = 250
 desired_year = 2016
 
-# Get single parameter correction factors
+# Get single parameter correction factors from existing counts
 pred_hour_cols = pred_hour %>%
   select(hour, easting, northing, Fitted)
 to_correct_hour = inner_join(pred_hour_cols, existing_count, by = c("hour", "easting", "northing"))
@@ -44,21 +46,30 @@ new_year = pred_year %>%
   filter(easting == existing_count$easting[1], northing == existing_count$northing[1],
          year == desired_year)
 
-# get adjustments for each parameter
+# get adjustments for each parameter for each new time point
 joined_hour = left_join(new_hour, existing_count, by = c("DoY", "year", "hour", "easting", "northing"))
 joined_hour = joined_hour %>%
   mutate(predicted_bicycles = correction_factor_hour*Fitted)
 # View(joined_hour)
+# length(unique(existing_count$hour))
+
+# mean count for each hour
+mean_hour = existing_count %>%
+  select(hour, bicycles) %>%
+  group_by(hour) %>%
+  summarise(bicycles = mean(bicycles))
+
 hour_adjustment = joined_hour %>%
-  mutate(predict_hour = predicted_bicycles/existing_count$bicycles) %>%
+  mutate(predict_hour = predicted_bicycles/mean_hour$bicycles[1:dim(joined_hour)[1]]) %>% # this still isn't right
   select(hour, predict_hour)
 
 joined_DoY = left_join(new_DoY, existing_count, by = c("DoY", "year", "hour", "easting", "northing"))
 joined_DoY = joined_DoY %>%
   mutate(predicted_bicycles = correction_factor_DoY*Fitted)
 # View(joined_DoY)
+# existing_count$bicycles[1:dim(joined_DoY)[1]]
 DoY_adjustment = joined_DoY %>%
-  mutate(predict_DoY = predicted_bicycles/existing_count$bicycles) %>%
+  mutate(predict_DoY = predicted_bicycles/existing_count$bicycles[1:dim(joined_DoY)[1]]) %>% #does this fix work?
   select(DoY, predict_DoY)
 
 joined_year = left_join(new_year, existing_count, by = c("DoY", "year", "hour", "easting", "northing"))
@@ -67,7 +78,7 @@ joined_year = joined_year %>%
 # View(joined_year)
 # year_adjustment = joined_year$predicted_bicycles/existing_count$bicycles
 year_adjustment = joined_year %>%
-  mutate(predict_year = predicted_bicycles/existing_count$bicycles) %>%
+  mutate(predict_year = predicted_bicycles/existing_count$bicycles[1:dim(joined_year)[1]]) %>% #does this fix work?
   select(year, predict_year)
 
 # get the full new predictions

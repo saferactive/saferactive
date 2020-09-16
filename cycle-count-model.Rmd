@@ -3,7 +3,7 @@
 # title: "Predicting cycle flows through time and space"
 title: "Estimating annual, daily and peak cycle flows from sporadic cycle counters: a nationally scalable approach"
 # title: "UpCycle: a nationally scalable approach for modelling active transport flows based on open count data"
-author: "Joey Talbot"
+author: "Joey Talbot, Robin Lovelace"
 date: "08/09/2020"
 output: bookdown::pdf_document2
 ---
@@ -23,17 +23,51 @@ These results can be used as correction factors to compare counts taken at diffe
 # Introduction
 
 In view of the major global challenges of climate change, poor health, air pollution and traffic congestion, cycling is increasingly seen as important solution. 
+Recognition of cycling’s importance has further grown in light of the impacts of the Covid-19 pandemic. 
+As a means of travel cycling allows for social distancing.
+During national lockdowns, large numbers of people took up or returned to cycling, for exercise or to undertake necessary journeys in a safe manner (ref). 
+They were encouraged in this by streets which were relatively car-free.
+However, with public transport capacity remaining limited, private car usage has since risen as countries have emerged from lockdown (ref), risking a return to high levels of air pollution and congestion.
+
+Air pollution is linked with a range of diseases, including respiratory conditions such as asthma (ref). 
+Studies are emerging highlighting a potential role of air pollution in increasing susceptibility to Covid-19 infection (ref) or increased morbidity (ref). 
+Inactivity is also associated with numerous physical and mental health conditions (ref). 
+Incorporating active travel into daily journeys combats this.
+
+To enable the continuance of this step change in cycling rates, major changes to urban street design are needed so that, even with rising traffic levels, people who wouldn’t have previously cycled feel safe to do so.
+
+For this to happen it is necessary to know where and when people are cycling.
+Which are the key cycle flows and desire lines?
+How do these relate to crash rates and collision hotspots?
+Who are the main users of these streets, including people on foot, on bicycles or in other types of vehicles?
+Where are there opportunities to improve cycle provision?
+To answer all of these questions, we need to have reliable cycle count data.
 
 # Open cycle counter datasets
+
+Traffic counts are commonly used to monitor road networks.
+In the UK counts cover all major roads and a selection of minor roads. 
+
+There are various types of traffic count. 
+Screen lines monitor the number of vehicles passing a given line; this may involve conducting counts on two or more parallel streets.
+Point counts monitor vehicles at a particular point such as a junction; this may involve recording the different paths vehicles take through the junction.
+Counts can be manual or automatic.
+Cycle counts are often manual, as some automatic devices do not detect cyclists.
+
 
 ## Department for Transport road traffic statistics 
 
 The UK's Department for Transport maintains a database of road traffic statistics based on manual hourly point counts, which it makes available in an interactive map and for [bulk download](https://roadtraffic.dft.gov.uk/downloads)
 <!-- , in .zip and .csv formats, -->
 at [roadtraffic.dft.gov.uk](https://roadtraffic.dft.gov.uk).
+These counts are taken on weekdays, from March to early November. 
+The counts avoid school holiday periods such as August and late July. 
 
 
 ## Transport for London
+
+For the period 2014-2019, 1.3 million cycle counts are available from Transport for London, covering streets across the capital. 
+These are released as open data by TfL, available at [cycling.data.tfl.gov.uk](https://cycling.data.tfl.gov.uk/).
 
 ## Local cycle counter schemes
 
@@ -79,10 +113,19 @@ The partial effects of each smooth term are shown in Figure \@ref(fig:ksi).
 knitr::include_graphics("figures/cycle-KSI-bkm.png")
 ```
 
+### Model predictions
+
 Using this model we generate predictions for the full range of each parameter for which data is available. 
 
 
-With cycle count data from a given locality, these predictions can be used to produce correction factors. It is then possible to predict the expected counts at different points in time. For example, given count data from 08:00 - 09:00 on a day in April 2010, the expected number of cyclists passing the same location at 15:00 - 16:00 in September 2015 could be inferred.
+### Correction factors
+Together with cycle count data from a given locality, our model predictions can be used to produce correction factors. 
+It is then possible to predict the expected counts at the same location, for different points in time. 
+For example, given count data from 08:00 - 09:00 on a day in April 2010, the expected number of cyclists passing the same location at 15:00 - 16:00 in September 2015 could be inferred.
+
+To calculate the correction factors, each hourly total from the existing count is divided by the model prediction for the same location and time period. 
+The mean correction factor is then multiplied by the model prediction for the time period desired.
+
 
 ## Estimation of confidence intervals
 
@@ -99,6 +142,10 @@ With cycle count data from a given locality, these predictions can be used to pr
 
 The aim was to enable anyone in the UK (and beyond) to translate sporadic and relatively low value counts into standard units such as annual, daily and peak hour flows.
 These in turn can be converted into real-world outputs such as design standards (e.g. minimum width) [@parkin_designing_2018] and estimated health impacts used to prioritise schemes.
+
+For the assessment of cycle infrastructure schemes, for example through [the Department for Transport's Active Mode Appraisal Toolkit](https://www.gov.uk/government/publications/tag-unit-a5-1-active-mode-appraisal), it is important to be able to estimate the expected usership of the new infrastructure. 
+Our methods may make this easier, by enabling the generalisation of any existing cycle count data which provides a suitable local example of cycle flows.
+
 
 
 # Discussion
