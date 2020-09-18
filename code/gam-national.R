@@ -22,22 +22,40 @@ traffic_bam = transform(traffic_points,
                                local_authority_name = factor(local_authority_name),
                                DoY = as.numeric(lubridate::yday(count_date)))
 
+
+# Fix points with location errors
+error1 = traffic_bam %>%
+  filter(count_point_id == 946853)
+error2 = traffic_bam %>%
+  filter(count_point_id == 952939)
+
+error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
+  mutate(northing = 24870)
+error2 = error2 %>%
+  mutate(northing = 221460)
+
+
+
+traffic_bam = traffic_bam %>%
+  filter(count_point_id != 952939,
+         count_point_id != 946853)
+traffic_bam = rbind(traffic_bam, error1, error2)
+
+
 # Assign count points to 2km grid squares # this has to use `round()` instead of `signif()`
 traffic_bam = traffic_bam %>%
   mutate(grid_location = paste((round((traffic_bam$easting/2), digits = -3)*2),(round((traffic_bam$northing/2), digits = -3)*2)))
 
-dim(traffic_bam)
-length(unique(traffic_bam$grid_location))
+# dim(traffic_bam)
+# length(unique(traffic_bam$grid_location))
 
-traffic_bam %>%
-  filter(count_point_id == c(952939, 946853))
 
 #  Investigate count point numbers and placements per/across the year ----------------
 traffic_days = traffic_bam %>%
   group_by(year, count_date, DoY, local_authority_name, count_point_id, easting, northing, grid_location) %>%
   summarise(pedal_cycles = sum(pedal_cycles))
 
-#Get London Borough boundaries for maps
+#Get LA boundaries for maps
 lads = readRDS("lads.Rds")
 
 traffic_days %>%
@@ -45,11 +63,7 @@ traffic_days %>%
   # filter(year == 2011) %>%
   mapview() + mapview(lads)
 
-traffic_london_days %>%
-  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
-  filter(year == 2018) %>%
-  mapview() + mapview(lads)
-
-traffic_london_days %>%
+#number of count points per year
+traffic_days %>%
   group_by(year) %>%
   count()
