@@ -29,12 +29,24 @@ ui = function(request) {
 }
 server = function(input, output, session) {
 
-  if(is.null(lng)) {
-    map_centre = st_centroid(world %>% filter(name_long == "Brazil")) %>%
-      st_coordinates()
-  } else {
-    map_centre = as.matrix(data.frame(X = lng, Y = lat))
-  }
+  observeEvent(input$._bookmark_, {
+    updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+    updateTextInput(session, inputId = "lat", value = input$map_center$lat)
+    updateTextInput(session, inputId = "lng", value = input$map_center$lng)
+    session$doBookmark()
+  })
+
+  observeEvent(input$savestate, {
+    updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+    updateTextInput(session, inputId = "lat", value = input$map_center$lat)
+    updateTextInput(session, inputId = "lng", value = input$map_center$lng)
+  })
+
+  onRestore(function(state) {
+    updateTextInput(session, inputId = "zoom", value = state$input$map_zoom)
+    updateTextInput(session, inputId = "lat", value = state$input$map_center$lat)
+    updateTextInput(session, inputId = "lng", value = state$input$map_center$lng)
+  })
 
   # This reactive expression returns a character string representing the selected variable
   yr = reactive({
@@ -46,6 +58,10 @@ server = function(input, output, session) {
     world_coffee$Production = world_coffee[[yr()]]
     filter(world_coffee, Production >= input$range[1] &
              Production <= input$range[2])
+  })
+
+  latlng = reactive({
+
   })
 
   output$map = renderLeaflet({
@@ -70,17 +86,13 @@ server = function(input, output, session) {
   # observeEvent(input$map_zoom, {
   #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
   # })
-  observeEvent(input$savestate, {
-    updateTextInput(session, inputId = "zoom", value = input$map_zoom)
-    updateTextInput(session, inputId = "lat", value = input$map_center$lat)
-    updateTextInput(session, inputId = "lng", value = input$map_center$lng)
-  })
 
   # # See https://shiny.rstudio.com/articles/advanced-bookmarking.html
   # # Save extra values in state$values when we bookmark
   # onBookmark(function(state) {
-  #   # state$values$lng <- lng
-  #   # state$values$lat <- lat
+  #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+  #   updateTextInput(session, inputId = "lat", value = input$map_center$lat)
+  #   updateTextInput(session, inputId = "lng", value = input$map_center$lng)
   # })
   #
   # Read values from state$values when we restore
