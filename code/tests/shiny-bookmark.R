@@ -16,6 +16,7 @@ ui = function(request) {
                   value = c(1000, 4000), step = 100),
       selectInput("year", "Year", c(2016, 2017)),
       checkboxInput("legend", "Show legend", FALSE),
+      actionButton(inputId = "savestate", label = "Save map state"),
       textInput("lng", "Longitude", value = -10),
       textInput("lat", "Latitude", value = 0),
       textInput("zoom", "Zoom", value = 2),
@@ -27,19 +28,6 @@ ui = function(request) {
   )
 }
 server = function(input, output, session) {
-
-  # # See https://shiny.rstudio.com/articles/advanced-bookmarking.html
-  # # Save extra values in state$values when we bookmark
-  # onBookmark(function(state) {
-  #   # state$values$lng <- lng
-  #   # state$values$lat <- lat
-  # })
-  #
-  # # Read values from state$values when we restore
-  # onRestore(function(state) {
-  #   lng <- state$values$lng
-  #   lat <- state$values$lat
-  # })
 
   if(is.null(lng)) {
     map_centre = st_centroid(world %>% filter(name_long == "Brazil")) %>%
@@ -78,14 +66,30 @@ server = function(input, output, session) {
     }
   })
 
-  observeEvent(input$map_zoom, {
+  # demonstrate updating text input of map:
+  # observeEvent(input$map_zoom, {
+  #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+  # })
+  observeEvent(input$savestate, {
     updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+    updateTextInput(session, inputId = "lat", value = input$map_center$lat)
+    updateTextInput(session, inputId = "lng", value = input$map_center$lng)
   })
 
-  observeEvent(input$map_center, {
-    updateTextInput(session, inputId = "lat", value = round(input$map_center$lat, digits = 4))
-    updateTextInput(session, inputId = "lng", value = round(input$map_center$lng, digits = 4))
-  })
+  # # See https://shiny.rstudio.com/articles/advanced-bookmarking.html
+  # # Save extra values in state$values when we bookmark
+  # onBookmark(function(state) {
+  #   # state$values$lng <- lng
+  #   # state$values$lat <- lat
+  # })
+  #
+  # Read values from state$values when we restore
+  # onRestore(function(state) {
+  #   updateTextInput(session, inputId = "lat", value = round(as.numeric(state$values$map_center$lat), digits = 4))
+  #   updateTextInput(session, inputId = "lng", value = round(as.numeric(state$values$map_center$lng), digits = 4))
+  #   # input$lng <- state$values$map_center$lng
+  #   # input$lat <- state$values$map_center$lat
+  # })
 
   output$text = renderText(input$map_zoom)
 
