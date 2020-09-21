@@ -6,7 +6,6 @@ library(leaflet)
 library(tidyverse)
 world_coffee = left_join(world, coffee_data)
 pal = colorNumeric(palette = "RdYlBu", domain = c(0, 4000))
-lng = NULL
 
 ui = function(request) {
   fluidPage(
@@ -29,15 +28,7 @@ ui = function(request) {
 }
 server = function(input, output, session) {
 
-  # output from bookmark url example: http://127.0.0.1:6150/?_inputs_&savestate=0&map_zoom=6&zoom=%222%22&map_center=%7B%22lng%22%3A-2.28515625%2C%22lat%22%3A37.781135851454%7D&legend=false&range=%5B1000%2C4000%5D
-
   setBookmarkExclude(names = c("lat", "lng", "year", "map_bounds", "north", "east", "south", "west", "legend", "range"))
-
-  # observeEvent(input$._bookmark_, {
-  #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
-  #   updateTextInput(session, inputId = "lat", value = input$map_center$lat)
-  #   updateTextInput(session, inputId = "lng", value = input$map_center$lng)
-  # })
 
   observeEvent(input$savestate, {
     updateTextInput(session, inputId = "zoom", value = input$map_zoom)
@@ -80,27 +71,6 @@ server = function(input, output, session) {
                           pal = pal, values = ~Production)
     }
   })
-
-  # demonstrate updating text input of map:
-  # observeEvent(input$map_zoom, {
-  #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
-  # })
-
-  # # See https://shiny.rstudio.com/articles/advanced-bookmarking.html
-  # # Save extra values in state$values when we bookmark
-  # onBookmark(function(state) {
-  #   updateTextInput(session, inputId = "zoom", value = input$map_zoom)
-  #   updateTextInput(session, inputId = "lat", value = input$map_center$lat)
-  #   updateTextInput(session, inputId = "lng", value = input$map_center$lng)
-  # })
-  #
-  # Read values from state$values when we restore
-  # onRestore(function(state) {
-  #   updateTextInput(session, inputId = "lat", value = round(as.numeric(state$values$map_center$lat), digits = 4))
-  #   updateTextInput(session, inputId = "lng", value = round(as.numeric(state$values$map_center$lng), digits = 4))
-  #   # input$lng <- state$values$map_center$lng
-  #   # input$lat <- state$values$map_center$lat
-  # })
 
   output$text = renderText(input$map_zoom)
 
