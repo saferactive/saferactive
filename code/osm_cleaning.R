@@ -3,6 +3,9 @@ remotes::install_github("itsleeds/osmextract")
 library(osmextract)
 library(dplyr)
 library(progress)
+library(tmap)
+library(sf)
+tmap_mode("view")
 #osm_lines = oe_get("Greater London", extra_tags = c("ref", "maxspeed"))
 osm_lines = oe_read("E:/OneDrive - University of Leeds/wheretolive/data/otp/graphs/wy/wy.osm.pbf",
                     extra_tags = c("ref", "maxspeed"))
@@ -44,10 +47,13 @@ osm_get_junctions <- function(x){
   points <- sf::st_cast(x,"MULTIPOINT")
   points <- points$geometry
   points <- sf::st_cast(points,"POINT")
+  # TO be a junction their must be duplication of points
   dup <- duplicated(points)
   points <- points[dup]
+  # But we only want on version of the junction
+  dup <- duplicated(points)
   points <- points[!dup]
-  points
+  return(points)
 }
 
 # TODP: TRY BUFFER AND UNION
@@ -162,18 +168,63 @@ crash_junction <- crash[!crash$junction_detail %in% c("Not at junction or within
 
 nn_line <- function(point, lines){
   cents <- sf::st_centroid(lines)
-  nn <- nngeo::st_nn(point, cents, k = 10)
+  nn <- nngeo::st_nn(point, cents, k = 20)
 
   res <- list()
+  pb <- progress_bar$new(total = nrow(point))
   for(i in seq_len(nrow(point))){
+    pb$tick()
     nnsub <- nn[[i]]
-    sub <- unlist(nngeo::st_nn(point$geometry[i], lines$geometry[nnsub], progress = FALSE))
+    suppressMessages(sub <- unlist(nngeo::st_nn(point$geometry[i], sf::st_geometry(lines)[nnsub], progress = FALSE)))
     res[[i]] <- nnsub[sub]
   }
+  res <- unlist(res)
   return(res)
 
 }
 
+#system.time(bar <- nn_line(crash_road[1:2,], osm)) # fast
+#system.time(foo <- nngeo::st_nn(crash_road[1:2], osm)) # slow
 
-system.time(bar <- nn_line(crash_road[1:2,], osm)) # fast
-system.time(foo <- nngeo::st_nn(crash_road[1:2], osm)) # slow
+crash_road_nn <- nn_line(crash_road, osm)
+crash_junction_nn <- nn_line(crash_junction, junctions)
+
+crash_road$nn <- crash_road_nn
+crash_junction$nn <- crash_junction_nn
+
+crash_road_summary <- crash_road %>%
+  sf::st_drop_geometry() %>%
+  group_by(nn) %>%
+  summarise(number_of_casualties = sum(number_of_casualties))
+
+crash_junctions_summary <- crash_junction %>%
+  sf::st_drop_geometry() %>%
+  group_by(nn) %>%
+  summarise(number_of_casualties = sum(number_of_casualties))
+
+osm$id <- 1:nrow(osm)
+junctions <- st_sf(data.frame(id = 1:length(junctions),
+                              geometry = junctions), crs = 27700)
+
+
+osm <- left_join(osm, crash_road_summary, by = c("id" = "nn"))
+junctions <- left_join(junctions, crash_junctions_summary, by = c("id" = "nn"))
+
+head(osm)
+summary(osm$number_of_casualties)
+summary(junctions$number_of_casualties)
+
+osm_cas <- osm[!is.na(osm$number_of_casualties),]
+junctions_cas <- junctions[!is.na(junctions$number_of_casualties),]
+
+tm_shape(osm_cas) +
+  tm_lines(col = "number_of_casualties",
+           lwd = 3,
+           breaks = c(0,1,3,6,13,28),
+           palette = "viridis") +
+  tm_shape(junctions_cas) +
+  tm_fill(col = "number_of_casualties",
+          breaks = c(0,1,3,6,13,28),
+          palette = "viridis")
+
+
