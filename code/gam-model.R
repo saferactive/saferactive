@@ -148,8 +148,6 @@ plot(pedal_cycles ~ year, data = forplot)
 
 # Fit GAM model using national grid locations--------------------------------------------
 
-## should I use peak hour counts only for these models, to match with census commute data??
-
 M = list(c(1, 0.5), NA)
 
 # m = bam(pedal_cycles ~

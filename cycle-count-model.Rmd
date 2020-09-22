@@ -52,7 +52,6 @@ There are various types of traffic count.
 Screen lines monitor the number of vehicles passing a given line; this may involve conducting counts on two or more parallel streets.
 Point counts monitor vehicles at a particular point such as a junction; this may involve recording the different paths vehicles take through the junction.
 Counts can be manual or automatic.
-Cycle counts are often manual, as some automatic devices do not detect cyclists.
 
 
 ## Department for Transport road traffic statistics 
@@ -72,6 +71,11 @@ These are released as open data by TfL, available at [cycling.data.tfl.gov.uk](h
 ## Local cycle counter schemes
 
 **Bristol**...
+
+**York**
+York has a network of over 40 Automatic Cycle Counters. These are inductive loops placed in the cycleway or highway, which record the number of cycles passing over them. Data from these counters can be accessed at [data.gov.uk](https://data.gov.uk/dataset/eac3af51-37e4-4f99-97c3-6cd2994b9acc/automatic-cycle-counters).
+
+
 
 # Methodology
 
@@ -134,6 +138,14 @@ The mean correction factor is then multiplied by the model prediction for the ti
 <!-- We have written an R function that computes these predictions.  -->
 
 <!-- The input to this is cycle count data from a given location and time period, covering at least one hour. The function if flexible as to the number of hours of data to be inputted. Each hour of input data contributes to mean correction factors, which are then used to estimate   -->
+
+## Model training
+
+Exclude 10% of points to test and train model
+
+## Model validation using independent data set
+
+TfL cycle counters
 
 # Results
 
