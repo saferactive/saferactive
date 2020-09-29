@@ -45,6 +45,12 @@ server = function(input, output, session) {
     updateTextInput(session, inputId = "lng", value = input$map_center$lng)
   })
 
+  observeEvent(input$map_zoom, {
+    updateTextInput(session, inputId = "zoom", value = input$map_zoom)
+    updateTextInput(session, inputId = "lat", value = input$map_center$lat)
+    updateTextInput(session, inputId = "lng", value = input$map_center$lng)
+  })
+
   onRestore(function(state) {
     updateTextInput(session, inputId = "zoom", value = state$input$map_zoom)
     updateTextInput(session, inputId = "lat", value = state$input$map_center$lat)
