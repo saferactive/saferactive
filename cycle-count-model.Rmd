@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Abstract
 
-Using cycle count data from the UK's Department for Transport, we develop a GAM model to predict temporal and spatial variation in cyclist numbers on UK roads. 
+Using cycle count data from the UK's Department for Transport, we develop a GAM model to predict temporal and spatial variation in cyclist numbers on British roads. 
 Our model predictions closely correlate with an independent set of cycle count data. 
 These results can be used as correction factors to compare counts taken at different times.
 
@@ -82,6 +82,22 @@ York has a network of over 40 Automatic Cycle Counters. These are inductive loop
 
 <!-- ## Exploratory data analysis -->
 
+The national cycle count dataset contains 4.5 million unique hourly records from the years 2000 to 2019, covering England, Wales and Scotland. 
+We fixed errors in location data and removed a small number of records where hour was incorrectly recorded. 
+Removing motorways and combining bidirectional flows, this translates to 2.1 million hourly records comprising 175,000 daily count points. 
+Each count point contains 12 hours of count data, covering the hours 07:00-19:00. 
+
+Exploratory investigation (Figure \@ref(fig:annual)) reveals that around 7000-9000 daily counts were made in most years (mean 8782), but this ranged from 5368 counts in 2019 to 14629 counts in 2008. 
+However, the category of roads surveyed varied greatly from year to year. 
+In the years with greater numbers of counts (2008, 2009 and 2018), these additional counts came entirely from minor roads - B roads, C roads and unclassified roads. 
+In 2019, no counts from Principal A roads or Trunk A roads were recorded.   
+
+```{r annual, fig.cap = "Number of cycle count locations per year, classified by road category. MB = B road; MCU = C or Unclassified road, PA = Principal A road; TA = Trunk A road"}
+knitr::include_graphics("figures/annual-counts-by-road-cat.png")
+```
+
+Recorded bicycle numbers vary greatly with road category. They are highest on Principal A roads (mean 11.0 bicycles/hour) and lowest on Trunk A roads (mean 1.08 bicycles/hour)....
+
 
 <!-- ## Univariate models -->
 
@@ -92,7 +108,6 @@ York has a network of over 40 Automatic Cycle Counters. These are inductive loop
 <!-- ## Time series analysis -->
 
 ## General additive models
-
 
 We use a GAM model with a negative binomial distribution.
 
