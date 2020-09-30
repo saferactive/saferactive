@@ -13,7 +13,6 @@ casualties_adjusted.Rds
 lads.Rds
 crashes_active_london.*
 *.Rds
-*.csv
 *.zip
 *.gif
 raw*
