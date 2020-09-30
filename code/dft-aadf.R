@@ -12,7 +12,11 @@ saveRDS(d, "traffic-aadf-29092020.Rds")
 piggyback::pb_upload("traffic-aadf-29092020.Rds")
 traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
-# dim(traffic_aadf) #461948
+dim(traffic_aadf)
+# [1] 461948     33
+
+names(traffic_aadf)
+table(traffic_aadf$sequence)
 
 
 traffic_points = traffic_aadf %>%
@@ -20,6 +24,54 @@ traffic_points = traffic_aadf %>%
   group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>%
   ungroup()
+nrow(traffic_points) / nrow(traffic_aadf)
+# [1] 0.3980621 # why are there multiple reading for each count point?
+skimr::skim(traffic_aadf)
+
+traffic_points_sequence = traffic_aadf %>%
+  select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+  group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+  summarise(pedal_cycles = sum(pedal_cycles)) %>%
+  ungroup()
+nrow(traffic_points_sequence) / nrow(traffic_aadf) # including sequence gives 1:1 fit - indicating repeated counts
+# [1] 1
+
+# Next step: explore how dependent the data are on sequences
+traffic_sequence = traffic_aadf %>%
+  group_by(count_point_id) %>%
+  summarise(pedal_cycles = sum(pedal_cycles), n_sequence = length(unique(sequence)))
+
+summary(traffic_sequence$n_sequence)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# 1.000   1.000   1.000   1.118   1.000   3.000
+# what does sequence mean?
+cor(traffic_aadf$year, as.numeric(traffic_aadf$sequence), use = "complete.obs")
+# [1] -0.05876427 # no relationship with year...
+
+traffic_sequence2 = traffic_aadf %>%
+  group_by(count_point_id) %>%
+  mutate(mean_pedal_cycles = mean(pedal_cycles), n_sequence = length(unique(sequence))) %>%
+  filter(n_sequence > 1) %>%
+  group_by(count_point_id, sequence) %>%
+  summarise(pedal_cycles_sequence = mean(pedal_cycles))
+traffic_sequence2
+# # A tibble: 10,600 x 3
+# # Groups:   count_point_id [5,298]
+# count_point_id sequence pedal_cycles_sequence
+# <dbl> <chr>                    <dbl>
+#   1            627 3040                     3.22
+# 2            627 5040                     5.5
+# 3            664 10                      44.8
+# 4            664 400                     36
+# 5            703 3120                     0
+# 6            703 5120                     0
+# 7           1187 3210                     0.944
+# 8           1187 5210                     0
+# 9           1189 3110                     4.67
+# 10           1189 5110                     4
+# # … with 10,590 more rows
+traffic_sequence2 %>%
+  summarise(unique_per_sequence = length(unique(pedal_cycles_sequence)))
 
 # remove motorways
 traffic_points = traffic_points %>%
@@ -31,6 +83,8 @@ traffic_points = traffic_points %>%
   filter(estimation_method == "Counted")
 dim(traffic_points) #183884
 # there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
+
+# exploratory data analysis
 
 
 
