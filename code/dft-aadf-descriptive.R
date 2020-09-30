@@ -44,3 +44,21 @@ summary_n_id %>%
   ggplot() +
   geom_histogram(aes(n), binwidth = 1)
 ggsave("figures/aadf-n-repeats-ids.png")
+ids_2_plus = summary_n_id %>% filter(n > 1) %>% pull(count_point_id)
+
+traffic_cyclable_2 = traffic_cyclable %>%
+  filter(count_point_id %in% ids_2_plus)
+
+summary_n_year = traffic_cyclable2 %>%
+  group_by(year) %>%
+  summarise(n = n())
+
+ggplot(summary_n_year) +
+  geom_line(aes(year, n))
+ggsave("figures/aadf-counts-per-year-2-plus.png")
+
+traffic_cyclable_years = traffic_cyclable_2 %>%
+  group_by(count_point_id) %>%
+  mutate(present_2009 = year %in% 2009)
+
+summary(traffic_cyclable_years$present_2009)
