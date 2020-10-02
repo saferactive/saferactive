@@ -1,0 +1,2883 @@
+count_point_id,name,local_authority_name
+521,Vale of Glamorgan,The Vale of Glamorgan
+540,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+541,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+571,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+617,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+619,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+620,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+646,Vale of Glamorgan,The Vale of Glamorgan
+722,Perth and Kinross,Perth & Kinross
+724,Perth and Kinross,Perth & Kinross
+740,Dumfries and Galloway,Dumfries & Galloway
+764,Argyll and Bute,Argyll & Bute
+788,Dumfries and Galloway,Dumfries & Galloway
+792,Argyll and Bute,Argyll & Bute
+1028,Dumfries and Galloway,Dumfries & Galloway
+1034,Perth and Kinross,Perth & Kinross
+1051,Perth and Kinross,Perth & Kinross
+1054,Perth and Kinross,Perth & Kinross
+1071,Dumfries and Galloway,Dumfries & Galloway
+1072,Dumfries and Galloway,Dumfries & Galloway
+1074,Dumfries and Galloway,Dumfries & Galloway
+1075,Dumfries and Galloway,Dumfries & Galloway
+1077,Dumfries and Galloway,Dumfries & Galloway
+1078,Dumfries and Galloway,Dumfries & Galloway
+1113,Argyll and Bute,Argyll & Bute
+1114,Argyll and Bute,Argyll & Bute
+1116,Perth and Kinross,Perth & Kinross
+1117,Perth and Kinross,Perth & Kinross
+1118,Perth and Kinross,Perth & Kinross
+1128,Argyll and Bute,Argyll & Bute
+1129,Argyll and Bute,Argyll & Bute
+1130,Argyll and Bute,Argyll & Bute
+1134,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+1135,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+1140,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+1141,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+1145,Argyll and Bute,Argyll & Bute
+1167,Perth and Kinross,Perth & Kinross
+6079,Central Bedfordshire,Bedfordshire
+6147,Central Bedfordshire,Bedfordshire
+6326,Cornwall,Cornwall excluding Isles of Scilly
+6327,Cornwall,Cornwall excluding Isles of Scilly
+6331,Cornwall,Cornwall excluding Isles of Scilly
+6352,Cheshire East,Cheshire
+6352,Cheshire East,East Cheshire
+6413,Cornwall,Cornwall excluding Isles of Scilly
+6420,Cornwall,Cornwall excluding Isles of Scilly
+6441,Cheshire West and Chester,Cheshire
+6441,Cheshire West and Chester,West Cheshire
+6442,Cheshire West and Chester,Cheshire
+6442,Cheshire West and Chester,West Cheshire
+6514,Cheshire West and Chester,Cheshire
+6514,Cheshire West and Chester,West Cheshire
+6520,Cheshire East,Cheshire
+6521,Cheshire East,Cheshire
+6521,Cheshire East,East Cheshire
+6530,Cheshire West and Chester,Cheshire
+6530,Cheshire West and Chester,West Cheshire
+6547,Cheshire West and Chester,Cheshire
+6547,Cheshire West and Chester,West Cheshire
+6548,Cheshire West and Chester,Cheshire
+6558,Cheshire West and Chester,Cheshire
+6558,Cheshire West and Chester,West Cheshire
+6621,County Durham,Durham
+6715,County Durham,Durham
+6734,County Durham,Durham
+6952,"Bournemouth, Christchurch and Poole",Bournemouth
+7002,Cornwall,Cornwall excluding Isles of Scilly
+7027,Cornwall,Cornwall excluding Isles of Scilly
+7028,Cornwall,Cornwall excluding Isles of Scilly
+7033,Cornwall,Cornwall excluding Isles of Scilly
+7034,Cornwall,Cornwall excluding Isles of Scilly
+7037,Cornwall,Cornwall excluding Isles of Scilly
+7039,Cornwall,Cornwall excluding Isles of Scilly
+7083,Bedford,Bedfordshire
+7121,Bedford,Bedfordshire
+7202,Cheshire West and Chester,Cheshire
+7202,Cheshire West and Chester,West Cheshire
+7241,Cheshire East,Cheshire
+7241,Cheshire East,East Cheshire
+7247,Cheshire East,Cheshire
+7250,Cheshire West and Chester,Cheshire
+7250,Cheshire West and Chester,West Cheshire
+7251,Cheshire East,Cheshire
+7251,Cheshire East,East Cheshire
+7252,Cheshire West and Chester,Cheshire
+7253,Cheshire East,Cheshire
+7253,Cheshire East,East Cheshire
+7255,Cheshire East,Cheshire
+7255,Cheshire East,East Cheshire
+7257,Cheshire West and Chester,Cheshire
+7257,Cheshire West and Chester,West Cheshire
+7259,Cheshire West and Chester,Cheshire
+7259,Cheshire West and Chester,West Cheshire
+7265,Cheshire West and Chester,Cheshire
+7265,Cheshire West and Chester,West Cheshire
+7269,Cheshire West and Chester,Cheshire
+7455,County Durham,Durham
+7457,County Durham,Durham
+7458,County Durham,Durham
+7459,County Durham,Durham
+7460,County Durham,Durham
+7581,Cornwall,Cornwall excluding Isles of Scilly
+7582,Cornwall,Cornwall excluding Isles of Scilly
+7584,"Bournemouth, Christchurch and Poole",Bournemouth
+7588,Cornwall,Cornwall excluding Isles of Scilly
+7589,Cornwall,Cornwall excluding Isles of Scilly
+7592,Cornwall,Cornwall excluding Isles of Scilly
+7699,Cheshire East,Cheshire
+7699,Cheshire East,East Cheshire
+7705,Cheshire West and Chester,Cheshire
+7705,Cheshire West and Chester,West Cheshire
+7711,Bedford,Bedfordshire
+7722,Central Bedfordshire,Bedfordshire
+7804,Cheshire East,Cheshire
+7804,Cheshire East,East Cheshire
+7805,Cheshire East,East Cheshire
+7806,Cheshire East,Cheshire
+7806,Cheshire East,East Cheshire
+7868,"Bournemouth, Christchurch and Poole",Poole
+7871,"Bournemouth, Christchurch and Poole",Poole
+7985,Central Bedfordshire,Bedfordshire
+7994,Bedford,Bedfordshire
+7998,"Bournemouth, Christchurch and Poole",Bournemouth
+8046,"Bournemouth, Christchurch and Poole",Bournemouth
+8132,County Durham,Durham
+8140,County Durham,Durham
+8288,Bedford,Bedfordshire
+8393,Bedford,Bedfordshire
+8396,Cheshire East,Cheshire
+8396,Cheshire East,East Cheshire
+8441,Cheshire East,Cheshire
+8441,Cheshire East,East Cheshire
+8574,"Bournemouth, Christchurch and Poole",Bournemouth
+8604,Cornwall,Cornwall excluding Isles of Scilly
+8617,Cornwall,Cornwall excluding Isles of Scilly
+8624,Cornwall,Cornwall excluding Isles of Scilly
+8653,Cheshire East,Cheshire
+8653,Cheshire East,East Cheshire
+8661,Cheshire West and Chester,Cheshire
+8661,Cheshire West and Chester,West Cheshire
+8675,County Durham,Durham
+8700,Cheshire East,Cheshire
+8708,Central Bedfordshire,Bedfordshire
+8719,Bedford,Bedfordshire
+8720,"Bournemouth, Christchurch and Poole",Poole
+8736,Cheshire East,Cheshire
+8736,Cheshire East,East Cheshire
+10526,Vale of Glamorgan,The Vale of Glamorgan
+10548,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+10630,Vale of Glamorgan,The Vale of Glamorgan
+10632,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+10650,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+10654,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+10663,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+10664,Vale of Glamorgan,The Vale of Glamorgan
+10723,Perth and Kinross,Perth & Kinross
+10740,Dumfries and Galloway,Dumfries & Galloway
+10744,Dumfries and Galloway,Dumfries & Galloway
+10745,Dumfries and Galloway,Dumfries & Galloway
+10748,Dumfries and Galloway,Dumfries & Galloway
+10762,Argyll and Bute,Argyll & Bute
+10765,Argyll and Bute,Argyll & Bute
+10768,Perth and Kinross,Perth & Kinross
+10804,Perth and Kinross,Perth & Kinross
+10838,Dumfries and Galloway,Dumfries & Galloway
+10844,Argyll and Bute,Argyll & Bute
+10846,Perth and Kinross,Perth & Kinross
+10851,Perth and Kinross,Perth & Kinross
+10861,Perth and Kinross,Perth & Kinross
+10862,Perth and Kinross,Perth & Kinross
+10864,Perth and Kinross,Perth & Kinross
+10875,Dumfries and Galloway,Dumfries & Galloway
+10876,Dumfries and Galloway,Dumfries & Galloway
+10881,Dumfries and Galloway,Dumfries & Galloway
+10882,Dumfries and Galloway,Dumfries & Galloway
+10883,Dumfries and Galloway,Dumfries & Galloway
+10884,Dumfries and Galloway,Dumfries & Galloway
+10886,Dumfries and Galloway,Dumfries & Galloway
+10888,Dumfries and Galloway,Dumfries & Galloway
+10907,Dumfries and Galloway,Dumfries & Galloway
+10908,Dumfries and Galloway,Dumfries & Galloway
+10910,Dumfries and Galloway,Dumfries & Galloway
+10912,Dumfries and Galloway,Dumfries & Galloway
+10922,Argyll and Bute,Argyll & Bute
+10925,Argyll and Bute,Argyll & Bute
+10927,Perth and Kinross,Perth & Kinross
+10930,Perth and Kinross,Perth & Kinross
+10940,Argyll and Bute,Argyll & Bute
+10941,Argyll and Bute,Argyll & Bute
+10942,Argyll and Bute,Argyll & Bute
+10946,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+10947,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+10948,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+10953,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+10957,Argyll and Bute,Argyll & Bute
+10971,Perth and Kinross,Perth & Kinross
+10972,Perth and Kinross,Perth & Kinross
+10977,Perth and Kinross,Perth & Kinross
+10978,Perth and Kinross,Perth & Kinross
+10979,Perth and Kinross,Perth & Kinross
+16073,Central Bedfordshire,Bedfordshire
+16137,Central Bedfordshire,Bedfordshire
+16165,Bedford,Bedfordshire
+16166,Central Bedfordshire,Bedfordshire
+16302,Cornwall,Cornwall excluding Isles of Scilly
+16304,Cornwall,Cornwall excluding Isles of Scilly
+16305,Cornwall,Cornwall excluding Isles of Scilly
+16307,Cornwall,Cornwall excluding Isles of Scilly
+16324,Cheshire East,Cheshire
+16324,Cheshire East,East Cheshire
+16343,"Bournemouth, Christchurch and Poole",Bournemouth
+16386,Cornwall,Cornwall excluding Isles of Scilly
+16387,Cornwall,Cornwall excluding Isles of Scilly
+16388,Cornwall,Cornwall excluding Isles of Scilly
+16395,Cornwall,Cornwall excluding Isles of Scilly
+16398,Cornwall,Cornwall excluding Isles of Scilly
+16416,Cheshire West and Chester,Cheshire
+16416,Cheshire West and Chester,West Cheshire
+16417,Cheshire West and Chester,Cheshire
+16417,Cheshire West and Chester,West Cheshire
+16492,Cheshire West and Chester,Cheshire
+16492,Cheshire West and Chester,West Cheshire
+16499,Cheshire East,Cheshire
+16499,Cheshire East,East Cheshire
+16500,Cheshire East,Cheshire
+16500,Cheshire East,East Cheshire
+16510,Cheshire East,Cheshire
+16510,Cheshire East,East Cheshire
+16529,Cheshire West and Chester,Cheshire
+16529,Cheshire West and Chester,West Cheshire
+16530,Cheshire West and Chester,Cheshire
+16531,Cheshire East,Cheshire
+16531,Cheshire East,East Cheshire
+16532,Cheshire West and Chester,Cheshire
+16532,Cheshire West and Chester,West Cheshire
+16605,County Durham,Durham
+16606,County Durham,Durham
+16702,County Durham,Durham
+16716,County Durham,Durham
+16718,County Durham,Durham
+16899,"Bournemouth, Christchurch and Poole",Dorset
+16904,"Bournemouth, Christchurch and Poole",Bournemouth
+16916,"Bournemouth, Christchurch and Poole",Poole
+16990,Cornwall,Cornwall excluding Isles of Scilly
+16992,Cornwall,Cornwall excluding Isles of Scilly
+16993,Cornwall,Cornwall excluding Isles of Scilly
+16995,Cornwall,Cornwall excluding Isles of Scilly
+16996,Cornwall,Cornwall excluding Isles of Scilly
+16998,Cornwall,Cornwall excluding Isles of Scilly
+17001,Cornwall,Cornwall excluding Isles of Scilly
+17003,Cornwall,Cornwall excluding Isles of Scilly
+17045,Central Bedfordshire,Bedfordshire
+17046,Central Bedfordshire,Bedfordshire
+17082,Bedford,Bedfordshire
+17162,Cheshire West and Chester,Cheshire
+17162,Cheshire West and Chester,West Cheshire
+17206,Cheshire West and Chester,Cheshire
+17206,Cheshire West and Chester,West Cheshire
+17207,Cheshire East,Cheshire
+17207,Cheshire East,East Cheshire
+17209,Cheshire West and Chester,Cheshire
+17209,Cheshire West and Chester,West Cheshire
+17211,Cheshire East,Cheshire
+17211,Cheshire East,East Cheshire
+17212,Cheshire East,Cheshire
+17213,Cheshire East,Cheshire
+17213,Cheshire East,East Cheshire
+17214,Cheshire East,Cheshire
+17214,Cheshire East,East Cheshire
+17215,Cheshire West and Chester,Cheshire
+17215,Cheshire West and Chester,West Cheshire
+17217,Cheshire West and Chester,Cheshire
+17217,Cheshire West and Chester,West Cheshire
+17224,Cheshire East,Cheshire
+17224,Cheshire East,East Cheshire
+17225,Cheshire West and Chester,Cheshire
+17225,Cheshire West and Chester,West Cheshire
+17275,Bedford,Bedfordshire
+17409,County Durham,Durham
+17410,County Durham,Durham
+17413,County Durham,Durham
+17415,County Durham,Durham
+17416,County Durham,Durham
+17418,County Durham,Durham
+17540,Cornwall,Cornwall excluding Isles of Scilly
+17550,Cornwall,Cornwall excluding Isles of Scilly
+17556,Cornwall,Cornwall excluding Isles of Scilly
+17561,Cornwall,Cornwall excluding Isles of Scilly
+17649,Cheshire East,Cheshire
+17649,Cheshire East,East Cheshire
+17652,Cheshire East,Cheshire
+17652,Cheshire East,East Cheshire
+17654,Cheshire West and Chester,Cheshire
+17654,Cheshire West and Chester,West Cheshire
+17678,Cheshire West and Chester,Cheshire
+17678,Cheshire West and Chester,West Cheshire
+17679,Central Bedfordshire,Bedfordshire
+17696,Central Bedfordshire,Bedfordshire
+17801,Cheshire West and Chester,Cheshire
+17801,Cheshire West and Chester,West Cheshire
+17851,Cornwall,Cornwall excluding Isles of Scilly
+17944,Bedford,Bedfordshire
+18030,"Bournemouth, Christchurch and Poole",Bournemouth
+18035,Cornwall,Cornwall excluding Isles of Scilly
+18136,Central Bedfordshire,Bedfordshire
+18165,Central Bedfordshire,Bedfordshire
+18204,Cheshire West and Chester,Cheshire
+18204,Cheshire West and Chester,West Cheshire
+18240,County Durham,Durham
+18307,Cornwall,Cornwall excluding Isles of Scilly
+18310,County Durham,Durham
+18378,Central Bedfordshire,Bedfordshire
+18435,Bedford,Bedfordshire
+18485,County Durham,Durham
+18541,County Durham,Durham
+18617,Cornwall,Cornwall excluding Isles of Scilly
+18636,Cheshire East,Cheshire
+18636,Cheshire East,East Cheshire
+18658,Central Bedfordshire,Bedfordshire
+18697,Central Bedfordshire,Bedfordshire
+18698,Central Bedfordshire,Bedfordshire
+18713,Cheshire East,Cheshire
+18713,Cheshire East,East Cheshire
+18714,Cheshire East,Cheshire
+18714,Cheshire East,East Cheshire
+20536,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20547,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20577,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20625,Vale of Glamorgan,The Vale of Glamorgan
+20626,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20627,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20631,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+20651,Vale of Glamorgan,The Vale of Glamorgan
+20655,Vale of Glamorgan,The Vale of Glamorgan
+20717,Dumfries and Galloway,Dumfries & Galloway
+20718,Dumfries and Galloway,Dumfries & Galloway
+20728,Perth and Kinross,Perth & Kinross
+20730,Perth and Kinross,Perth & Kinross
+20749,Dumfries and Galloway,Dumfries & Galloway
+20750,Dumfries and Galloway,Dumfries & Galloway
+20772,Argyll and Bute,Argyll & Bute
+20804,Perth and Kinross,Perth & Kinross
+20819,Perth and Kinross,Perth & Kinross
+20835,Dumfries and Galloway,Dumfries & Galloway
+20836,Dumfries and Galloway,Dumfries & Galloway
+20837,Dumfries and Galloway,Dumfries & Galloway
+20844,Perth and Kinross,Perth & Kinross
+20862,Perth and Kinross,Perth & Kinross
+20865,Perth and Kinross,Perth & Kinross
+20877,Dumfries and Galloway,Dumfries & Galloway
+20882,Dumfries and Galloway,Dumfries & Galloway
+20883,Dumfries and Galloway,Dumfries & Galloway
+20884,Dumfries and Galloway,Dumfries & Galloway
+20885,Dumfries and Galloway,Dumfries & Galloway
+20888,Dumfries and Galloway,Dumfries & Galloway
+20889,Dumfries and Galloway,Dumfries & Galloway
+20906,Dumfries and Galloway,Dumfries & Galloway
+20911,Dumfries and Galloway,Dumfries & Galloway
+20925,Argyll and Bute,Argyll & Bute
+20927,Perth and Kinross,Perth & Kinross
+20937,Argyll and Bute,Argyll & Bute
+20938,Argyll and Bute,Argyll & Bute
+20939,Argyll and Bute,Argyll & Bute
+20942,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+20943,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+20946,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+20947,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+20953,Argyll and Bute,Argyll & Bute
+20969,Perth and Kinross,Perth & Kinross
+20975,Perth and Kinross,Perth & Kinross
+21019,Dumfries and Galloway,Dumfries & Galloway
+21022,Argyll and Bute,Argyll & Bute
+26083,Central Bedfordshire,Bedfordshire
+26170,Bedford,Bedfordshire
+26330,Cornwall,Cornwall excluding Isles of Scilly
+26332,Cornwall,Cornwall excluding Isles of Scilly
+26335,Cornwall,Cornwall excluding Isles of Scilly
+26374,"Bournemouth, Christchurch and Poole",Bournemouth
+26415,Cornwall,Cornwall excluding Isles of Scilly
+26416,Cornwall,Cornwall excluding Isles of Scilly
+26423,Cornwall,Cornwall excluding Isles of Scilly
+26424,Cornwall,Cornwall excluding Isles of Scilly
+26427,Cornwall,Cornwall excluding Isles of Scilly
+26447,Cheshire West and Chester,Cheshire
+26447,Cheshire West and Chester,West Cheshire
+26523,Cheshire West and Chester,Cheshire
+26523,Cheshire West and Chester,West Cheshire
+26540,Cheshire East,Cheshire
+26540,Cheshire East,East Cheshire
+26558,Cheshire West and Chester,Cheshire
+26558,Cheshire West and Chester,West Cheshire
+26559,Cheshire East,Cheshire
+26559,Cheshire East,East Cheshire
+26569,Cheshire West and Chester,Cheshire
+26569,Cheshire West and Chester,West Cheshire
+26636,County Durham,Durham
+26734,County Durham,Durham
+26749,County Durham,Durham
+26967,"Bournemouth, Christchurch and Poole",Bournemouth
+26971,"Bournemouth, Christchurch and Poole",Poole
+26990,"Bournemouth, Christchurch and Poole",Poole
+27035,Cornwall,Cornwall excluding Isles of Scilly
+27057,Cornwall,Cornwall excluding Isles of Scilly
+27058,Cornwall,Cornwall excluding Isles of Scilly
+27061,Cornwall,Cornwall excluding Isles of Scilly
+27063,Cornwall,Cornwall excluding Isles of Scilly
+27114,Central Bedfordshire,Bedfordshire
+27150,Bedford,Bedfordshire
+27267,Cheshire East,Cheshire
+27267,Cheshire East,East Cheshire
+27273,Cheshire East,Cheshire
+27274,Cheshire East,Cheshire
+27274,Cheshire East,East Cheshire
+27277,Cheshire East,Cheshire
+27277,Cheshire East,East Cheshire
+27278,Cheshire West and Chester,Cheshire
+27278,Cheshire West and Chester,West Cheshire
+27279,Cheshire East,Cheshire
+27279,Cheshire East,East Cheshire
+27280,Cheshire East,Cheshire
+27280,Cheshire East,East Cheshire
+27284,Cheshire West and Chester,Cheshire
+27284,Cheshire West and Chester,West Cheshire
+27289,Cheshire East,Cheshire
+27289,Cheshire East,East Cheshire
+27290,Cheshire East,Cheshire
+27290,Cheshire East,East Cheshire
+27291,Cheshire West and Chester,Cheshire
+27291,Cheshire West and Chester,West Cheshire
+27293,Cheshire West and Chester,Cheshire
+27293,Cheshire West and Chester,West Cheshire
+27478,County Durham,Durham
+27479,County Durham,Durham
+27482,County Durham,Durham
+27483,County Durham,Durham
+27626,Cornwall,Cornwall excluding Isles of Scilly
+27627,"Bournemouth, Christchurch and Poole",Bournemouth
+27642,Cornwall,Cornwall excluding Isles of Scilly
+27644,Cornwall,Cornwall excluding Isles of Scilly
+27646,Cornwall,Cornwall excluding Isles of Scilly
+27647,Cornwall,Cornwall excluding Isles of Scilly
+27724,Central Bedfordshire,Bedfordshire
+27740,Cheshire East,Cheshire
+27740,Cheshire East,East Cheshire
+27741,Cheshire East,Cheshire
+27741,Cheshire East,East Cheshire
+27768,Cheshire West and Chester,Cheshire
+27768,Cheshire West and Chester,West Cheshire
+27775,Central Bedfordshire,Bedfordshire
+27789,Cheshire West and Chester,Cheshire
+27789,Cheshire West and Chester,West Cheshire
+27816,County Durham,Durham
+27852,Cheshire East,Cheshire
+27852,Cheshire East,East Cheshire
+27869,Cornwall,Cornwall excluding Isles of Scilly
+27997,Bedford,Bedfordshire
+28032,Cheshire East,Cheshire
+28032,Cheshire East,East Cheshire
+28034,Cheshire East,Cheshire
+28034,Cheshire East,East Cheshire
+28074,"Bournemouth, Christchurch and Poole",Poole
+28104,Cornwall,Cornwall excluding Isles of Scilly
+28168,County Durham,Durham
+28174,Cheshire West and Chester,Cheshire
+28174,Cheshire West and Chester,West Cheshire
+28332,"Bournemouth, Christchurch and Poole",Poole
+28422,Bedford,Bedfordshire
+28423,Cheshire West and Chester,Cheshire
+28423,Cheshire West and Chester,West Cheshire
+28471,"Bournemouth, Christchurch and Poole",Poole
+28530,County Durham,Durham
+28691,Cheshire East,Cheshire
+28691,Cheshire East,East Cheshire
+28704,"Bournemouth, Christchurch and Poole",Bournemouth
+28751,Cornwall,Cornwall excluding Isles of Scilly
+28775,Cheshire West and Chester,Cheshire
+28775,Cheshire West and Chester,West Cheshire
+28778,Cornwall,Cornwall excluding Isles of Scilly
+28789,Cheshire West and Chester,Cheshire
+28789,Cheshire West and Chester,West Cheshire
+28854,Cheshire West and Chester,Cheshire
+28854,Cheshire West and Chester,West Cheshire
+29054,Bedford,Bedfordshire
+30547,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+30636,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+30667,Vale of Glamorgan,The Vale of Glamorgan
+30729,Perth and Kinross,Perth & Kinross
+30747,Dumfries and Galloway,Dumfries & Galloway
+30749,Dumfries and Galloway,Dumfries & Galloway
+30753,Dumfries and Galloway,Dumfries & Galloway
+30759,Dumfries and Galloway,Dumfries & Galloway
+30769,Argyll and Bute,Argyll & Bute
+30774,Perth and Kinross,Perth & Kinross
+30775,Argyll and Bute,Argyll & Bute
+30797,Argyll and Bute,Argyll & Bute
+30846,Perth and Kinross,Perth & Kinross
+30863,Perth and Kinross,Perth & Kinross
+30865,Perth and Kinross,Perth & Kinross
+30866,Perth and Kinross,Perth & Kinross
+30877,Dumfries and Galloway,Dumfries & Galloway
+30878,Dumfries and Galloway,Dumfries & Galloway
+30882,Dumfries and Galloway,Dumfries & Galloway
+30884,Dumfries and Galloway,Dumfries & Galloway
+30885,Dumfries and Galloway,Dumfries & Galloway
+30886,Dumfries and Galloway,Dumfries & Galloway
+30888,Dumfries and Galloway,Dumfries & Galloway
+30890,Dumfries and Galloway,Dumfries & Galloway
+30909,Dumfries and Galloway,Dumfries & Galloway
+30913,Dumfries and Galloway,Dumfries & Galloway
+30926,Argyll and Bute,Argyll & Bute
+30927,Argyll and Bute,Argyll & Bute
+30940,Argyll and Bute,Argyll & Bute
+30941,Argyll and Bute,Argyll & Bute
+30942,Argyll and Bute,Argyll & Bute
+30943,Argyll and Bute,Argyll & Bute
+30946,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+30948,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+30953,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+30954,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+30972,Perth and Kinross,Perth & Kinross
+30973,Perth and Kinross,Perth & Kinross
+30980,Perth and Kinross,Perth & Kinross
+30981,Perth and Kinross,Perth & Kinross
+31010,Perth and Kinross,Perth & Kinross
+36081,Bedford,Bedfordshire
+36145,Central Bedfordshire,Bedfordshire
+36173,Bedford,Bedfordshire
+36330,Cornwall,Cornwall excluding Isles of Scilly
+36333,Cornwall,Cornwall excluding Isles of Scilly
+36334,Cornwall,Cornwall excluding Isles of Scilly
+36335,Cornwall,Cornwall excluding Isles of Scilly
+36357,Cheshire East,Cheshire
+36357,Cheshire East,East Cheshire
+36358,Cheshire East,Cheshire
+36358,Cheshire East,East Cheshire
+36384,"Bournemouth, Christchurch and Poole",Poole
+36422,Cornwall,Cornwall excluding Isles of Scilly
+36540,Cheshire East,Cheshire
+36540,Cheshire East,East Cheshire
+36541,Cheshire East,Cheshire
+36541,Cheshire East,East Cheshire
+36542,Cheshire East,Cheshire
+36542,Cheshire East,East Cheshire
+36552,Cheshire West and Chester,Cheshire
+36552,Cheshire West and Chester,West Cheshire
+36553,Cheshire East,Cheshire
+36554,Cheshire East,Cheshire
+36571,Cheshire West and Chester,Cheshire
+36571,Cheshire West and Chester,West Cheshire
+36572,Cheshire East,Cheshire
+36572,Cheshire East,East Cheshire
+36573,Cheshire East,Cheshire
+36573,Cheshire East,East Cheshire
+36652,County Durham,Durham
+36744,County Durham,Durham
+36756,County Durham,Durham
+36757,County Durham,Durham
+36769,County Durham,Durham
+36995,"Bournemouth, Christchurch and Poole",Bournemouth
+36999,"Bournemouth, Christchurch and Poole",Bournemouth
+37060,Cornwall,Cornwall excluding Isles of Scilly
+37083,Cornwall,Cornwall excluding Isles of Scilly
+37085,Cornwall,Cornwall excluding Isles of Scilly
+37086,Cornwall,Cornwall excluding Isles of Scilly
+37089,Cornwall,Cornwall excluding Isles of Scilly
+37090,Cornwall,Cornwall excluding Isles of Scilly
+37091,Cornwall,Cornwall excluding Isles of Scilly
+37096,Cornwall,Cornwall excluding Isles of Scilly
+37176,Bedford,Bedfordshire
+37306,Cheshire East,Cheshire
+37306,Cheshire East,East Cheshire
+37311,Cheshire East,Cheshire
+37311,Cheshire East,East Cheshire
+37312,Cheshire East,Cheshire
+37312,Cheshire East,East Cheshire
+37314,Cheshire East,Cheshire
+37314,Cheshire East,East Cheshire
+37315,Cheshire East,Cheshire
+37315,Cheshire East,East Cheshire
+37317,Cheshire East,Cheshire
+37317,Cheshire East,East Cheshire
+37318,Cheshire West and Chester,Cheshire
+37318,Cheshire West and Chester,West Cheshire
+37320,Cheshire West and Chester,Cheshire
+37320,Cheshire West and Chester,West Cheshire
+37326,Cheshire East,Cheshire
+37326,Cheshire East,East Cheshire
+37327,Cheshire West and Chester,Cheshire
+37327,Cheshire West and Chester,West Cheshire
+37329,Cheshire West and Chester,Cheshire
+37523,County Durham,Durham
+37526,County Durham,Durham
+37528,County Durham,Durham
+37531,County Durham,Durham
+37667,Cornwall,Cornwall excluding Isles of Scilly
+37668,Cornwall,Cornwall excluding Isles of Scilly
+37669,"Bournemouth, Christchurch and Poole",Poole
+37678,Cornwall,Cornwall excluding Isles of Scilly
+37679,Cornwall,Cornwall excluding Isles of Scilly
+37686,Cornwall,Cornwall excluding Isles of Scilly
+37690,Cornwall,Cornwall excluding Isles of Scilly
+37786,Cheshire West and Chester,Cheshire
+37786,Cheshire West and Chester,West Cheshire
+37812,Cheshire West and Chester,Cheshire
+37812,Cheshire West and Chester,West Cheshire
+37813,Cheshire West and Chester,Cheshire
+37813,Cheshire West and Chester,West Cheshire
+37823,Bedford,Bedfordshire
+37832,Cheshire West and Chester,Cheshire
+37832,Cheshire West and Chester,West Cheshire
+37855,County Durham,Durham
+37931,County Durham,Durham
+38074,Central Bedfordshire,Bedfordshire
+38078,Cheshire West and Chester,Cheshire
+38078,Cheshire West and Chester,West Cheshire
+38123,County Durham,Durham
+38223,County Durham,Durham
+38228,Cheshire West and Chester,Cheshire
+38228,Cheshire West and Chester,West Cheshire
+38229,Cheshire East,Cheshire
+38229,Cheshire East,East Cheshire
+38262,Bedford,Bedfordshire
+38371,Bedford,Bedfordshire
+38387,"Bournemouth, Christchurch and Poole",Poole
+38403,Bedford,Bedfordshire
+38687,Cornwall,Cornwall excluding Isles of Scilly
+38724,Central Bedfordshire,Bedfordshire
+38733,"Bournemouth, Christchurch and Poole",Poole
+38742,Cheshire East,Cheshire
+38742,Cheshire East,East Cheshire
+38750,Cheshire West and Chester,Cheshire
+38750,Cheshire West and Chester,West Cheshire
+38758,Central Bedfordshire,Bedfordshire
+38787,Central Bedfordshire,Bedfordshire
+38797,Bedford,Bedfordshire
+38799,"Bournemouth, Christchurch and Poole",Dorset
+38808,Cheshire West and Chester,Cheshire
+38808,Cheshire West and Chester,West Cheshire
+38814,Cheshire East,Cheshire
+38814,Cheshire East,East Cheshire
+40526,Vale of Glamorgan,The Vale of Glamorgan
+40536,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+40548,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+40628,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+40629,Vale of Glamorgan,The Vale of Glamorgan
+40650,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+40661,Vale of Glamorgan,The Vale of Glamorgan
+40716,Dumfries and Galloway,Dumfries & Galloway
+40725,Perth and Kinross,Perth & Kinross
+40767,Argyll and Bute,Argyll & Bute
+40768,Argyll and Bute,Argyll & Bute
+40770,Perth and Kinross,Perth & Kinross
+40794,Argyll and Bute,Argyll & Bute
+40796,Argyll and Bute,Argyll & Bute
+40804,Perth and Kinross,Perth & Kinross
+40836,Dumfries and Galloway,Dumfries & Galloway
+40837,Dumfries and Galloway,Dumfries & Galloway
+40838,Dumfries and Galloway,Dumfries & Galloway
+40845,Argyll and Bute,Argyll & Bute
+40847,Perth and Kinross,Perth & Kinross
+40852,Perth and Kinross,Perth & Kinross
+40863,Perth and Kinross,Perth & Kinross
+40864,Perth and Kinross,Perth & Kinross
+40866,Perth and Kinross,Perth & Kinross
+40878,Dumfries and Galloway,Dumfries & Galloway
+40883,Dumfries and Galloway,Dumfries & Galloway
+40884,Dumfries and Galloway,Dumfries & Galloway
+40885,Dumfries and Galloway,Dumfries & Galloway
+40886,Dumfries and Galloway,Dumfries & Galloway
+40888,Dumfries and Galloway,Dumfries & Galloway
+40890,Dumfries and Galloway,Dumfries & Galloway
+40908,Dumfries and Galloway,Dumfries & Galloway
+40909,Dumfries and Galloway,Dumfries & Galloway
+40913,Dumfries and Galloway,Dumfries & Galloway
+40923,Argyll and Bute,Argyll & Bute
+40926,Argyll and Bute,Argyll & Bute
+40928,Perth and Kinross,Perth & Kinross
+40930,Perth and Kinross,Perth & Kinross
+40931,Perth and Kinross,Perth & Kinross
+40940,Argyll and Bute,Argyll & Bute
+40941,Argyll and Bute,Argyll & Bute
+40942,Argyll and Bute,Argyll & Bute
+40946,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+40947,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+40948,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+40953,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+40957,Argyll and Bute,Argyll & Bute
+40972,Perth and Kinross,Perth & Kinross
+40973,Perth and Kinross,Perth & Kinross
+40974,Perth and Kinross,Perth & Kinross
+40979,Perth and Kinross,Perth & Kinross
+46079,Central Bedfordshire,Bedfordshire
+46150,Central Bedfordshire,Bedfordshire
+46178,Bedford,Bedfordshire
+46179,Central Bedfordshire,Bedfordshire
+46242,County Durham,Durham
+46337,Cornwall,Cornwall excluding Isles of Scilly
+46359,Cheshire East,Cheshire
+46359,Cheshire East,East Cheshire
+46377,"Bournemouth, Christchurch and Poole",Dorset
+46379,"Bournemouth, Christchurch and Poole",Poole
+46420,Cornwall,Cornwall excluding Isles of Scilly
+46429,Cornwall,Cornwall excluding Isles of Scilly
+46449,Cheshire West and Chester,Cheshire
+46449,Cheshire West and Chester,West Cheshire
+46450,Cheshire West and Chester,Cheshire
+46450,Cheshire West and Chester,West Cheshire
+46531,Cheshire West and Chester,Cheshire
+46537,Cheshire East,Cheshire
+46547,Cheshire East,Cheshire
+46547,Cheshire East,East Cheshire
+46566,Cheshire West and Chester,Cheshire
+46566,Cheshire West and Chester,West Cheshire
+46567,Cheshire East,Cheshire
+46567,Cheshire East,East Cheshire
+46568,Cheshire East,Cheshire
+46568,Cheshire East,East Cheshire
+46569,Cheshire West and Chester,Cheshire
+46569,Cheshire West and Chester,West Cheshire
+46577,Cheshire West and Chester,Cheshire
+46577,Cheshire West and Chester,West Cheshire
+46644,County Durham,Durham
+46647,County Durham,Durham
+46648,County Durham,Durham
+46760,County Durham,Durham
+46971,"Bournemouth, Christchurch and Poole",Bournemouth
+46976,"Bournemouth, Christchurch and Poole",Bournemouth
+46987,"Bournemouth, Christchurch and Poole",Bournemouth
+46988,"Bournemouth, Christchurch and Poole",Poole
+46994,"Bournemouth, Christchurch and Poole",Poole
+47061,Cornwall,Cornwall excluding Isles of Scilly
+47066,Cornwall,Cornwall excluding Isles of Scilly
+47067,Cornwall,Cornwall excluding Isles of Scilly
+47068,Cornwall,Cornwall excluding Isles of Scilly
+47070,Cornwall,Cornwall excluding Isles of Scilly
+47119,Central Bedfordshire,Bedfordshire
+47278,Cheshire East,Cheshire
+47278,Cheshire East,East Cheshire
+47279,Cheshire West and Chester,Cheshire
+47279,Cheshire West and Chester,West Cheshire
+47280,Cheshire East,Cheshire
+47280,Cheshire East,East Cheshire
+47282,Cheshire West and Chester,Cheshire
+47282,Cheshire West and Chester,West Cheshire
+47284,Cheshire East,Cheshire
+47284,Cheshire East,East Cheshire
+47287,Cheshire East,Cheshire
+47287,Cheshire East,East Cheshire
+47290,Cheshire West and Chester,Cheshire
+47290,Cheshire West and Chester,West Cheshire
+47291,Cheshire West and Chester,Cheshire
+47291,Cheshire West and Chester,West Cheshire
+47298,Cheshire West and Chester,Cheshire
+47298,Cheshire West and Chester,West Cheshire
+47300,Cheshire West and Chester,Cheshire
+47300,Cheshire West and Chester,West Cheshire
+47353,Bedford,Bedfordshire
+47484,County Durham,Durham
+47485,County Durham,Durham
+47486,County Durham,Durham
+47488,County Durham,Durham
+47525,County Durham,Durham
+47627,"Bournemouth, Christchurch and Poole",Bournemouth
+47641,Cornwall,Cornwall excluding Isles of Scilly
+47647,Cornwall,Cornwall excluding Isles of Scilly
+47737,Cheshire East,Cheshire
+47737,Cheshire East,East Cheshire
+47739,Cheshire East,Cheshire
+47739,Cheshire East,East Cheshire
+47751,Cheshire East,Cheshire
+47751,Cheshire East,East Cheshire
+47769,Cheshire West and Chester,Cheshire
+47769,Cheshire West and Chester,West Cheshire
+47770,Cheshire West and Chester,Cheshire
+47771,Cheshire West and Chester,Cheshire
+47771,Cheshire West and Chester,West Cheshire
+47772,Central Bedfordshire,Bedfordshire
+47782,Bedford,Bedfordshire
+47792,Cheshire West and Chester,Cheshire
+47792,Cheshire West and Chester,West Cheshire
+47814,County Durham,Durham
+47870,Central Bedfordshire,Bedfordshire
+47881,Bedford,Bedfordshire
+48045,Bedford,Bedfordshire
+48058,Central Bedfordshire,Bedfordshire
+48199,County Durham,Durham
+48206,County Durham,Durham
+48207,County Durham,Durham
+48246,Bedford,Bedfordshire
+48300,Central Bedfordshire,Bedfordshire
+48321,Cornwall,Cornwall excluding Isles of Scilly
+48355,Bedford,Bedfordshire
+48387,Bedford,Bedfordshire
+48389,Cornwall,Cornwall excluding Isles of Scilly
+48392,"Bournemouth, Christchurch and Poole",Poole
+48472,County Durham,Durham
+48569,County Durham,Durham
+48628,Central Bedfordshire,Bedfordshire
+48705,Central Bedfordshire,Bedfordshire
+48714,"Bournemouth, Christchurch and Poole",Poole
+48717,Cheshire East,Cheshire
+48717,Cheshire East,East Cheshire
+48753,Bedford,Bedfordshire
+48779,Central Bedfordshire,Bedfordshire
+48780,Central Bedfordshire,Bedfordshire
+48797,Cheshire East,Cheshire
+48797,Cheshire East,East Cheshire
+48822,Cornwall,Cornwall excluding Isles of Scilly
+50536,Vale of Glamorgan,The Vale of Glamorgan
+50578,Vale of Glamorgan,The Vale of Glamorgan
+50600,Vale of Glamorgan,The Vale of Glamorgan
+50628,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+50629,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+50668,Vale of Glamorgan,The Vale of Glamorgan
+50718,Dumfries and Galloway,Dumfries & Galloway
+50746,Dumfries and Galloway,Dumfries & Galloway
+50747,Dumfries and Galloway,Dumfries & Galloway
+50752,Dumfries and Galloway,Dumfries & Galloway
+50763,Argyll and Bute,Argyll & Bute
+50771,Argyll and Bute,Argyll & Bute
+50798,Dumfries and Galloway,Dumfries & Galloway
+50806,Dumfries and Galloway,Dumfries & Galloway
+50809,Perth and Kinross,Perth & Kinross
+50824,Perth and Kinross,Perth & Kinross
+50826,Argyll and Bute,Argyll & Bute
+50838,Perth and Kinross,Perth & Kinross
+50840,Perth and Kinross,Perth & Kinross
+50879,Perth and Kinross,Perth & Kinross
+50880,Perth and Kinross,Perth & Kinross
+50887,Perth and Kinross,Perth & Kinross
+50902,Perth and Kinross,Perth & Kinross
+50908,Argyll and Bute,Argyll & Bute
+50913,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+50914,Perth and Kinross,Perth & Kinross
+50915,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+50921,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+50923,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+50929,Argyll and Bute,Argyll & Bute
+50930,Argyll and Bute,Argyll & Bute
+50932,Argyll and Bute,Argyll & Bute
+50945,Perth and Kinross,Perth & Kinross
+50946,Perth and Kinross,Perth & Kinross
+50948,Perth and Kinross,Perth & Kinross
+50973,Dumfries and Galloway,Dumfries & Galloway
+50993,Dumfries and Galloway,Dumfries & Galloway
+50994,Dumfries and Galloway,Dumfries & Galloway
+50995,Dumfries and Galloway,Dumfries & Galloway
+50998,Dumfries and Galloway,Dumfries & Galloway
+50999,Dumfries and Galloway,Dumfries & Galloway
+51000,Dumfries and Galloway,Dumfries & Galloway
+56180,Central Bedfordshire,Bedfordshire
+56243,County Durham,Durham
+56291,Cornwall,Cornwall excluding Isles of Scilly
+56329,Cornwall,Cornwall excluding Isles of Scilly
+56334,"Bournemouth, Christchurch and Poole",Dorset
+56337,"Bournemouth, Christchurch and Poole",Poole
+56338,"Bournemouth, Christchurch and Poole",Bournemouth
+56354,Cheshire East,Cheshire
+56354,Cheshire East,East Cheshire
+56371,Cornwall,Cornwall excluding Isles of Scilly
+56373,"Bournemouth, Christchurch and Poole",Dorset
+56448,Cheshire West and Chester,Cheshire
+56448,Cheshire West and Chester,West Cheshire
+56450,Cheshire West and Chester,Cheshire
+56450,Cheshire West and Chester,West Cheshire
+56509,Cheshire West and Chester,Cheshire
+56509,Cheshire West and Chester,West Cheshire
+56516,Cheshire East,Cheshire
+56530,Cheshire East,Cheshire
+56530,Cheshire East,East Cheshire
+56531,Cheshire East,Cheshire
+56533,Cheshire West and Chester,Cheshire
+56533,Cheshire West and Chester,West Cheshire
+56540,Cheshire West and Chester,Cheshire
+56540,Cheshire West and Chester,West Cheshire
+56549,Cheshire East,Cheshire
+56549,Cheshire East,East Cheshire
+56552,Cheshire East,Cheshire
+56552,Cheshire East,East Cheshire
+56581,Cheshire West and Chester,Cheshire
+56581,Cheshire West and Chester,West Cheshire
+56583,Bedford,Bedfordshire
+56633,County Durham,Durham
+56640,County Durham,Durham
+56703,County Durham,Durham
+56715,County Durham,Durham
+56716,County Durham,Durham
+56736,Cornwall,Cornwall excluding Isles of Scilly
+56738,Cornwall,Cornwall excluding Isles of Scilly
+56743,County Durham,Durham
+56813,Cheshire East,Cheshire
+56813,Cheshire East,East Cheshire
+56972,"Bournemouth, Christchurch and Poole",Bournemouth
+57009,"Bournemouth, Christchurch and Poole",Bournemouth
+57062,Cornwall,Cornwall excluding Isles of Scilly
+57063,Cornwall,Cornwall excluding Isles of Scilly
+57066,Cornwall,Cornwall excluding Isles of Scilly
+57071,Cornwall,Cornwall excluding Isles of Scilly
+57087,Cornwall,Cornwall excluding Isles of Scilly
+57093,Cornwall,Cornwall excluding Isles of Scilly
+57109,Central Bedfordshire,Bedfordshire
+57113,Bedford,Bedfordshire
+57216,Cheshire West and Chester,Cheshire
+57216,Cheshire West and Chester,West Cheshire
+57248,Cheshire East,Cheshire
+57248,Cheshire East,East Cheshire
+57256,Cheshire West and Chester,Cheshire
+57256,Cheshire West and Chester,West Cheshire
+57266,Cheshire West and Chester,Cheshire
+57266,Cheshire West and Chester,West Cheshire
+57272,"Bournemouth, Christchurch and Poole",Bournemouth
+57275,Cheshire East,Cheshire
+57275,Cheshire East,East Cheshire
+57276,Cheshire West and Chester,Cheshire
+57276,Cheshire West and Chester,West Cheshire
+57286,Cheshire East,Cheshire
+57286,Cheshire East,East Cheshire
+57297,Cheshire East,Cheshire
+57297,Cheshire East,East Cheshire
+57310,Cheshire West and Chester,Cheshire
+57316,Cheshire East,Cheshire
+57316,Cheshire East,East Cheshire
+57321,Bedford,Bedfordshire
+57462,County Durham,Durham
+57477,County Durham,Durham
+57521,County Durham,Durham
+57522,County Durham,Durham
+57527,County Durham,Durham
+57541,"Bournemouth, Christchurch and Poole",Bournemouth
+57543,County Durham,Durham
+57560,Cornwall,Cornwall excluding Isles of Scilly
+57597,Cheshire East,Cheshire
+57597,Cheshire East,East Cheshire
+57626,Cornwall,Cornwall excluding Isles of Scilly
+57643,Cornwall,Cornwall excluding Isles of Scilly
+57676,Central Bedfordshire,Bedfordshire
+57685,County Durham,Durham
+57687,Cornwall,Cornwall excluding Isles of Scilly
+57706,Central Bedfordshire,Bedfordshire
+57763,Bedford,Bedfordshire
+57769,Central Bedfordshire,Bedfordshire
+57789,Cheshire East,Cheshire
+57789,Cheshire East,East Cheshire
+57792,Central Bedfordshire,Bedfordshire
+57835,Central Bedfordshire,Bedfordshire
+57956,"Bournemouth, Christchurch and Poole",Poole
+58071,Bedford,Bedfordshire
+58075,Cheshire East,Cheshire
+58075,Cheshire East,East Cheshire
+58128,Bedford,Bedfordshire
+58250,Cheshire East,Cheshire
+58250,Cheshire East,East Cheshire
+58263,"Bournemouth, Christchurch and Poole",Bournemouth
+58337,Cornwall,Cornwall excluding Isles of Scilly
+58341,Cheshire East,Cheshire
+58341,Cheshire East,East Cheshire
+58364,Central Bedfordshire,Bedfordshire
+58374,Cornwall,Cornwall excluding Isles of Scilly
+58403,Central Bedfordshire,Bedfordshire
+58404,Central Bedfordshire,Bedfordshire
+58420,Cheshire East,Cheshire
+58420,Cheshire East,East Cheshire
+59056,Cornwall,Cornwall excluding Isles of Scilly
+60003,Cheshire West and Chester,Cheshire
+60003,Cheshire West and Chester,West Cheshire
+60010,Cheshire East,Cheshire
+60010,Cheshire East,East Cheshire
+60018,Cheshire East,Cheshire
+60018,Cheshire East,East Cheshire
+60020,Cheshire East,Cheshire
+60020,Cheshire East,East Cheshire
+60021,Cheshire East,Cheshire
+60021,Cheshire East,East Cheshire
+60062,County Durham,Durham
+60069,County Durham,Durham
+60070,County Durham,Durham
+60079,"Bournemouth, Christchurch and Poole",Poole
+70013,Cheshire West and Chester,Cheshire
+70013,Cheshire West and Chester,West Cheshire
+70014,Cheshire West and Chester,Cheshire
+70014,Cheshire West and Chester,West Cheshire
+70015,Cheshire West and Chester,Cheshire
+70015,Cheshire West and Chester,West Cheshire
+70016,Cheshire West and Chester,Cheshire
+70016,Cheshire West and Chester,West Cheshire
+70044,Cheshire East,Cheshire
+70044,Cheshire East,East Cheshire
+70045,Cheshire East,Cheshire
+70045,Cheshire East,East Cheshire
+70077,Cornwall,Cornwall excluding Isles of Scilly
+70078,Cornwall,Cornwall excluding Isles of Scilly
+70091,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+70092,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+70093,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+70248,Bedford,Bedfordshire
+73029,Central Bedfordshire,Bedfordshire
+73031,Central Bedfordshire,Bedfordshire
+73032,Central Bedfordshire,Bedfordshire
+73035,Bedford,Bedfordshire
+73036,Bedford,Bedfordshire
+73043,Central Bedfordshire,Bedfordshire
+73045,Central Bedfordshire,Bedfordshire
+73094,"Bournemouth, Christchurch and Poole",Bournemouth
+73095,"Bournemouth, Christchurch and Poole",Dorset
+73098,"Bournemouth, Christchurch and Poole",Bournemouth
+73099,"Bournemouth, Christchurch and Poole",Poole
+73231,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+73232,Vale of Glamorgan,The Vale of Glamorgan
+73233,Vale of Glamorgan,The Vale of Glamorgan
+73262,Cheshire East,Cheshire
+73262,Cheshire East,East Cheshire
+73264,Cheshire East,Cheshire
+73264,Cheshire East,East Cheshire
+73265,Cheshire East,Cheshire
+73265,Cheshire East,East Cheshire
+73267,Cheshire East,Cheshire
+73271,Cheshire East,Cheshire
+73271,Cheshire East,East Cheshire
+73281,Cheshire West and Chester,Cheshire
+73281,Cheshire West and Chester,West Cheshire
+73284,Cheshire West and Chester,Cheshire
+73284,Cheshire West and Chester,West Cheshire
+73285,Cheshire West and Chester,Cheshire
+73285,Cheshire West and Chester,West Cheshire
+73286,Cheshire West and Chester,Cheshire
+73286,Cheshire West and Chester,West Cheshire
+73287,Cheshire East,Cheshire
+73287,Cheshire East,East Cheshire
+73329,County Durham,Durham
+73331,County Durham,Durham
+73416,"Bournemouth, Christchurch and Poole",Poole
+73417,"Bournemouth, Christchurch and Poole",Dorset
+73432,County Durham,Durham
+73433,County Durham,Durham
+73434,County Durham,Durham
+73436,County Durham,Durham
+73437,County Durham,Durham
+73440,County Durham,Durham
+73442,County Durham,Durham
+74073,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+74075,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+74089,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+74094,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+74096,Vale of Glamorgan,The Vale of Glamorgan
+74100,Vale of Glamorgan,The Vale of Glamorgan
+74279,Argyll and Bute,Argyll & Bute
+74280,Argyll and Bute,Argyll & Bute
+74300,Dumfries and Galloway,Dumfries & Galloway
+74301,Dumfries and Galloway,Dumfries & Galloway
+74328,Perth and Kinross,Perth & Kinross
+74330,Perth and Kinross,Perth & Kinross
+74336,Argyll and Bute,Argyll & Bute
+74337,Argyll and Bute,Argyll & Bute
+74338,Argyll and Bute,Argyll & Bute
+74339,Argyll and Bute,Argyll & Bute
+74340,Argyll and Bute,Argyll & Bute
+74341,Argyll and Bute,Argyll & Bute
+74342,Argyll and Bute,Argyll & Bute
+74455,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+74932,"Bournemouth, Christchurch and Poole",Poole
+74933,"Bournemouth, Christchurch and Poole",Poole
+74934,"Bournemouth, Christchurch and Poole",Poole
+75153,Cornwall,Cornwall excluding Isles of Scilly
+75154,Cornwall,Cornwall excluding Isles of Scilly
+75155,Cornwall,Cornwall excluding Isles of Scilly
+75176,Cheshire East,Cheshire
+75176,Cheshire East,East Cheshire
+75179,Cheshire West and Chester,Cheshire
+75179,Cheshire West and Chester,West Cheshire
+75180,Cheshire West and Chester,Cheshire
+75180,Cheshire West and Chester,West Cheshire
+75181,Cheshire West and Chester,Cheshire
+75181,Cheshire West and Chester,West Cheshire
+75211,Bedford,Bedfordshire
+75212,Bedford,Bedfordshire
+77066,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+77067,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+77069,Vale of Glamorgan,The Vale of Glamorgan
+77107,Argyll and Bute,Argyll & Bute
+77113,Perth and Kinross,Perth & Kinross
+77121,Perth and Kinross,Perth & Kinross
+77122,Perth and Kinross,Perth & Kinross
+77123,Perth and Kinross,Perth & Kinross
+77127,Cheshire East,Cheshire
+77127,Cheshire East,East Cheshire
+77128,Cheshire East,Cheshire
+77128,Cheshire East,East Cheshire
+77129,Cheshire East,Cheshire
+77129,Cheshire East,East Cheshire
+77211,Bedford,Bedfordshire
+77212,Bedford,Bedfordshire
+77214,Bedford,Bedfordshire
+77215,Bedford,Bedfordshire
+77216,Bedford,Bedfordshire
+77224,Central Bedfordshire,Bedfordshire
+77327,Central Bedfordshire,Bedfordshire
+77374,Central Bedfordshire,Bedfordshire
+77399,Central Bedfordshire,Bedfordshire
+77536,County Durham,Durham
+77537,County Durham,Durham
+77587,County Durham,Durham
+77614,County Durham,Durham
+77689,County Durham,Durham
+77711,County Durham,Durham
+77765,County Durham,Durham
+77792,Cheshire West and Chester,Cheshire
+77792,Cheshire West and Chester,West Cheshire
+77796,Cheshire East,Cheshire
+77796,Cheshire East,East Cheshire
+77797,Cheshire East,Cheshire
+77797,Cheshire East,East Cheshire
+77798,Cheshire East,Cheshire
+77798,Cheshire East,East Cheshire
+77799,Cheshire East,Cheshire
+77799,Cheshire East,East Cheshire
+77800,Cheshire East,Cheshire
+77800,Cheshire East,East Cheshire
+77818,Cheshire East,Cheshire
+77818,Cheshire East,East Cheshire
+77819,Cheshire East,Cheshire
+77819,Cheshire East,East Cheshire
+77836,Cheshire East,Cheshire
+77836,Cheshire East,East Cheshire
+77837,Cheshire East,Cheshire
+77837,Cheshire East,East Cheshire
+77838,Cheshire East,Cheshire
+77838,Cheshire East,East Cheshire
+77839,Cheshire East,Cheshire
+77839,Cheshire East,East Cheshire
+77840,Cheshire East,Cheshire
+77840,Cheshire East,East Cheshire
+77841,Cheshire West and Chester,Cheshire
+77841,Cheshire West and Chester,West Cheshire
+77843,Cheshire West and Chester,Cheshire
+77843,Cheshire West and Chester,West Cheshire
+77849,Cheshire West and Chester,Cheshire
+77849,Cheshire West and Chester,West Cheshire
+77867,Cheshire East,Cheshire
+77867,Cheshire East,East Cheshire
+77871,Cheshire East,Cheshire
+77871,Cheshire East,East Cheshire
+77873,Cheshire East,Cheshire
+77873,Cheshire East,East Cheshire
+77922,Cheshire East,East Cheshire
+77923,Cheshire East,Cheshire
+77923,Cheshire East,East Cheshire
+77935,Cheshire West and Chester,Cheshire
+77935,Cheshire West and Chester,West Cheshire
+77936,Cheshire West and Chester,Cheshire
+77936,Cheshire West and Chester,West Cheshire
+77961,"Bournemouth, Christchurch and Poole",Poole
+77962,"Bournemouth, Christchurch and Poole",Poole
+77999,Cornwall,Cornwall excluding Isles of Scilly
+78061,Cornwall,Cornwall excluding Isles of Scilly
+78065,"Bournemouth, Christchurch and Poole",Poole
+78419,Vale of Glamorgan,The Vale of Glamorgan
+78434,Vale of Glamorgan,The Vale of Glamorgan
+78473,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78475,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78484,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78488,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78489,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78491,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78492,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78503,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78504,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78506,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78507,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+78556,Dumfries and Galloway,Dumfries & Galloway
+78558,Dumfries and Galloway,Dumfries & Galloway
+78559,Dumfries and Galloway,Dumfries & Galloway
+78560,Dumfries and Galloway,Dumfries & Galloway
+78598,Argyll and Bute,Argyll & Bute
+78599,Argyll and Bute,Argyll & Bute
+78638,Dumfries and Galloway,Dumfries & Galloway
+78640,Dumfries and Galloway,Dumfries & Galloway
+80053,Perth and Kinross,Perth & Kinross
+80054,Perth and Kinross,Perth & Kinross
+80055,Perth and Kinross,Perth & Kinross
+80056,Perth and Kinross,Perth & Kinross
+80057,Perth and Kinross,Perth & Kinross
+80058,Perth and Kinross,Perth & Kinross
+80066,Perth and Kinross,Perth & Kinross
+80067,Perth and Kinross,Perth & Kinross
+80068,Perth and Kinross,Perth & Kinross
+80069,Perth and Kinross,Perth & Kinross
+80070,Perth and Kinross,Perth & Kinross
+80071,Perth and Kinross,Perth & Kinross
+80072,Perth and Kinross,Perth & Kinross
+80073,Perth and Kinross,Perth & Kinross
+80074,Perth and Kinross,Perth & Kinross
+80075,Perth and Kinross,Perth & Kinross
+80082,Perth and Kinross,Perth & Kinross
+80083,Perth and Kinross,Perth & Kinross
+80199,Dumfries and Galloway,Dumfries & Galloway
+80200,Dumfries and Galloway,Dumfries & Galloway
+80201,Dumfries and Galloway,Dumfries & Galloway
+80213,Cheshire East,Cheshire
+80213,Cheshire East,East Cheshire
+80214,Cheshire East,Cheshire
+80214,Cheshire East,East Cheshire
+80241,Argyll and Bute,Argyll & Bute
+80242,Argyll and Bute,Argyll & Bute
+80243,Cheshire East,Cheshire
+80243,Cheshire East,East Cheshire
+80244,Cheshire East,Cheshire
+80244,Cheshire East,East Cheshire
+80245,Argyll and Bute,Argyll & Bute
+80285,Dumfries and Galloway,Dumfries & Galloway
+80286,Dumfries and Galloway,Dumfries & Galloway
+80287,Dumfries and Galloway,Dumfries & Galloway
+80288,Dumfries and Galloway,Dumfries & Galloway
+80289,Dumfries and Galloway,Dumfries & Galloway
+80290,Dumfries and Galloway,Dumfries & Galloway
+80291,Dumfries and Galloway,Dumfries & Galloway
+80292,Dumfries and Galloway,Dumfries & Galloway
+80293,Dumfries and Galloway,Dumfries & Galloway
+80294,Dumfries and Galloway,Dumfries & Galloway
+80295,Dumfries and Galloway,Dumfries & Galloway
+80296,Dumfries and Galloway,Dumfries & Galloway
+80297,Dumfries and Galloway,Dumfries & Galloway
+80298,Dumfries and Galloway,Dumfries & Galloway
+80299,Dumfries and Galloway,Dumfries & Galloway
+80300,Dumfries and Galloway,Dumfries & Galloway
+80301,Dumfries and Galloway,Dumfries & Galloway
+80302,Dumfries and Galloway,Dumfries & Galloway
+80303,Dumfries and Galloway,Dumfries & Galloway
+80304,Dumfries and Galloway,Dumfries & Galloway
+80305,Dumfries and Galloway,Dumfries & Galloway
+80306,Dumfries and Galloway,Dumfries & Galloway
+80307,Dumfries and Galloway,Dumfries & Galloway
+80308,Dumfries and Galloway,Dumfries & Galloway
+80309,Dumfries and Galloway,Dumfries & Galloway
+80310,Dumfries and Galloway,Dumfries & Galloway
+80313,Dumfries and Galloway,Dumfries & Galloway
+80314,Dumfries and Galloway,Dumfries & Galloway
+80315,Dumfries and Galloway,Dumfries & Galloway
+80316,Dumfries and Galloway,Dumfries & Galloway
+80324,Dumfries and Galloway,Dumfries & Galloway
+80325,Dumfries and Galloway,Dumfries & Galloway
+80334,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+80335,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+80338,Dumfries and Galloway,Dumfries & Galloway
+80339,Argyll and Bute,Argyll & Bute
+80347,Perth and Kinross,Perth & Kinross
+80349,Dumfries and Galloway,Dumfries & Galloway
+80359,Dumfries and Galloway,Dumfries & Galloway
+80362,Dumfries and Galloway,Dumfries & Galloway
+80363,Argyll and Bute,Argyll & Bute
+80367,Argyll and Bute,Argyll & Bute
+80370,Perth and Kinross,Perth & Kinross
+80371,Argyll and Bute,Argyll & Bute
+80377,Dumfries and Galloway,Dumfries & Galloway
+80378,Perth and Kinross,Perth & Kinross
+80392,Argyll and Bute,Argyll & Bute
+80412,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+80413,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+80414,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+80475,Cornwall,Cornwall excluding Isles of Scilly
+80533,Perth and Kinross,Perth & Kinross
+80650,Cornwall,Cornwall excluding Isles of Scilly
+80674,Central Bedfordshire,Bedfordshire
+80676,Central Bedfordshire,Bedfordshire
+80682,Cheshire East,Cheshire
+80682,Cheshire East,East Cheshire
+80683,Cheshire East,Cheshire
+80683,Cheshire East,East Cheshire
+80684,Cheshire East,Cheshire
+80684,Cheshire East,East Cheshire
+80692,County Durham,Durham
+80698,Cornwall,Cornwall excluding Isles of Scilly
+80699,Cornwall,Cornwall excluding Isles of Scilly
+80700,Cornwall,Cornwall excluding Isles of Scilly
+80710,Central Bedfordshire,Bedfordshire
+80711,Bedford,Bedfordshire
+80712,Bedford,Bedfordshire
+80750,Cheshire East,Cheshire
+80750,Cheshire East,East Cheshire
+80751,Cheshire East,Cheshire
+80751,Cheshire East,East Cheshire
+80752,Cheshire East,Cheshire
+80752,Cheshire East,East Cheshire
+80753,Cheshire East,Cheshire
+80753,Cheshire East,East Cheshire
+80754,Cheshire East,Cheshire
+80754,Cheshire East,East Cheshire
+80755,Cheshire East,Cheshire
+80787,County Durham,Durham
+80880,County Durham,Durham
+81006,County Durham,Durham
+81008,County Durham,Durham
+81009,County Durham,Durham
+81010,County Durham,Durham
+81011,County Durham,Durham
+81075,County Durham,Durham
+81103,Argyll and Bute,Argyll & Bute
+81104,Argyll and Bute,Argyll & Bute
+81105,Argyll and Bute,Argyll & Bute
+81116,Argyll and Bute,Argyll & Bute
+81153,Bedford,Bedfordshire
+81173,Central Bedfordshire,Bedfordshire
+81174,Central Bedfordshire,Bedfordshire
+81175,Central Bedfordshire,Bedfordshire
+81180,Cornwall,Cornwall excluding Isles of Scilly
+81182,Cornwall,Cornwall excluding Isles of Scilly
+81183,Cornwall,Cornwall excluding Isles of Scilly
+81184,Cornwall,Cornwall excluding Isles of Scilly
+81185,Cornwall,Cornwall excluding Isles of Scilly
+81186,Cornwall,Cornwall excluding Isles of Scilly
+81232,County Durham,Durham
+81240,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+81241,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+81243,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+81244,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+81256,Cheshire West and Chester,West Cheshire
+81257,Cheshire East,East Cheshire
+81260,Cheshire East,East Cheshire
+81261,Cheshire West and Chester,West Cheshire
+81262,Cheshire East,East Cheshire
+81263,Cheshire West and Chester,West Cheshire
+81264,Cheshire West and Chester,West Cheshire
+81265,Cheshire East,East Cheshire
+81266,Cheshire East,East Cheshire
+81267,Cheshire West and Chester,West Cheshire
+81268,Cheshire East,East Cheshire
+81269,Cheshire West and Chester,West Cheshire
+81272,Cheshire East,East Cheshire
+81273,Cheshire West and Chester,West Cheshire
+81274,Cheshire East,East Cheshire
+81275,Cheshire West and Chester,West Cheshire
+81276,Cheshire East,East Cheshire
+81277,Cheshire East,East Cheshire
+81278,Cheshire West and Chester,West Cheshire
+81279,Cheshire East,East Cheshire
+81295,County Durham,Durham
+81296,County Durham,Durham
+81297,County Durham,Durham
+81375,Cheshire West and Chester,West Cheshire
+81376,Cheshire West and Chester,West Cheshire
+81427,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+81477,Dumfries and Galloway,Dumfries & Galloway
+81478,Dumfries and Galloway,Dumfries & Galloway
+81512,"Bournemouth, Christchurch and Poole",Poole
+81513,"Bournemouth, Christchurch and Poole",Poole
+81514,"Bournemouth, Christchurch and Poole",Poole
+81515,"Bournemouth, Christchurch and Poole",Poole
+81516,"Bournemouth, Christchurch and Poole",Poole
+82125,Cornwall,Cornwall excluding Isles of Scilly
+82126,Cornwall,Cornwall excluding Isles of Scilly
+82127,Cornwall,Cornwall excluding Isles of Scilly
+82128,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+82129,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+82130,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+84063,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+86066,County Durham,Durham
+88003,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+88025,Cheshire West and Chester,West Cheshire
+88026,Cheshire West and Chester,West Cheshire
+88027,Cheshire West and Chester,West Cheshire
+88028,Cheshire West and Chester,West Cheshire
+88029,Cheshire West and Chester,West Cheshire
+88030,Cheshire West and Chester,West Cheshire
+88031,Cheshire West and Chester,West Cheshire
+88032,Cheshire West and Chester,West Cheshire
+88082,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+88083,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+89024,Cheshire East,East Cheshire
+89026,Cheshire East,East Cheshire
+89027,Cheshire East,East Cheshire
+89233,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+89235,Cheshire East,East Cheshire
+89344,Cheshire East,East Cheshire
+90111,Perth and Kinross,Perth & Kinross
+90112,Perth and Kinross,Perth & Kinross
+90197,Cheshire West and Chester,West Cheshire
+90327,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+91044,Perth and Kinross,Perth & Kinross
+91047,Perth and Kinross,Perth & Kinross
+91048,Perth and Kinross,Perth & Kinross
+91051,Perth and Kinross,Perth & Kinross
+91111,Cheshire East,East Cheshire
+91233,Cheshire West and Chester,West Cheshire
+91292,Argyll and Bute,Argyll & Bute
+99023,Cornwall,Cornwall excluding Isles of Scilly
+99056,County Durham,Durham
+99057,County Durham,Durham
+99058,County Durham,Durham
+99060,County Durham,Durham
+99061,County Durham,Durham
+99062,County Durham,Durham
+99064,Cheshire East,Cheshire
+99064,Cheshire East,East Cheshire
+99089,Cornwall,Cornwall excluding Isles of Scilly
+99090,Cornwall,Cornwall excluding Isles of Scilly
+99092,Cornwall,Cornwall excluding Isles of Scilly
+99093,Cornwall,Cornwall excluding Isles of Scilly
+99094,Cornwall,Cornwall excluding Isles of Scilly
+99096,Cornwall,Cornwall excluding Isles of Scilly
+99097,Cornwall,Cornwall excluding Isles of Scilly
+99098,Cornwall,Cornwall excluding Isles of Scilly
+99100,Cornwall,Cornwall excluding Isles of Scilly
+99101,Cornwall,Cornwall excluding Isles of Scilly
+99102,Cornwall,Cornwall excluding Isles of Scilly
+99103,Cornwall,Cornwall excluding Isles of Scilly
+99106,Cornwall,Cornwall excluding Isles of Scilly
+99113,Cheshire East,Cheshire
+99113,Cheshire East,East Cheshire
+99226,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99227,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99229,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99238,Central Bedfordshire,Bedfordshire
+99239,Central Bedfordshire,Bedfordshire
+99240,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99262,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99263,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99264,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99265,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99287,Cheshire East,Cheshire
+99287,Cheshire East,East Cheshire
+99290,Cheshire East,Cheshire
+99290,Cheshire East,East Cheshire
+99312,Bedford,Bedfordshire
+99313,Bedford,Bedfordshire
+99314,Bedford,Bedfordshire
+99315,Bedford,Bedfordshire
+99316,Bedford,Bedfordshire
+99317,Bedford,Bedfordshire
+99318,Bedford,Bedfordshire
+99339,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99340,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99341,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99384,Cheshire East,Cheshire
+99384,Cheshire East,East Cheshire
+99410,Bedford,Bedfordshire
+99503,Cheshire West and Chester,Cheshire
+99503,Cheshire West and Chester,West Cheshire
+99581,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99583,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99586,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99587,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99592,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99597,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99655,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99660,Cornwall,Cornwall excluding Isles of Scilly
+99661,Cornwall,Cornwall excluding Isles of Scilly
+99754,Cheshire East,Cheshire
+99754,Cheshire East,East Cheshire
+99763,Cheshire West and Chester,Cheshire
+99763,Cheshire West and Chester,West Cheshire
+99787,Cheshire East,Cheshire
+99787,Cheshire East,East Cheshire
+99862,"Bournemouth, Christchurch and Poole",Poole
+99863,"Bournemouth, Christchurch and Poole",Poole
+99864,"Bournemouth, Christchurch and Poole",Poole
+99933,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99934,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99935,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+99943,Central Bedfordshire,Bedfordshire
+99946,Bedford,Bedfordshire
+99947,Bedford,Bedfordshire
+99961,Vale of Glamorgan,The Vale of Glamorgan
+99962,Vale of Glamorgan,The Vale of Glamorgan
+800015,Cheshire West and Chester,West Cheshire
+800016,Cheshire West and Chester,West Cheshire
+800018,Cornwall,Cornwall excluding Isles of Scilly
+800021,Cornwall,Cornwall excluding Isles of Scilly
+800024,County Durham,Durham
+800025,County Durham,Durham
+800026,County Durham,Durham
+800027,County Durham,Durham
+800028,County Durham,Durham
+800197,Cheshire East,East Cheshire
+800200,Cornwall,Cornwall excluding Isles of Scilly
+800201,County Durham,Durham
+800202,County Durham,Durham
+800362,Cheshire East,East Cheshire
+800364,Cheshire East,East Cheshire
+800365,Cheshire East,East Cheshire
+800366,Cheshire East,East Cheshire
+800367,Cheshire East,East Cheshire
+800368,Cheshire East,East Cheshire
+800369,Cheshire East,East Cheshire
+800370,Cheshire East,East Cheshire
+800374,Cheshire East,East Cheshire
+800376,Cheshire West and Chester,West Cheshire
+800377,Cheshire West and Chester,West Cheshire
+800378,Cheshire West and Chester,West Cheshire
+800379,Cheshire West and Chester,West Cheshire
+800380,Cheshire West and Chester,West Cheshire
+800381,Cheshire West and Chester,West Cheshire
+800382,Cheshire West and Chester,West Cheshire
+800383,Cheshire West and Chester,West Cheshire
+800385,Cheshire West and Chester,West Cheshire
+800386,Cheshire West and Chester,West Cheshire
+800390,Cheshire West and Chester,West Cheshire
+800398,Cornwall,Cornwall excluding Isles of Scilly
+800399,Cornwall,Cornwall excluding Isles of Scilly
+800402,Cornwall,Cornwall excluding Isles of Scilly
+800414,Cornwall,Cornwall excluding Isles of Scilly
+800420,Cornwall,Cornwall excluding Isles of Scilly
+800426,Cornwall,Cornwall excluding Isles of Scilly
+800436,County Durham,Durham
+800437,County Durham,Durham
+800438,County Durham,Durham
+800439,County Durham,Durham
+800440,County Durham,Durham
+800442,County Durham,Durham
+800444,County Durham,Durham
+801245,Cheshire East,East Cheshire
+801250,Cornwall,Cornwall excluding Isles of Scilly
+801252,County Durham,Durham
+801254,County Durham,Durham
+801490,Cheshire East,East Cheshire
+801493,Cheshire East,East Cheshire
+801495,Cheshire East,East Cheshire
+801498,Cheshire East,East Cheshire
+801499,Cheshire West and Chester,West Cheshire
+801500,Cheshire West and Chester,West Cheshire
+801502,Cheshire West and Chester,West Cheshire
+801503,Cheshire West and Chester,West Cheshire
+801504,Cheshire West and Chester,West Cheshire
+801505,Cheshire West and Chester,West Cheshire
+801523,Cornwall,Cornwall excluding Isles of Scilly
+801524,Cornwall,Cornwall excluding Isles of Scilly
+801527,Cornwall,Cornwall excluding Isles of Scilly
+801528,Cornwall,Cornwall excluding Isles of Scilly
+801539,Cornwall,Cornwall excluding Isles of Scilly
+801540,Cornwall,Cornwall excluding Isles of Scilly
+801542,Cornwall,Cornwall excluding Isles of Scilly
+801548,Cornwall,Cornwall excluding Isles of Scilly
+801550,Cornwall,Cornwall excluding Isles of Scilly
+801553,Cornwall,Cornwall excluding Isles of Scilly
+801555,Cornwall,Cornwall excluding Isles of Scilly
+801558,Cornwall,Cornwall excluding Isles of Scilly
+801561,Cornwall,Cornwall excluding Isles of Scilly
+801562,County Durham,Durham
+801563,County Durham,Durham
+801565,County Durham,Durham
+801566,County Durham,Durham
+801570,County Durham,Durham
+801571,County Durham,Durham
+801572,County Durham,Durham
+801573,County Durham,Durham
+801574,County Durham,Durham
+801575,County Durham,Durham
+801577,County Durham,Durham
+803139,Cheshire East,East Cheshire
+803140,Cheshire East,East Cheshire
+803142,Cheshire East,East Cheshire
+803143,Cheshire East,East Cheshire
+803144,Cheshire East,East Cheshire
+803145,Cheshire East,East Cheshire
+803146,Cheshire East,East Cheshire
+803147,Cheshire East,East Cheshire
+803148,Cheshire East,East Cheshire
+803149,Cheshire East,East Cheshire
+803150,Cheshire East,East Cheshire
+803151,Cheshire East,East Cheshire
+803152,Cheshire East,East Cheshire
+803153,Cheshire West and Chester,West Cheshire
+803154,Cheshire West and Chester,West Cheshire
+803155,Cheshire West and Chester,West Cheshire
+803156,Cheshire West and Chester,West Cheshire
+803157,Cheshire West and Chester,West Cheshire
+803158,Cheshire West and Chester,West Cheshire
+803159,Cheshire West and Chester,West Cheshire
+803160,Cheshire West and Chester,West Cheshire
+803161,Cheshire West and Chester,West Cheshire
+803162,Cheshire West and Chester,West Cheshire
+803163,Cheshire West and Chester,West Cheshire
+803164,Cheshire West and Chester,West Cheshire
+803189,Cornwall,Cornwall excluding Isles of Scilly
+803190,Cornwall,Cornwall excluding Isles of Scilly
+803192,Cornwall,Cornwall excluding Isles of Scilly
+803196,County Durham,Durham
+803197,County Durham,Durham
+803198,County Durham,Durham
+803199,County Durham,Durham
+803200,County Durham,Durham
+803201,County Durham,Durham
+803202,County Durham,Durham
+803203,County Durham,Durham
+803204,County Durham,Durham
+803205,County Durham,Durham
+803206,County Durham,Durham
+803207,County Durham,Durham
+803208,County Durham,Durham
+803209,County Durham,Durham
+803210,County Durham,Durham
+804644,Dumfries and Galloway,Dumfries & Galloway
+804664,Perth and Kinross,Perth & Kinross
+804672,Perth and Kinross,Perth & Kinross
+804681,Perth and Kinross,Perth & Kinross
+804688,Dumfries and Galloway,Dumfries & Galloway
+804694,Argyll and Bute,Argyll & Bute
+804711,Perth and Kinross,Perth & Kinross
+804726,Argyll and Bute,Argyll & Bute
+804737,Dumfries and Galloway,Dumfries & Galloway
+804744,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+804749,Dumfries and Galloway,Dumfries & Galloway
+804762,Dumfries and Galloway,Dumfries & Galloway
+804795,Perth and Kinross,Perth & Kinross
+804796,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+804813,Perth and Kinross,Perth & Kinross
+804814,Dumfries and Galloway,Dumfries & Galloway
+804827,Argyll and Bute,Argyll & Bute
+804837,Argyll and Bute,Argyll & Bute
+804850,Perth and Kinross,Perth & Kinross
+804856,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+804865,Dumfries and Galloway,Dumfries & Galloway
+804885,Perth and Kinross,Perth & Kinross
+804894,Dumfries and Galloway,Dumfries & Galloway
+804911,Argyll and Bute,Argyll & Bute
+804913,Dumfries and Galloway,Dumfries & Galloway
+804919,Dumfries and Galloway,Dumfries & Galloway
+804928,Dumfries and Galloway,Dumfries & Galloway
+804929,Perth and Kinross,Perth & Kinross
+804933,Dumfries and Galloway,Dumfries & Galloway
+804955,Dumfries and Galloway,Dumfries & Galloway
+804956,Perth and Kinross,Perth & Kinross
+804960,Argyll and Bute,Argyll & Bute
+804963,Dumfries and Galloway,Dumfries & Galloway
+804971,Argyll and Bute,Argyll & Bute
+804975,Dumfries and Galloway,Dumfries & Galloway
+804986,Dumfries and Galloway,Dumfries & Galloway
+804989,Perth and Kinross,Perth & Kinross
+804992,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+804997,Dumfries and Galloway,Dumfries & Galloway
+805005,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+805006,Argyll and Bute,Argyll & Bute
+805033,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805034,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805104,Vale of Glamorgan,The Vale of Glamorgan
+805118,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805120,Vale of Glamorgan,The Vale of Glamorgan
+805205,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805206,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805210,Vale of Glamorgan,The Vale of Glamorgan
+805243,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805245,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805252,Vale of Glamorgan,The Vale of Glamorgan
+805253,Vale of Glamorgan,The Vale of Glamorgan
+805296,Cornwall,Cornwall excluding Isles of Scilly
+805304,County Durham,Durham
+805347,Cornwall,Cornwall excluding Isles of Scilly
+805369,County Durham,Durham
+805411,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+805433,Argyll and Bute,Argyll & Bute
+805434,Perth and Kinross,Perth & Kinross
+805446,County Durham,Durham
+805454,Cheshire West and Chester,West Cheshire
+805510,Dumfries and Galloway,Dumfries & Galloway
+805523,Dumfries and Galloway,Dumfries & Galloway
+805527,Perth and Kinross,Perth & Kinross
+805535,Cornwall,Cornwall excluding Isles of Scilly
+805556,Cheshire West and Chester,West Cheshire
+805557,Argyll and Bute,Argyll & Bute
+805558,Dumfries and Galloway,Dumfries & Galloway
+805598,Cheshire East,East Cheshire
+805599,County Durham,Durham
+805609,Cheshire East,East Cheshire
+805652,Perth and Kinross,Perth & Kinross
+805663,Dumfries and Galloway,Dumfries & Galloway
+805679,Dumfries and Galloway,Dumfries & Galloway
+805752,Cornwall,Cornwall excluding Isles of Scilly
+805781,Cornwall,Cornwall excluding Isles of Scilly
+805797,Cheshire East,East Cheshire
+805841,Cornwall,Cornwall excluding Isles of Scilly
+805842,Cornwall,Cornwall excluding Isles of Scilly
+805845,Cornwall,Cornwall excluding Isles of Scilly
+805854,Cornwall,Cornwall excluding Isles of Scilly
+805858,Cornwall,Cornwall excluding Isles of Scilly
+805864,Cornwall,Cornwall excluding Isles of Scilly
+805874,Argyll and Bute,Argyll & Bute
+805885,Perth and Kinross,Perth & Kinross
+805886,Perth and Kinross,Perth & Kinross
+805891,Dumfries and Galloway,Dumfries & Galloway
+805893,Perth and Kinross,Perth & Kinross
+805894,County Durham,Durham
+805899,County Durham,Durham
+805938,County Durham,Durham
+805962,Vale of Glamorgan,The Vale of Glamorgan
+805966,Cheshire East,East Cheshire
+806022,Cheshire East,East Cheshire
+806031,Cornwall,Cornwall excluding Isles of Scilly
+806043,Cornwall,Cornwall excluding Isles of Scilly
+806047,Cornwall,Cornwall excluding Isles of Scilly
+806051,Cornwall,Cornwall excluding Isles of Scilly
+806074,Cornwall,Cornwall excluding Isles of Scilly
+806075,Cornwall,Cornwall excluding Isles of Scilly
+806080,Cornwall,Cornwall excluding Isles of Scilly
+806083,Cornwall,Cornwall excluding Isles of Scilly
+806085,Cheshire East,East Cheshire
+806096,Cornwall,Cornwall excluding Isles of Scilly
+806098,Cornwall,Cornwall excluding Isles of Scilly
+806104,Cornwall,Cornwall excluding Isles of Scilly
+806122,Cornwall,Cornwall excluding Isles of Scilly
+806137,Cornwall,Cornwall excluding Isles of Scilly
+806142,County Durham,Durham
+806166,Cheshire East,East Cheshire
+806170,Cheshire West and Chester,West Cheshire
+806193,Cheshire West and Chester,West Cheshire
+806206,Cheshire East,East Cheshire
+806241,Perth and Kinross,Perth & Kinross
+806242,Perth and Kinross,Perth & Kinross
+806264,County Durham,Durham
+806322,Cheshire East,East Cheshire
+806393,County Durham,Durham
+806394,Cheshire East,East Cheshire
+806398,Cheshire West and Chester,West Cheshire
+806399,County Durham,Durham
+806460,Cornwall,Cornwall excluding Isles of Scilly
+806471,Cheshire East,East Cheshire
+806474,Cornwall,Cornwall excluding Isles of Scilly
+806498,Cornwall,Cornwall excluding Isles of Scilly
+806510,Cheshire East,East Cheshire
+806525,Cheshire East,East Cheshire
+806530,Cheshire East,East Cheshire
+806534,County Durham,Durham
+806539,Cornwall,Cornwall excluding Isles of Scilly
+806549,Cheshire West and Chester,West Cheshire
+806560,Cheshire East,East Cheshire
+806602,County Durham,Durham
+806618,Cheshire West and Chester,West Cheshire
+806631,Cheshire East,East Cheshire
+806634,Cheshire East,East Cheshire
+806688,Cornwall,Cornwall excluding Isles of Scilly
+806689,Cornwall,Cornwall excluding Isles of Scilly
+806692,Cheshire East,East Cheshire
+806715,Cheshire East,East Cheshire
+806800,Cheshire East,East Cheshire
+806806,Cornwall,Cornwall excluding Isles of Scilly
+806812,County Durham,Durham
+806814,Cheshire West and Chester,West Cheshire
+806825,County Durham,Durham
+806829,Cheshire East,East Cheshire
+806854,Cheshire West and Chester,West Cheshire
+806875,Cheshire West and Chester,West Cheshire
+806882,County Durham,Durham
+806926,Cornwall,Cornwall excluding Isles of Scilly
+806933,Cheshire East,East Cheshire
+806936,Cornwall,Cornwall excluding Isles of Scilly
+806984,County Durham,Durham
+806989,County Durham,Durham
+807014,Cheshire East,East Cheshire
+807045,Cornwall,Cornwall excluding Isles of Scilly
+807094,Cornwall,Cornwall excluding Isles of Scilly
+807121,Cheshire West and Chester,West Cheshire
+807127,County Durham,Durham
+807132,County Durham,Durham
+807133,Cornwall,Cornwall excluding Isles of Scilly
+807165,Cheshire East,East Cheshire
+807178,Cheshire East,East Cheshire
+807181,County Durham,Durham
+807198,Cheshire West and Chester,West Cheshire
+807237,Cheshire East,East Cheshire
+807259,Cheshire East,East Cheshire
+807283,Cheshire West and Chester,West Cheshire
+807291,Cheshire West and Chester,West Cheshire
+807308,Cheshire East,East Cheshire
+807314,County Durham,Durham
+807415,Cornwall,Cornwall excluding Isles of Scilly
+807449,Cornwall,Cornwall excluding Isles of Scilly
+807459,Cornwall,Cornwall excluding Isles of Scilly
+807469,Cheshire West and Chester,West Cheshire
+807500,County Durham,Durham
+807535,County Durham,Durham
+807555,County Durham,Durham
+807576,Cheshire West and Chester,West Cheshire
+807581,Cornwall,Cornwall excluding Isles of Scilly
+807584,Cheshire West and Chester,West Cheshire
+807592,Cheshire East,East Cheshire
+807610,Cheshire West and Chester,West Cheshire
+807626,Cornwall,Cornwall excluding Isles of Scilly
+807627,County Durham,Durham
+807665,Cheshire West and Chester,West Cheshire
+807712,Cheshire East,East Cheshire
+807751,Cheshire East,East Cheshire
+807764,Cheshire West and Chester,West Cheshire
+807766,Cheshire West and Chester,West Cheshire
+807770,County Durham,Durham
+807785,Cornwall,Cornwall excluding Isles of Scilly
+807826,County Durham,Durham
+807827,Cheshire West and Chester,West Cheshire
+807833,Cheshire West and Chester,West Cheshire
+807842,County Durham,Durham
+807862,County Durham,Durham
+807871,Cheshire East,East Cheshire
+807921,Cheshire East,East Cheshire
+807949,County Durham,Durham
+807965,Cheshire East,East Cheshire
+807971,Cheshire West and Chester,West Cheshire
+807979,Cheshire West and Chester,West Cheshire
+807981,Cheshire West and Chester,West Cheshire
+807990,Cheshire West and Chester,West Cheshire
+808034,Cornwall,Cornwall excluding Isles of Scilly
+808064,Cornwall,Cornwall excluding Isles of Scilly
+808095,Cheshire West and Chester,West Cheshire
+808100,Cornwall,Cornwall excluding Isles of Scilly
+808102,Cornwall,Cornwall excluding Isles of Scilly
+808152,Cornwall,Cornwall excluding Isles of Scilly
+808198,County Durham,Durham
+808237,Cheshire East,East Cheshire
+808241,Cheshire West and Chester,West Cheshire
+808317,Cheshire East,East Cheshire
+808321,Cornwall,Cornwall excluding Isles of Scilly
+808339,Cornwall,Cornwall excluding Isles of Scilly
+808347,Cornwall,Cornwall excluding Isles of Scilly
+808369,Cornwall,Cornwall excluding Isles of Scilly
+808395,County Durham,Durham
+808419,Cheshire West and Chester,West Cheshire
+808420,Cheshire West and Chester,West Cheshire
+808426,County Durham,Durham
+808431,Cheshire West and Chester,West Cheshire
+808448,Cornwall,Cornwall excluding Isles of Scilly
+808454,Cheshire West and Chester,West Cheshire
+808464,Cornwall,Cornwall excluding Isles of Scilly
+808469,County Durham,Durham
+808527,Cheshire East,East Cheshire
+808559,County Durham,Durham
+808569,Cornwall,Cornwall excluding Isles of Scilly
+808620,Cornwall,Cornwall excluding Isles of Scilly
+808657,County Durham,Durham
+808694,Cheshire East,East Cheshire
+808696,Cheshire East,East Cheshire
+808697,Cheshire West and Chester,West Cheshire
+808703,County Durham,Durham
+808706,County Durham,Durham
+808798,Cheshire West and Chester,West Cheshire
+808801,Cornwall,Cornwall excluding Isles of Scilly
+808803,County Durham,Durham
+808811,Cornwall,Cornwall excluding Isles of Scilly
+808850,Cornwall,Cornwall excluding Isles of Scilly
+808875,Cheshire West and Chester,West Cheshire
+808903,Cheshire West and Chester,West Cheshire
+808905,Cheshire West and Chester,West Cheshire
+808910,County Durham,Durham
+808911,County Durham,Durham
+808929,Cornwall,Cornwall excluding Isles of Scilly
+808938,County Durham,Durham
+808958,Cornwall,Cornwall excluding Isles of Scilly
+808994,Cheshire East,East Cheshire
+809001,County Durham,Durham
+809019,Cheshire West and Chester,West Cheshire
+809076,County Durham,Durham
+809104,Cornwall,Cornwall excluding Isles of Scilly
+809120,Cheshire West and Chester,West Cheshire
+809127,Cheshire West and Chester,West Cheshire
+809147,Cheshire West and Chester,West Cheshire
+809149,County Durham,Durham
+809183,County Durham,Durham
+809236,Cornwall,Cornwall excluding Isles of Scilly
+809241,Cornwall,Cornwall excluding Isles of Scilly
+809243,Cheshire East,East Cheshire
+809245,County Durham,Durham
+809308,Cornwall,Cornwall excluding Isles of Scilly
+809310,Cornwall,Cornwall excluding Isles of Scilly
+809337,County Durham,Durham
+809343,Cornwall,Cornwall excluding Isles of Scilly
+809347,County Durham,Durham
+809380,Cheshire West and Chester,West Cheshire
+809418,Cheshire East,East Cheshire
+809480,County Durham,Durham
+809496,Cheshire East,East Cheshire
+809497,Cheshire West and Chester,West Cheshire
+809537,Cornwall,Cornwall excluding Isles of Scilly
+809568,Cornwall,Cornwall excluding Isles of Scilly
+809573,Cornwall,Cornwall excluding Isles of Scilly
+809665,Cheshire East,East Cheshire
+809680,Cornwall,Cornwall excluding Isles of Scilly
+809710,County Durham,Durham
+809718,County Durham,Durham
+809729,Cheshire West and Chester,West Cheshire
+809768,Cheshire West and Chester,West Cheshire
+809774,Cheshire West and Chester,West Cheshire
+809843,Cheshire East,East Cheshire
+809845,Cheshire East,East Cheshire
+809860,Cornwall,Cornwall excluding Isles of Scilly
+809868,Cheshire West and Chester,West Cheshire
+809883,Cornwall,Cornwall excluding Isles of Scilly
+809886,Cheshire West and Chester,West Cheshire
+809890,County Durham,Durham
+809897,Cheshire West and Chester,West Cheshire
+809908,Cheshire East,East Cheshire
+809920,Cheshire East,East Cheshire
+809946,Cheshire East,East Cheshire
+809962,Cheshire East,East Cheshire
+810021,Cornwall,Cornwall excluding Isles of Scilly
+810073,Cornwall,Cornwall excluding Isles of Scilly
+810076,Cheshire East,East Cheshire
+810113,Cornwall,Cornwall excluding Isles of Scilly
+810134,Cheshire East,East Cheshire
+810138,Cheshire West and Chester,West Cheshire
+810157,Cheshire West and Chester,West Cheshire
+810162,Cheshire West and Chester,West Cheshire
+810170,Cornwall,Cornwall excluding Isles of Scilly
+810190,Cheshire East,East Cheshire
+810221,Cornwall,Cornwall excluding Isles of Scilly
+810223,Cornwall,Cornwall excluding Isles of Scilly
+810246,Cornwall,Cornwall excluding Isles of Scilly
+810257,Cheshire West and Chester,West Cheshire
+810351,Cheshire West and Chester,West Cheshire
+810352,Cheshire West and Chester,West Cheshire
+810360,County Durham,Durham
+810365,Cheshire East,East Cheshire
+810400,Cheshire West and Chester,West Cheshire
+810404,Cheshire East,East Cheshire
+810425,Cheshire West and Chester,West Cheshire
+810430,County Durham,Durham
+810436,Cheshire West and Chester,West Cheshire
+810464,Cheshire West and Chester,West Cheshire
+810521,Cheshire West and Chester,West Cheshire
+810528,Cheshire West and Chester,West Cheshire
+810536,County Durham,Durham
+810554,Cheshire West and Chester,West Cheshire
+810556,Cornwall,Cornwall excluding Isles of Scilly
+810578,Cheshire West and Chester,West Cheshire
+810594,Cheshire East,East Cheshire
+810622,County Durham,Durham
+810625,County Durham,Durham
+810633,Cornwall,Cornwall excluding Isles of Scilly
+810652,Cheshire East,East Cheshire
+810662,Cheshire West and Chester,West Cheshire
+810685,Cheshire East,East Cheshire
+810704,Cornwall,Cornwall excluding Isles of Scilly
+810715,Cheshire West and Chester,West Cheshire
+810796,County Durham,Durham
+810815,Cornwall,Cornwall excluding Isles of Scilly
+810825,County Durham,Durham
+810835,Cheshire West and Chester,West Cheshire
+810868,Cheshire West and Chester,West Cheshire
+810889,Cheshire East,East Cheshire
+810894,County Durham,Durham
+810922,County Durham,Durham
+810942,County Durham,Durham
+811258,Argyll and Bute,Argyll & Bute
+811261,Perth and Kinross,Perth & Kinross
+811264,Dumfries and Galloway,Dumfries & Galloway
+811268,Dumfries and Galloway,Dumfries & Galloway
+811270,Argyll and Bute,Argyll & Bute
+811273,Argyll and Bute,Argyll & Bute
+811277,Dumfries and Galloway,Dumfries & Galloway
+811281,Argyll and Bute,Argyll & Bute
+811288,Argyll and Bute,Argyll & Bute
+811290,Perth and Kinross,Perth & Kinross
+811303,Dumfries and Galloway,Dumfries & Galloway
+811305,Perth and Kinross,Perth & Kinross
+811306,Perth and Kinross,Perth & Kinross
+811307,Perth and Kinross,Perth & Kinross
+811320,Dumfries and Galloway,Dumfries & Galloway
+811329,Dumfries and Galloway,Dumfries & Galloway
+811342,Argyll and Bute,Argyll & Bute
+811343,Dumfries and Galloway,Dumfries & Galloway
+811348,Dumfries and Galloway,Dumfries & Galloway
+811350,Dumfries and Galloway,Dumfries & Galloway
+811353,Argyll and Bute,Argyll & Bute
+811361,Dumfries and Galloway,Dumfries & Galloway
+811369,Perth and Kinross,Perth & Kinross
+811394,Argyll and Bute,Argyll & Bute
+811395,Perth and Kinross,Perth & Kinross
+811396,Dumfries and Galloway,Dumfries & Galloway
+811401,Dumfries and Galloway,Dumfries & Galloway
+811403,Dumfries and Galloway,Dumfries & Galloway
+811404,Dumfries and Galloway,Dumfries & Galloway
+811408,Dumfries and Galloway,Dumfries & Galloway
+811410,Perth and Kinross,Perth & Kinross
+811421,Dumfries and Galloway,Dumfries & Galloway
+811426,Dumfries and Galloway,Dumfries & Galloway
+811427,Argyll and Bute,Argyll & Bute
+811429,Perth and Kinross,Perth & Kinross
+811430,Argyll and Bute,Argyll & Bute
+811437,Dumfries and Galloway,Dumfries & Galloway
+811438,Dumfries and Galloway,Dumfries & Galloway
+811445,Dumfries and Galloway,Dumfries & Galloway
+811446,Argyll and Bute,Argyll & Bute
+811465,Perth and Kinross,Perth & Kinross
+811473,Dumfries and Galloway,Dumfries & Galloway
+811475,Dumfries and Galloway,Dumfries & Galloway
+811480,Dumfries and Galloway,Dumfries & Galloway
+811490,Perth and Kinross,Perth & Kinross
+811491,Dumfries and Galloway,Dumfries & Galloway
+811500,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811505,Argyll and Bute,Argyll & Bute
+811512,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811525,Dumfries and Galloway,Dumfries & Galloway
+811526,Argyll and Bute,Argyll & Bute
+811531,Argyll and Bute,Argyll & Bute
+811533,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811536,Dumfries and Galloway,Dumfries & Galloway
+811538,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811550,Dumfries and Galloway,Dumfries & Galloway
+811560,Dumfries and Galloway,Dumfries & Galloway
+811564,Perth and Kinross,Perth & Kinross
+811577,Perth and Kinross,Perth & Kinross
+811589,Perth and Kinross,Perth & Kinross
+811590,Perth and Kinross,Perth & Kinross
+811595,Argyll and Bute,Argyll & Bute
+811603,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811609,Dumfries and Galloway,Dumfries & Galloway
+811616,Dumfries and Galloway,Dumfries & Galloway
+811618,Perth and Kinross,Perth & Kinross
+811645,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811657,Vale of Glamorgan,The Vale of Glamorgan
+811665,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811671,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811702,Vale of Glamorgan,The Vale of Glamorgan
+811714,Vale of Glamorgan,The Vale of Glamorgan
+811719,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811723,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811729,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811732,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811745,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811783,Vale of Glamorgan,The Vale of Glamorgan
+811809,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811835,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811848,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811863,Vale of Glamorgan,The Vale of Glamorgan
+811864,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811869,Vale of Glamorgan,The Vale of Glamorgan
+811870,Vale of Glamorgan,The Vale of Glamorgan
+811888,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811890,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+811943,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811945,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811946,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811949,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+811953,Argyll and Bute,Argyll & Bute
+811956,Dumfries and Galloway,Dumfries & Galloway
+811959,Dumfries and Galloway,Dumfries & Galloway
+811961,Cheshire West and Chester,West Cheshire
+811979,Argyll and Bute,Argyll & Bute
+811982,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+812009,Cornwall,Cornwall excluding Isles of Scilly
+812010,Cornwall,Cornwall excluding Isles of Scilly
+812011,Vale of Glamorgan,The Vale of Glamorgan
+812025,Cheshire East,East Cheshire
+812026,Cheshire East,East Cheshire
+812037,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+812052,Perth and Kinross,Perth & Kinross
+812061,Cornwall,Cornwall excluding Isles of Scilly
+812067,Cornwall,Cornwall excluding Isles of Scilly
+812068,Cornwall,Cornwall excluding Isles of Scilly
+812070,Cheshire East,East Cheshire
+812072,Vale of Glamorgan,The Vale of Glamorgan
+812097,Dumfries and Galloway,Dumfries & Galloway
+812099,Cornwall,Cornwall excluding Isles of Scilly
+812104,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+812125,Vale of Glamorgan,The Vale of Glamorgan
+812154,Cheshire East,East Cheshire
+812157,Cornwall,Cornwall excluding Isles of Scilly
+812174,Cornwall,Cornwall excluding Isles of Scilly
+812183,Argyll and Bute,Argyll & Bute
+812184,Cheshire East,East Cheshire
+812217,Cornwall,Cornwall excluding Isles of Scilly
+812237,Cheshire West and Chester,West Cheshire
+812242,Cheshire East,East Cheshire
+812247,Cheshire West and Chester,West Cheshire
+812259,Perth and Kinross,Perth & Kinross
+900024,Bedford,Bedfordshire
+900027,Cornwall,Cornwall excluding Isles of Scilly
+900030,Dumfries and Galloway,Dumfries & Galloway
+900033,Cornwall,Cornwall excluding Isles of Scilly
+900076,County Durham,Durham
+919009,Cheshire West and Chester,Cheshire
+919009,Cheshire West and Chester,West Cheshire
+919011,Cheshire East,Cheshire
+919011,Cheshire East,East Cheshire
+919333,Cheshire East,Cheshire
+919333,Cheshire East,East Cheshire
+919338,Cheshire East,Cheshire
+919338,Cheshire East,East Cheshire
+919341,Cheshire East,Cheshire
+919341,Cheshire East,East Cheshire
+919347,Cheshire East,Cheshire
+919347,Cheshire East,East Cheshire
+919374,Cheshire East,Cheshire
+919374,Cheshire East,East Cheshire
+930064,Central Bedfordshire,Bedfordshire
+930074,Cheshire East,Cheshire
+930074,Cheshire East,East Cheshire
+930075,Cheshire East,Cheshire
+930075,Cheshire East,East Cheshire
+930146,County Durham,Durham
+930147,County Durham,Durham
+930148,County Durham,Durham
+930160,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+930185,Perth and Kinross,Perth & Kinross
+930186,Perth and Kinross,Perth & Kinross
+930191,Dumfries and Galloway,Dumfries & Galloway
+930192,Cornwall,Cornwall excluding Isles of Scilly
+930432,"Bournemouth, Christchurch and Poole",Bournemouth
+930433,"Bournemouth, Christchurch and Poole",Bournemouth
+930434,"Bournemouth, Christchurch and Poole",Bournemouth
+930435,"Bournemouth, Christchurch and Poole",Bournemouth
+930436,"Bournemouth, Christchurch and Poole",Bournemouth
+930437,"Bournemouth, Christchurch and Poole",Bournemouth
+930438,"Bournemouth, Christchurch and Poole",Poole
+930439,"Bournemouth, Christchurch and Poole",Poole
+930440,"Bournemouth, Christchurch and Poole",Poole
+930441,"Bournemouth, Christchurch and Poole",Poole
+930442,"Bournemouth, Christchurch and Poole",Poole
+930863,Bedford,Bedfordshire
+930864,Bedford,Bedfordshire
+930865,Central Bedfordshire,Bedfordshire
+930866,Central Bedfordshire,Bedfordshire
+930867,Central Bedfordshire,Bedfordshire
+930868,Central Bedfordshire,Bedfordshire
+930869,Central Bedfordshire,Bedfordshire
+930870,Central Bedfordshire,Bedfordshire
+930871,Bedford,Bedfordshire
+930872,Bedford,Bedfordshire
+930873,Central Bedfordshire,Bedfordshire
+931033,County Durham,Durham
+931034,County Durham,Durham
+931035,County Durham,Durham
+931036,County Durham,Durham
+931037,County Durham,Durham
+931038,County Durham,Durham
+931039,County Durham,Durham
+931040,County Durham,Durham
+931041,County Durham,Durham
+931042,County Durham,Durham
+931043,County Durham,Durham
+931044,County Durham,Durham
+931045,County Durham,Durham
+931046,County Durham,Durham
+931047,County Durham,Durham
+931470,Cheshire West and Chester,Cheshire
+931470,Cheshire West and Chester,West Cheshire
+931471,Cheshire East,Cheshire
+931471,Cheshire East,East Cheshire
+931472,Cheshire East,Cheshire
+931472,Cheshire East,East Cheshire
+931473,Cheshire East,Cheshire
+931473,Cheshire East,East Cheshire
+931474,Cheshire East,Cheshire
+931474,Cheshire East,East Cheshire
+931475,Cheshire East,Cheshire
+931475,Cheshire East,East Cheshire
+931476,Cheshire East,Cheshire
+931476,Cheshire East,East Cheshire
+931477,Cheshire East,Cheshire
+931477,Cheshire East,East Cheshire
+931478,Cheshire East,Cheshire
+931478,Cheshire East,East Cheshire
+931479,Cheshire West and Chester,Cheshire
+931479,Cheshire West and Chester,West Cheshire
+931480,Cheshire West and Chester,Cheshire
+931480,Cheshire West and Chester,West Cheshire
+931481,Cheshire West and Chester,Cheshire
+931481,Cheshire West and Chester,West Cheshire
+931482,Cheshire West and Chester,Cheshire
+931482,Cheshire West and Chester,West Cheshire
+931483,Cheshire East,Cheshire
+931483,Cheshire East,East Cheshire
+931484,Cheshire West and Chester,Cheshire
+931484,Cheshire West and Chester,West Cheshire
+931485,Cheshire East,Cheshire
+931485,Cheshire East,East Cheshire
+931486,Cheshire West and Chester,Cheshire
+931486,Cheshire West and Chester,West Cheshire
+931487,Cheshire West and Chester,Cheshire
+931487,Cheshire West and Chester,West Cheshire
+931488,Cheshire West and Chester,Cheshire
+931488,Cheshire West and Chester,West Cheshire
+931489,Cheshire West and Chester,Cheshire
+931489,Cheshire West and Chester,West Cheshire
+931490,Cheshire East,Cheshire
+931490,Cheshire East,East Cheshire
+931491,Cheshire West and Chester,Cheshire
+931491,Cheshire West and Chester,West Cheshire
+931492,Cheshire East,Cheshire
+931492,Cheshire East,East Cheshire
+931610,"Bournemouth, Christchurch and Poole",Dorset
+931611,"Bournemouth, Christchurch and Poole",Dorset
+931612,"Bournemouth, Christchurch and Poole",Dorset
+931616,Cornwall,Cornwall excluding Isles of Scilly
+931617,Cornwall,Cornwall excluding Isles of Scilly
+931618,Cornwall,Cornwall excluding Isles of Scilly
+931619,Cornwall,Cornwall excluding Isles of Scilly
+931620,Cornwall,Cornwall excluding Isles of Scilly
+931621,Cornwall,Cornwall excluding Isles of Scilly
+931622,Cornwall,Cornwall excluding Isles of Scilly
+931623,Cornwall,Cornwall excluding Isles of Scilly
+931624,Cornwall,Cornwall excluding Isles of Scilly
+931781,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931782,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931783,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931784,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931785,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931786,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931787,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931788,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931789,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931790,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931791,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931792,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+931813,Vale of Glamorgan,The Vale of Glamorgan
+931814,Vale of Glamorgan,The Vale of Glamorgan
+931815,Vale of Glamorgan,The Vale of Glamorgan
+931816,Vale of Glamorgan,The Vale of Glamorgan
+931817,Vale of Glamorgan,The Vale of Glamorgan
+931818,Vale of Glamorgan,The Vale of Glamorgan
+931819,Vale of Glamorgan,The Vale of Glamorgan
+931820,Vale of Glamorgan,The Vale of Glamorgan
+931821,Vale of Glamorgan,The Vale of Glamorgan
+931841,Argyll and Bute,Argyll & Bute
+931891,Perth and Kinross,Perth & Kinross
+931892,Perth and Kinross,Perth & Kinross
+931893,Perth and Kinross,Perth & Kinross
+931894,Perth and Kinross,Perth & Kinross
+931953,Cornwall,Cornwall excluding Isles of Scilly
+940254,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+940295,Cornwall,Cornwall excluding Isles of Scilly
+940395,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+940674,Cheshire West and Chester,Cheshire
+940674,Cheshire West and Chester,West Cheshire
+940849,Central Bedfordshire,Bedfordshire
+940850,Central Bedfordshire,Bedfordshire
+940851,Bedford,Bedfordshire
+940853,Central Bedfordshire,Bedfordshire
+940854,Central Bedfordshire,Bedfordshire
+940856,Bedford,Bedfordshire
+940857,Bedford,Bedfordshire
+940858,Cornwall,Cornwall excluding Isles of Scilly
+940859,Central Bedfordshire,Bedfordshire
+940860,Central Bedfordshire,Bedfordshire
+940861,Central Bedfordshire,Bedfordshire
+940862,Central Bedfordshire,Bedfordshire
+940863,Central Bedfordshire,Bedfordshire
+940865,Central Bedfordshire,Bedfordshire
+940867,Central Bedfordshire,Bedfordshire
+940868,Central Bedfordshire,Bedfordshire
+940869,Bedford,Bedfordshire
+940870,Bedford,Bedfordshire
+940871,Bedford,Bedfordshire
+940873,Central Bedfordshire,Bedfordshire
+940874,Central Bedfordshire,Bedfordshire
+940875,Bedford,Bedfordshire
+940876,Bedford,Bedfordshire
+940877,Bedford,Bedfordshire
+940878,Central Bedfordshire,Bedfordshire
+940879,Bedford,Bedfordshire
+940880,Bedford,Bedfordshire
+940882,Central Bedfordshire,Bedfordshire
+940883,Central Bedfordshire,Bedfordshire
+940884,Bedford,Bedfordshire
+940885,Central Bedfordshire,Bedfordshire
+940886,Central Bedfordshire,Bedfordshire
+940888,Central Bedfordshire,Bedfordshire
+940889,Central Bedfordshire,Bedfordshire
+940890,Bedford,Bedfordshire
+940891,Central Bedfordshire,Bedfordshire
+940893,Bedford,Bedfordshire
+940894,Central Bedfordshire,Bedfordshire
+940895,Bedford,Bedfordshire
+940896,Bedford,Bedfordshire
+940898,Central Bedfordshire,Bedfordshire
+940900,Central Bedfordshire,Bedfordshire
+940901,Central Bedfordshire,Bedfordshire
+940902,Central Bedfordshire,Bedfordshire
+940903,Central Bedfordshire,Bedfordshire
+940904,Bedford,Bedfordshire
+940905,Central Bedfordshire,Bedfordshire
+940906,Bedford,Bedfordshire
+940907,Bedford,Bedfordshire
+940908,Bedford,Bedfordshire
+940909,Bedford,Bedfordshire
+940910,Bedford,Bedfordshire
+940911,Central Bedfordshire,Bedfordshire
+940913,Central Bedfordshire,Bedfordshire
+940916,Central Bedfordshire,Bedfordshire
+940917,Central Bedfordshire,Bedfordshire
+940918,Central Bedfordshire,Bedfordshire
+940919,Bedford,Bedfordshire
+940920,Bedford,Bedfordshire
+940924,Central Bedfordshire,Bedfordshire
+940925,Central Bedfordshire,Bedfordshire
+940926,Bedford,Bedfordshire
+941064,Argyll and Bute,Argyll & Bute
+941320,County Durham,Durham
+941652,Cheshire West and Chester,Cheshire
+941652,Cheshire West and Chester,West Cheshire
+942019,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+942302,Cornwall,Cornwall excluding Isles of Scilly
+942798,"Bournemouth, Christchurch and Poole",Poole
+942808,"Bournemouth, Christchurch and Poole",Poole
+943265,County Durham,Durham
+943266,County Durham,Durham
+943267,County Durham,Durham
+943268,County Durham,Durham
+943269,County Durham,Durham
+943270,County Durham,Durham
+943271,County Durham,Durham
+943272,County Durham,Durham
+943273,County Durham,Durham
+943274,County Durham,Durham
+943275,County Durham,Durham
+943276,County Durham,Durham
+943277,County Durham,Durham
+943278,County Durham,Durham
+943279,County Durham,Durham
+943280,County Durham,Durham
+943281,County Durham,Durham
+943282,County Durham,Durham
+943283,County Durham,Durham
+943284,County Durham,Durham
+943286,County Durham,Durham
+943287,County Durham,Durham
+943289,County Durham,Durham
+943290,County Durham,Durham
+943291,County Durham,Durham
+943292,County Durham,Durham
+943293,County Durham,Durham
+943294,County Durham,Durham
+943295,County Durham,Durham
+943296,County Durham,Durham
+943297,County Durham,Durham
+943298,County Durham,Durham
+943299,County Durham,Durham
+943300,County Durham,Durham
+943301,County Durham,Durham
+943302,County Durham,Durham
+943303,County Durham,Durham
+943304,County Durham,Durham
+943305,County Durham,Durham
+943307,County Durham,Durham
+943308,County Durham,Durham
+943310,County Durham,Durham
+943311,County Durham,Durham
+943312,County Durham,Durham
+943313,County Durham,Durham
+943314,County Durham,Durham
+943315,County Durham,Durham
+943316,County Durham,Durham
+943317,County Durham,Durham
+943319,County Durham,Durham
+943320,County Durham,Durham
+943321,County Durham,Durham
+943322,County Durham,Durham
+943323,County Durham,Durham
+943324,County Durham,Durham
+943325,County Durham,Durham
+943326,County Durham,Durham
+943327,County Durham,Durham
+943328,County Durham,Durham
+943329,County Durham,Durham
+943330,County Durham,Durham
+943332,County Durham,Durham
+943334,County Durham,Durham
+943335,County Durham,Durham
+943336,County Durham,Durham
+943337,County Durham,Durham
+943338,County Durham,Durham
+943339,County Durham,Durham
+943340,County Durham,Durham
+943341,County Durham,Durham
+943342,County Durham,Durham
+943343,County Durham,Durham
+943344,County Durham,Durham
+943401,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+943922,Cheshire East,Cheshire
+943923,Cheshire West and Chester,Cheshire
+943924,Cheshire West and Chester,Cheshire
+943925,Cheshire East,Cheshire
+943925,Cheshire East,East Cheshire
+943926,Cheshire West and Chester,Cheshire
+943927,Cheshire East,Cheshire
+943928,Cheshire West and Chester,Cheshire
+943928,Cheshire West and Chester,West Cheshire
+943929,Cheshire East,Cheshire
+943929,Cheshire East,East Cheshire
+943930,Cheshire East,Cheshire
+943930,Cheshire East,East Cheshire
+943931,Cheshire West and Chester,Cheshire
+943931,Cheshire West and Chester,West Cheshire
+943932,Cheshire West and Chester,Cheshire
+943933,Cheshire West and Chester,Cheshire
+943933,Cheshire West and Chester,West Cheshire
+943934,Cheshire West and Chester,Cheshire
+943934,Cheshire West and Chester,West Cheshire
+943935,Cheshire East,Cheshire
+943935,Cheshire East,East Cheshire
+943936,Cheshire East,Cheshire
+943937,Cheshire East,Cheshire
+943937,Cheshire East,East Cheshire
+943938,Cheshire West and Chester,Cheshire
+943938,Cheshire West and Chester,West Cheshire
+943940,Cheshire West and Chester,Cheshire
+943941,Cheshire West and Chester,Cheshire
+943942,Cheshire East,Cheshire
+943943,Cheshire West and Chester,Cheshire
+943943,Cheshire West and Chester,West Cheshire
+943944,Cheshire West and Chester,Cheshire
+943945,Cheshire East,Cheshire
+943946,Cheshire East,Cheshire
+943946,Cheshire East,East Cheshire
+943947,Cheshire East,Cheshire
+943948,Cheshire East,Cheshire
+943948,Cheshire East,East Cheshire
+943949,Cheshire West and Chester,Cheshire
+943951,Cheshire West and Chester,Cheshire
+943952,Cheshire East,Cheshire
+943953,Cheshire West and Chester,Cheshire
+943953,Cheshire East,East Cheshire
+943953,Cheshire West and Chester,West Cheshire
+943954,Cheshire West and Chester,Cheshire
+943955,Cheshire East,Cheshire
+943956,Cheshire West and Chester,Cheshire
+943957,Cheshire West and Chester,Cheshire
+943957,Cheshire West and Chester,West Cheshire
+943958,Cheshire East,Cheshire
+943959,Cheshire East,Cheshire
+943960,Cheshire East,Cheshire
+943960,Cheshire East,East Cheshire
+943961,Cheshire East,Cheshire
+943962,Cheshire West and Chester,Cheshire
+943963,Cheshire East,Cheshire
+943964,Cheshire West and Chester,Cheshire
+943964,Cheshire West and Chester,West Cheshire
+943965,Cheshire East,Cheshire
+943966,Cheshire East,Cheshire
+943966,Cheshire East,East Cheshire
+943967,Cheshire West and Chester,Cheshire
+943967,Cheshire West and Chester,West Cheshire
+943968,Cheshire East,Cheshire
+943969,Cheshire West and Chester,Cheshire
+943970,Cheshire East,Cheshire
+943970,Cheshire East,East Cheshire
+943971,Cheshire East,Cheshire
+943971,Cheshire East,East Cheshire
+943972,Cheshire East,Cheshire
+943973,Cheshire West and Chester,Cheshire
+943973,Cheshire West and Chester,West Cheshire
+943974,Cheshire East,Cheshire
+943974,Cheshire East,East Cheshire
+943975,Cheshire West and Chester,Cheshire
+943975,Cheshire West and Chester,West Cheshire
+943976,Cheshire East,Cheshire
+943977,Cheshire East,Cheshire
+943978,Cheshire West and Chester,Cheshire
+943978,Cheshire West and Chester,West Cheshire
+943979,Cheshire West and Chester,Cheshire
+943980,Cheshire West and Chester,Cheshire
+943981,Cheshire East,Cheshire
+943981,Cheshire East,East Cheshire
+943982,Cheshire West and Chester,Cheshire
+943984,Cheshire East,Cheshire
+943986,Cheshire East,Cheshire
+943987,Cheshire East,Cheshire
+943988,Cheshire East,Cheshire
+943990,Cheshire East,Cheshire
+943991,Cheshire East,Cheshire
+943991,Cheshire East,East Cheshire
+943992,Cheshire East,Cheshire
+943993,Cheshire East,Cheshire
+943993,Cheshire East,East Cheshire
+943995,Cheshire East,Cheshire
+943996,Cheshire West and Chester,Cheshire
+943997,Cheshire West and Chester,Cheshire
+943997,Cheshire West and Chester,West Cheshire
+943998,Cheshire West and Chester,Cheshire
+943999,Cheshire West and Chester,Cheshire
+943999,Cheshire West and Chester,West Cheshire
+944000,Cheshire East,Cheshire
+944003,Cheshire West and Chester,Cheshire
+944003,Cheshire West and Chester,West Cheshire
+944004,Cheshire West and Chester,Cheshire
+944006,Cheshire West and Chester,Cheshire
+944007,Cheshire East,Cheshire
+944007,Cheshire East,East Cheshire
+944008,Cheshire East,Cheshire
+944009,Cheshire East,Cheshire
+944011,Cheshire East,Cheshire
+944012,Cheshire West and Chester,Cheshire
+944012,Cheshire West and Chester,West Cheshire
+944013,Cheshire West and Chester,Cheshire
+944013,Cheshire West and Chester,West Cheshire
+944014,Cheshire West and Chester,Cheshire
+944014,Cheshire West and Chester,West Cheshire
+944015,Cheshire East,Cheshire
+944015,Cheshire East,East Cheshire
+944016,Cheshire East,Cheshire
+944017,Cheshire East,Cheshire
+944018,Cheshire West and Chester,Cheshire
+944019,Cheshire East,Cheshire
+944019,Cheshire East,East Cheshire
+944020,Cheshire West and Chester,Cheshire
+944020,Cheshire West and Chester,West Cheshire
+944021,Cheshire East,Cheshire
+944021,Cheshire East,East Cheshire
+944022,Cheshire East,Cheshire
+944024,Cheshire East,Cheshire
+944025,Cheshire West and Chester,Cheshire
+944026,Cheshire East,Cheshire
+944027,Cheshire West and Chester,Cheshire
+944028,Cheshire West and Chester,Cheshire
+944029,Cheshire West and Chester,Cheshire
+944030,Cheshire East,Cheshire
+944031,Cheshire West and Chester,Cheshire
+944032,Cheshire West and Chester,Cheshire
+944032,Cheshire West and Chester,West Cheshire
+944033,Cheshire West and Chester,Cheshire
+944034,Cheshire West and Chester,Cheshire
+944035,Cheshire West and Chester,Cheshire
+944036,Cheshire West and Chester,Cheshire
+944652,Cheshire West and Chester,Cheshire
+944652,Cheshire West and Chester,West Cheshire
+944674,Cheshire West and Chester,Cheshire
+944674,Cheshire West and Chester,West Cheshire
+946048,Cornwall,Cornwall excluding Isles of Scilly
+946522,Bedford,Bedfordshire
+946533,Bedford,Bedfordshire
+946690,"Bournemouth, Christchurch and Poole",Poole
+946691,"Bournemouth, Christchurch and Poole",Poole
+946692,"Bournemouth, Christchurch and Poole",Poole
+946693,"Bournemouth, Christchurch and Poole",Poole
+946694,"Bournemouth, Christchurch and Poole",Poole
+946695,"Bournemouth, Christchurch and Poole",Poole
+946696,"Bournemouth, Christchurch and Poole",Poole
+946697,"Bournemouth, Christchurch and Poole",Poole
+946698,"Bournemouth, Christchurch and Poole",Poole
+946699,"Bournemouth, Christchurch and Poole",Poole
+946700,"Bournemouth, Christchurch and Poole",Poole
+946701,"Bournemouth, Christchurch and Poole",Poole
+946702,"Bournemouth, Christchurch and Poole",Poole
+946703,"Bournemouth, Christchurch and Poole",Poole
+946705,"Bournemouth, Christchurch and Poole",Poole
+946706,"Bournemouth, Christchurch and Poole",Poole
+946707,"Bournemouth, Christchurch and Poole",Poole
+946708,"Bournemouth, Christchurch and Poole",Poole
+946709,"Bournemouth, Christchurch and Poole",Poole
+946710,"Bournemouth, Christchurch and Poole",Poole
+946711,"Bournemouth, Christchurch and Poole",Poole
+946712,"Bournemouth, Christchurch and Poole",Poole
+946713,"Bournemouth, Christchurch and Poole",Poole
+946714,"Bournemouth, Christchurch and Poole",Poole
+946715,"Bournemouth, Christchurch and Poole",Poole
+946716,"Bournemouth, Christchurch and Poole",Poole
+946717,"Bournemouth, Christchurch and Poole",Poole
+946718,"Bournemouth, Christchurch and Poole",Poole
+946719,"Bournemouth, Christchurch and Poole",Bournemouth
+946720,"Bournemouth, Christchurch and Poole",Bournemouth
+946721,"Bournemouth, Christchurch and Poole",Bournemouth
+946722,"Bournemouth, Christchurch and Poole",Bournemouth
+946723,"Bournemouth, Christchurch and Poole",Bournemouth
+946724,"Bournemouth, Christchurch and Poole",Bournemouth
+946725,"Bournemouth, Christchurch and Poole",Bournemouth
+946726,"Bournemouth, Christchurch and Poole",Bournemouth
+946727,"Bournemouth, Christchurch and Poole",Bournemouth
+946728,"Bournemouth, Christchurch and Poole",Bournemouth
+946729,"Bournemouth, Christchurch and Poole",Bournemouth
+946730,"Bournemouth, Christchurch and Poole",Bournemouth
+946731,"Bournemouth, Christchurch and Poole",Bournemouth
+946732,"Bournemouth, Christchurch and Poole",Bournemouth
+946733,"Bournemouth, Christchurch and Poole",Bournemouth
+946734,"Bournemouth, Christchurch and Poole",Bournemouth
+946735,"Bournemouth, Christchurch and Poole",Bournemouth
+946736,"Bournemouth, Christchurch and Poole",Bournemouth
+946737,"Bournemouth, Christchurch and Poole",Bournemouth
+946737,"Bournemouth, Christchurch and Poole",Poole
+946738,"Bournemouth, Christchurch and Poole",Bournemouth
+946739,"Bournemouth, Christchurch and Poole",Bournemouth
+946740,"Bournemouth, Christchurch and Poole",Bournemouth
+946741,"Bournemouth, Christchurch and Poole",Bournemouth
+946824,Cornwall,Cornwall excluding Isles of Scilly
+946826,Cornwall,Cornwall excluding Isles of Scilly
+946827,Cornwall,Cornwall excluding Isles of Scilly
+946828,Cornwall,Cornwall excluding Isles of Scilly
+946829,Cornwall,Cornwall excluding Isles of Scilly
+946830,Cornwall,Cornwall excluding Isles of Scilly
+946831,Cornwall,Cornwall excluding Isles of Scilly
+946832,Cornwall,Cornwall excluding Isles of Scilly
+946833,Cornwall,Cornwall excluding Isles of Scilly
+946834,Cornwall,Cornwall excluding Isles of Scilly
+946835,Cornwall,Cornwall excluding Isles of Scilly
+946836,Cornwall,Cornwall excluding Isles of Scilly
+946837,Cornwall,Cornwall excluding Isles of Scilly
+946838,Cornwall,Cornwall excluding Isles of Scilly
+946839,Cornwall,Cornwall excluding Isles of Scilly
+946840,Cornwall,Cornwall excluding Isles of Scilly
+946841,Cornwall,Cornwall excluding Isles of Scilly
+946842,Cornwall,Cornwall excluding Isles of Scilly
+946843,Cornwall,Cornwall excluding Isles of Scilly
+946844,Cornwall,Cornwall excluding Isles of Scilly
+946845,Cornwall,Cornwall excluding Isles of Scilly
+946846,Cornwall,Cornwall excluding Isles of Scilly
+946847,Cornwall,Cornwall excluding Isles of Scilly
+946848,Cornwall,Cornwall excluding Isles of Scilly
+946849,Cornwall,Cornwall excluding Isles of Scilly
+946850,Cornwall,Cornwall excluding Isles of Scilly
+946851,Cornwall,Cornwall excluding Isles of Scilly
+946852,Cornwall,Cornwall excluding Isles of Scilly
+946854,Cornwall,Cornwall excluding Isles of Scilly
+946855,Cornwall,Cornwall excluding Isles of Scilly
+946856,Cornwall,Cornwall excluding Isles of Scilly
+946857,Cornwall,Cornwall excluding Isles of Scilly
+946858,Cornwall,Cornwall excluding Isles of Scilly
+946859,Cornwall,Cornwall excluding Isles of Scilly
+946860,Cornwall,Cornwall excluding Isles of Scilly
+946861,Cornwall,Cornwall excluding Isles of Scilly
+946862,Cornwall,Cornwall excluding Isles of Scilly
+946863,Cornwall,Cornwall excluding Isles of Scilly
+946864,Cornwall,Cornwall excluding Isles of Scilly
+946865,Cornwall,Cornwall excluding Isles of Scilly
+946866,Cornwall,Cornwall excluding Isles of Scilly
+946867,Cornwall,Cornwall excluding Isles of Scilly
+946868,Cornwall,Cornwall excluding Isles of Scilly
+946869,Cornwall,Cornwall excluding Isles of Scilly
+946870,Cornwall,Cornwall excluding Isles of Scilly
+946871,Cornwall,Cornwall excluding Isles of Scilly
+946872,Cornwall,Cornwall excluding Isles of Scilly
+946873,Cornwall,Cornwall excluding Isles of Scilly
+946874,Cornwall,Cornwall excluding Isles of Scilly
+946875,Cornwall,Cornwall excluding Isles of Scilly
+946876,Cornwall,Cornwall excluding Isles of Scilly
+946877,Cornwall,Cornwall excluding Isles of Scilly
+946878,Cornwall,Cornwall excluding Isles of Scilly
+946879,Cornwall,Cornwall excluding Isles of Scilly
+946880,Cornwall,Cornwall excluding Isles of Scilly
+946881,Cornwall,Cornwall excluding Isles of Scilly
+946882,Cornwall,Cornwall excluding Isles of Scilly
+946883,Cornwall,Cornwall excluding Isles of Scilly
+946884,Cornwall,Cornwall excluding Isles of Scilly
+946885,Cornwall,Cornwall excluding Isles of Scilly
+946886,Cornwall,Cornwall excluding Isles of Scilly
+946887,Cornwall,Cornwall excluding Isles of Scilly
+946888,Cornwall,Cornwall excluding Isles of Scilly
+946889,Cornwall,Cornwall excluding Isles of Scilly
+946890,Cornwall,Cornwall excluding Isles of Scilly
+946891,Cornwall,Cornwall excluding Isles of Scilly
+946892,Cornwall,Cornwall excluding Isles of Scilly
+946894,Cornwall,Cornwall excluding Isles of Scilly
+946895,Cornwall,Cornwall excluding Isles of Scilly
+946896,Cornwall,Cornwall excluding Isles of Scilly
+946897,Cornwall,Cornwall excluding Isles of Scilly
+946898,Cornwall,Cornwall excluding Isles of Scilly
+946899,Cornwall,Cornwall excluding Isles of Scilly
+946900,Cornwall,Cornwall excluding Isles of Scilly
+946902,Cornwall,Cornwall excluding Isles of Scilly
+946903,Cornwall,Cornwall excluding Isles of Scilly
+946904,Cornwall,Cornwall excluding Isles of Scilly
+946906,Cornwall,Cornwall excluding Isles of Scilly
+946907,Cornwall,Cornwall excluding Isles of Scilly
+946908,Cornwall,Cornwall excluding Isles of Scilly
+946909,Cornwall,Cornwall excluding Isles of Scilly
+947107,"Bournemouth, Christchurch and Poole",Dorset
+947125,"Bournemouth, Christchurch and Poole",Dorset
+947128,"Bournemouth, Christchurch and Poole",Dorset
+950454,Perth and Kinross,Perth & Kinross
+950546,Dumfries and Galloway,Dumfries & Galloway
+950565,County Durham,Durham
+950861,Cornwall,Cornwall excluding Isles of Scilly
+950867,Cornwall,Cornwall excluding Isles of Scilly
+951254,Dumfries and Galloway,Dumfries & Galloway
+951256,Dumfries and Galloway,Dumfries & Galloway
+951292,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951293,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951294,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951296,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951297,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951298,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951300,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951302,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951303,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951304,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951305,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951306,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951308,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951310,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951312,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951314,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951315,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951317,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951318,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951319,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951320,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951322,County Durham,Durham
+951324,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951325,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951326,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951328,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951330,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951332,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+951336,Vale of Glamorgan,The Vale of Glamorgan
+951338,Vale of Glamorgan,The Vale of Glamorgan
+951340,Vale of Glamorgan,The Vale of Glamorgan
+951341,Vale of Glamorgan,The Vale of Glamorgan
+951342,Vale of Glamorgan,The Vale of Glamorgan
+951343,Vale of Glamorgan,The Vale of Glamorgan
+951344,Vale of Glamorgan,The Vale of Glamorgan
+951348,Vale of Glamorgan,The Vale of Glamorgan
+951351,Vale of Glamorgan,The Vale of Glamorgan
+951352,Vale of Glamorgan,The Vale of Glamorgan
+951354,Vale of Glamorgan,The Vale of Glamorgan
+951357,Vale of Glamorgan,The Vale of Glamorgan
+951358,Vale of Glamorgan,The Vale of Glamorgan
+951360,Vale of Glamorgan,The Vale of Glamorgan
+951362,Vale of Glamorgan,The Vale of Glamorgan
+951363,Vale of Glamorgan,The Vale of Glamorgan
+951364,Vale of Glamorgan,The Vale of Glamorgan
+951366,Vale of Glamorgan,The Vale of Glamorgan
+951368,Vale of Glamorgan,The Vale of Glamorgan
+951494,Central Bedfordshire,Bedfordshire
+951495,Bedford,Bedfordshire
+951496,Bedford,Bedfordshire
+951497,Central Bedfordshire,Bedfordshire
+951498,Central Bedfordshire,Bedfordshire
+951499,Bedford,Bedfordshire
+951500,Central Bedfordshire,Bedfordshire
+951501,Bedford,Bedfordshire
+951502,Central Bedfordshire,Bedfordshire
+951503,Central Bedfordshire,Bedfordshire
+951505,Central Bedfordshire,Bedfordshire
+951695,Cheshire West and Chester,Cheshire
+951728,Cheshire East,Cheshire
+951728,Cheshire East,East Cheshire
+951783,Cheshire East,Cheshire
+951783,Cheshire East,East Cheshire
+951785,County Durham,Durham
+951786,County Durham,Durham
+951787,County Durham,Durham
+951789,County Durham,Durham
+951799,Cheshire East,Cheshire
+951799,Cheshire East,East Cheshire
+951811,Cheshire East,Cheshire
+951811,Cheshire East,East Cheshire
+951878,"Bournemouth, Christchurch and Poole",Poole
+951880,Cornwall,Cornwall excluding Isles of Scilly
+952042,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+952043,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+952045,Vale of Glamorgan,The Vale of Glamorgan
+952046,Vale of Glamorgan,The Vale of Glamorgan
+952047,Vale of Glamorgan,The Vale of Glamorgan
+952293,Central Bedfordshire,Bedfordshire
+952347,Vale of Glamorgan,The Vale of Glamorgan
+953747,Argyll and Bute,Argyll & Bute
+954117,County Durham,Durham
+954138,County Durham,Durham
+954635,Cheshire West and Chester,Cheshire
+954635,Cheshire West and Chester,West Cheshire
+954751,Cheshire East,Cheshire
+956076,Cornwall,Cornwall excluding Isles of Scilly
+956114,Cornwall,Cornwall excluding Isles of Scilly
+956133,Cornwall,Cornwall excluding Isles of Scilly
+961485,Cornwall,Cornwall excluding Isles of Scilly
+961498,"Bournemouth, Christchurch and Poole",Poole
+961528,Cornwall,Cornwall excluding Isles of Scilly
+961663,County Durham,Durham
+962960,Cheshire East,Cheshire
+962960,Cheshire East,East Cheshire
+963598,"Bournemouth, Christchurch and Poole",Bournemouth
+963672,County Durham,Durham
+963674,County Durham,Durham
+963721,Bedford,Bedfordshire
+964104,Cheshire West and Chester,Cheshire
+964104,Cheshire West and Chester,West Cheshire
+964414,Bedford,Bedfordshire
+964687,Cornwall,Cornwall excluding Isles of Scilly
+964695,Cornwall,Cornwall excluding Isles of Scilly
+964766,"Bournemouth, Christchurch and Poole",Poole
+965116,Cornwall,Cornwall excluding Isles of Scilly
+965563,Central Bedfordshire,Bedfordshire
+966095,Cheshire West and Chester,Cheshire
+966095,Cheshire West and Chester,West Cheshire
+966101,Cheshire West and Chester,Cheshire
+966106,Cheshire East,Cheshire
+966127,Cornwall,Cornwall excluding Isles of Scilly
+966132,Cornwall,Cornwall excluding Isles of Scilly
+966138,Cornwall,Cornwall excluding Isles of Scilly
+966139,Cornwall,Cornwall excluding Isles of Scilly
+966149,Cornwall,Cornwall excluding Isles of Scilly
+966285,"Bournemouth, Christchurch and Poole",Poole
+966290,"Bournemouth, Christchurch and Poole",Bournemouth
+966296,"Bournemouth, Christchurch and Poole",Dorset
+966297,County Durham,Durham
+966301,County Durham,Durham
+966302,County Durham,Durham
+966303,County Durham,Durham
+966310,County Durham,Durham
+966316,County Durham,Durham
+966319,County Durham,Durham
+967384,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+967458,Dumfries and Galloway,Dumfries & Galloway
+967575,Argyll and Bute,Argyll & Bute
+967589,Argyll and Bute,Argyll & Bute
+967659,Cornwall,Cornwall excluding Isles of Scilly
+967660,Cornwall,Cornwall excluding Isles of Scilly
+967661,Cornwall,Cornwall excluding Isles of Scilly
+967919,Cheshire East,Cheshire
+967941,County Durham,Durham
+968365,Cornwall,Cornwall excluding Isles of Scilly
+968371,Cornwall,Cornwall excluding Isles of Scilly
+968376,Cornwall,Cornwall excluding Isles of Scilly
+969015,Cornwall,Cornwall excluding Isles of Scilly
+969087,Cheshire West and Chester,Cheshire
+969087,Cheshire West and Chester,West Cheshire
+969118,Cornwall,Cornwall excluding Isles of Scilly
+969121,Cornwall,Cornwall excluding Isles of Scilly
+969196,County Durham,Durham
+979012,Dumfries and Galloway,Dumfries & Galloway
+979017,Central Bedfordshire,Bedfordshire
+979050,Bedford,Bedfordshire
+979052,County Durham,Durham
+979059,Bedford,Bedfordshire
+979123,Dumfries and Galloway,Dumfries & Galloway
+979149,Bedford,Bedfordshire
+979167,Bedford,Bedfordshire
+979242,Bedford,Bedfordshire
+979252,Dumfries and Galloway,Dumfries & Galloway
+979266,Cornwall,Cornwall excluding Isles of Scilly
+979919,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+990019,Perth and Kinross,Perth & Kinross
+990047,Cheshire East,Cheshire
+990047,Cheshire East,East Cheshire
+990094,County Durham,Durham
+990130,Central Bedfordshire,Bedfordshire
+990178,Argyll and Bute,Argyll & Bute
+990179,Argyll and Bute,Argyll & Bute
+990181,Dumfries and Galloway,Dumfries & Galloway
+990182,Dumfries and Galloway,Dumfries & Galloway
+990186,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+990187,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+990250,"Bournemouth, Christchurch and Poole",Bournemouth
+990251,"Bournemouth, Christchurch and Poole",Bournemouth
+990252,"Bournemouth, Christchurch and Poole",Bournemouth
+990288,Vale of Glamorgan,The Vale of Glamorgan
+990289,Vale of Glamorgan,The Vale of Glamorgan
+990297,Cornwall,Cornwall excluding Isles of Scilly
+990298,Cornwall,Cornwall excluding Isles of Scilly
+990299,Cornwall,Cornwall excluding Isles of Scilly
+990381,Perth and Kinross,Perth & Kinross
+990382,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+990406,Cornwall,Cornwall excluding Isles of Scilly
+990408,Cheshire East,Cheshire
+990408,Cheshire East,East Cheshire
+990436,Vale of Glamorgan,The Vale of Glamorgan
+990437,Vale of Glamorgan,The Vale of Glamorgan
+990468,"Bournemouth, Christchurch and Poole",Poole
+990488,"Bournemouth, Christchurch and Poole",Bournemouth
+990489,"Bournemouth, Christchurch and Poole",Bournemouth
+990508,Cornwall,Cornwall excluding Isles of Scilly
+990524,Central Bedfordshire,Bedfordshire
+990526,Cheshire East,Cheshire
+990526,Cheshire East,East Cheshire
+990543,Vale of Glamorgan,The Vale of Glamorgan
+990544,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+990552,Perth and Kinross,Perth & Kinross
+990556,Cheshire East,Cheshire
+990556,Cheshire East,East Cheshire
+990559,Vale of Glamorgan,The Vale of Glamorgan
+990802,County Durham,Durham
+991008,Cornwall,Cornwall excluding Isles of Scilly
+991129,Cheshire East,Cheshire
+991129,Cheshire East,East Cheshire
+991233,Dumfries and Galloway,Dumfries & Galloway
+991436,Cornwall,Cornwall excluding Isles of Scilly
+996010,Na h-Eileanan Siar,Comhairle nan Eilean Siar
+996022,Cornwall,Cornwall excluding Isles of Scilly
+996023,Cornwall,Cornwall excluding Isles of Scilly
+996025,Cornwall,Cornwall excluding Isles of Scilly
+996032,Cornwall,Cornwall excluding Isles of Scilly
+996060,Cornwall,Cornwall excluding Isles of Scilly
+996188,Perth and Kinross,Perth & Kinross
+996216,Perth and Kinross,Perth & Kinross
+996270,Rhondda Cynon Taf,"Rhondda, Cynon, Taff"
+996277,Dumfries and Galloway,Dumfries & Galloway
+996398,Dumfries and Galloway,Dumfries & Galloway
+996581,Cheshire East,Cheshire
+996581,Cheshire East,East Cheshire
+996686,Cheshire East,Cheshire
+996686,Cheshire East,East Cheshire
+996722,Cheshire East,Cheshire
+996722,Cheshire East,East Cheshire
+996816,County Durham,Durham
+996822,County Durham,Durham
+996824,"Bournemouth, Christchurch and Poole",Bournemouth
+996970,County Durham,Durham
+996988,County Durham,Durham
+997357,Central Bedfordshire,Bedfordshire
+997385,Central Bedfordshire,Bedfordshire

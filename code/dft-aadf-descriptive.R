@@ -228,50 +228,106 @@ readr::write_csv(traffic_aadf_yrs_la_summary, "small-output-datasets/traffic_aad
 dir.create("small-output-datasets")
 
 # Make map of LAs
-lads = readRDS("lads.Rds")
-nrow(lads)
-length(unique(traffic_aadf$local_authority_name))
-summary(sel <- lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
-# Mode   FALSE    TRUE
-# logical     219     163
-summary(traffic_aadf_yrs_la_summary$local_authority_name %in% lads$Name)
-# Mode   FALSE    TRUE
-# logical     380    1625
-lads_in_aadf1 = lads[sel, ]
-mapview::mapview(lads_in_aadf1)
-
-u = "https://opendata.arcgis.com/datasets/b216b4c8a4e74f6fb692a1785255d777_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-dir.create("counties-uas-2019")
-setwd("counties-uas-2019")
+# download uas/counties - bfc
+u = "https://opendata.arcgis.com/datasets/43b324dc1da74f418261378a9a73227f_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+# ultra-generalised - not used
+# u = "https://opendata.arcgis.com/datasets/b216b4c8a4e74f6fb692a1785255d777_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+dir.create("counties-uas-2019-bfc")
+setwd("counties-uas-2019-bfc/")
 counties_gb = ukboundaries::duraz(u)
 setwd("..")
 getwd() # in the right directory again 🎉
-counties_gb = sf::read_sf("counties-uas-2019/")
-table(counties_gb$ctyua19cd)
-counties_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N"))
-mapview::mapview(counties_gb) # missing loads!
-nrow(counties_gb)
+counties_uas_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N"))
+saveRDS(counties_uas_gb, "counties_uas_gb_2019_bfc.Rds")
+mapview::mapview(counties_uas_gb)
 
+traffic_aadf_sf = traffic_cyclable %>%
+  group_by(count_point_id, local_authority_name) %>%
+  mutate(easting = mean(easting), northing = mean(northing)) %>%
+  group_by(count_point_id, local_authority_name, easting, northing) %>%
+  summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
+  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
+nrow(traffic_aadf_sf)
+# [1] 42541 ([1] 41980 when local_authority_name is omitted)
+summary(sf::st_geometry_type(traffic_aadf_sf))
+mapview::mapview(traffic_aadf_sf)
 
+# county aggregation
+traffic_aadf_sf_las = traffic_cyclable %>%
+  group_by(local_authority_name) %>%
+  mutate(easting = mean(easting), northing = mean(northing)) %>%
+  group_by(local_authority_name, easting, northing) %>%
+  summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
+  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
+nrow(traffic_aadf_sf_las)
+# [1] 210
+mapview::mapview(traffic_aadf_sf_las)
+traffic_aadf_sf_las_joined = sf::st_join(
+  traffic_aadf_sf_las,
+  counties_uas_gb %>% select(name = ctyua19nm)
+  )
+aadf_la_county_lookup = traffic_aadf_sf_las_joined %>%
+  select(name, local_authority_name) %>%
+  filter(name != local_authority_name) %>%
+  sf::st_drop_geometry()
+readr::write_csv(aadf_la_county_lookup, "small-output-datasets/aadf_la_county_lookup.csv")
 
-# Make map of LAs
-summary(sel <- counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
-summary(traffic_aadf_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
-lads_not_in_aadf1 = counties_gb[!sel, ]
-mapview::mapview(lads_not_in_aadf1)
+# join and create lookup at counter id level
+traffic_aadf_sf_las_joined = sf::st_join(
+  traffic_aadf_sf,
+  counties_uas_gb %>% select(name = ctyua19nm)
+)
+
+aadf_la_county_lookup_point = traffic_aadf_sf_las_joined %>%
+  select(count_point_id, name, local_authority_name) %>%
+  filter(name != local_authority_name)
+
+aadf_la_county_lookup_point
+# identify edge case points in aggregated data:
+# aadf_la_county_lookup_point %>%
+#   filter(name == "Swansea" & local_authority_name == "Carmarthenshire") %>%
+#   mapview::mapview() +
+#   mapview::mapview(counties_uas_gb)
+
+aadf_la_county_lookup_point_n = aadf_la_county_lookup_point %>%
+  sf::st_drop_geometry() %>%
+  group_by(name, local_authority_name) %>%
+  summarise(n = n()) %>%
+  arrange(n)
+table(aadf_la_county_lookup_point_n$n)
+# 1   2   3   4   5  14  59  63  78  79 106 112 125 145 155 181 204 240 264 304 344 409
+# 95  18   2   4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+View(aadf_la_county_lookup_point_n)
+aadf_la_county_lookup_point_n_filtered = aadf_la_county_lookup_point_n %>%
+  filter(n >= 14)
+aadf_la_county_lookup_point_n_filtered
+
+summary(sel <- counties_uas_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
+counties_gb$ctyua19nm[!sel]
+
+aadf_la_county_lookup_point2 = aadf_la_county_lookup_point %>%
+  sf::st_drop_geometry() %>%
+  inner_join(., aadf_la_county_lookup_point_n_filtered) %>%
+  select(-n)
+readr::write_csv(aadf_la_county_lookup_point2, "small-output-datasets/aadf_la_county_lookup.csv")
+
 
 # test code ---------------------------------------------------------------
 
-# check nrow of different county/ua datasets
-# rapid regions?
-u = "https://opendata.arcgis.com/datasets/54a0620552824e32af97d476b83ca18d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-dir.create("counties-uas-2011")
-setwd("counties-uas-2011")
-counties_gb = ukboundaries::duraz(u)
-nrow(counties_gb)
-# [1] 174
-setwd("..")
-getwd() # in the right directory again 🎉
+# # check nrow of different county/ua datasets
+# # rapid regions?
+# u = "https://opendata.arcgis.com/datasets/54a0620552824e32af97d476b83ca18d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+# dir.create("counties-uas-2011")
+# setwd("counties-uas-2011")
+# counties_gb = ukboundaries::duraz(u)
+# nrow(counties_gb)
+# # [1] 174
+# setwd("..")
+# getwd() # in the right directory again 🎉
+# summary(sel <- counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# summary(traffic_aadf_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
+# lads_not_in_aadf1 = counties_gb[!sel, ]
+# mapview::mapview(lads_not_in_aadf1)
 
 
 # dir.create("counties-2019")
@@ -316,6 +372,18 @@ getwd() # in the right directory again 🎉
 #     )
 # ggplot(summary_present_years) +
 #   geom_line(aes(year, n, col = present_2009))
+
+# lads = readRDS("lads.Rds")
+# nrow(lads)
+# length(unique(traffic_aadf$local_authority_name))
+# summary(sel <- lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# # Mode   FALSE    TRUE
+# # logical     219     163
+# summary(traffic_aadf_yrs_la_summary$local_authority_name %in% lads$Name)
+# # Mode   FALSE    TRUE
+# # logical     380    1625
+# lads_in_aadf1 = lads[sel, ]
+# mapview::mapview(lads_in_aadf1)
 
 # # try 2018 definition of uas/counties
 # u = "https://opendata.arcgis.com/datasets/d13feea979be44eb83bceeed94a1510d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
