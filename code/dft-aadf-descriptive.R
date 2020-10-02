@@ -227,8 +227,58 @@ ggsave("figures/aadf-uptake-2011-multiplier-line-mean.png")
 readr::write_csv(traffic_aadf_yrs_la_summary, "small-output-datasets/traffic_aadf_yrs_la_summary.csv")
 dir.create("small-output-datasets")
 
+# Make map of LAs
+lads = readRDS("lads.Rds")
+nrow(lads)
+length(unique(traffic_aadf$local_authority_name))
+summary(sel <- lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# Mode   FALSE    TRUE
+# logical     219     163
+summary(traffic_aadf_yrs_la_summary$local_authority_name %in% lads$Name)
+# Mode   FALSE    TRUE
+# logical     380    1625
+lads_in_aadf1 = lads[sel, ]
+mapview::mapview(lads_in_aadf1)
+
+u = "https://opendata.arcgis.com/datasets/b216b4c8a4e74f6fb692a1785255d777_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+dir.create("counties-uas-2019")
+setwd("counties-uas-2019")
+counties_gb = ukboundaries::duraz(u)
+setwd("..")
+getwd() # in the right directory again 🎉
+counties_gb = sf::read_sf("counties-uas-2019/")
+table(counties_gb$ctyua19cd)
+counties_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N"))
+mapview::mapview(counties_gb) # missing loads!
+nrow(counties_gb)
+
+
+
+# Make map of LAs
+summary(sel <- counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
+summary(traffic_aadf_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
+lads_not_in_aadf1 = counties_gb[!sel, ]
+mapview::mapview(lads_not_in_aadf1)
+
 # test code ---------------------------------------------------------------
 
+# check nrow of different county/ua datasets
+# rapid regions?
+u = "https://opendata.arcgis.com/datasets/54a0620552824e32af97d476b83ca18d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+dir.create("counties-uas-2011")
+setwd("counties-uas-2011")
+counties_gb = ukboundaries::duraz(u)
+nrow(counties_gb)
+# [1] 174
+setwd("..")
+getwd() # in the right directory again 🎉
+
+
+# dir.create("counties-2019")
+# setwd("counties-2019")
+# counties_gb = ukboundaries::duraz("https://opendata.arcgis.com/datasets/7a7c4e834b4c493d9c011b4f3d144698_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D")
+# mapview::mapview(counties_gb) # missing loads!
+# setwd("..")
 #
 #
 #
@@ -266,3 +316,16 @@ dir.create("small-output-datasets")
 #     )
 # ggplot(summary_present_years) +
 #   geom_line(aes(year, n, col = present_2009))
+
+# # try 2018 definition of uas/counties
+# u = "https://opendata.arcgis.com/datasets/d13feea979be44eb83bceeed94a1510d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+# dir.create("counties-uas-2018")
+# setwd("counties-uas-2018")
+# counties_gb = ukboundaries::duraz(u)
+# setwd("..")
+# saveRDS(counties_gb, "counties-uas-2018.Rds")
+# getwd() # in the right directory again 🎉
+# counties_gb = counties_gb %>% filter(!str_detect(string = cauth18cd, "N"))
+# nrow(counties_gb)
+# mapview::mapview(counties_gb) # missing loads!
+# nrow(counties_gb)
