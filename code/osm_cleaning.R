@@ -36,8 +36,8 @@ crash_junction <- crash[!crash$junction_detail %in% c("Not at junction or within
 rm(crash)
 
 # Need nearest line not nearest centroid of line
-crash_road$nn <- nn_line(crash_road, osm)
-crash_junction$nn <- nn_line(crash_junction, junctions)
+crash_road$nn <- nn_line2(crash_road, osm, ncores = 4)
+crash_junction$nn <- nn_line2(crash_junction, junctions, ncores = 4)
 
 crash_road_summary <- crash_road %>%
   sf::st_drop_geometry() %>%
