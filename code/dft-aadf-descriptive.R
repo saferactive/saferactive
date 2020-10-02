@@ -311,6 +311,67 @@ aadf_la_county_lookup_point2 = aadf_la_county_lookup_point %>%
   select(-n)
 readr::write_csv(aadf_la_county_lookup_point2, "small-output-datasets/aadf_la_county_lookup.csv")
 
+# Fix points with location errors
+error1 = traffic_cyclable %>%
+  filter(count_point_id == 946853)
+error2 = traffic_cyclable %>%
+  filter(count_point_id == 952939)
+
+error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
+  mutate(northing = 24870)
+error2 = error2 %>%
+  mutate(northing = 221460)
+
+traffic_cyclable = traffic_cyclable %>%
+  filter(count_point_id != 952939,
+         count_point_id != 946853)
+traffic_cyclable = rbind(traffic_cyclable, error1, error2)
+
+traffic_cyclable_clean = traffic_cyclable %>%
+  left_join(., aadf_la_county_lookup_point2 %>% select(count_point_id, name))
+summary(as.factor(traffic_cyclable_clean$name))
+summary(as.factor(traffic_cyclable_clean$local_authority_name))
+traffic_cyclable_clean$name[is.na(traffic_cyclable_clean$name)] =
+  traffic_cyclable_clean$local_authority_name[is.na(traffic_cyclable_clean$name)]
+summary(traffic_cyclable_clean$name == traffic_cyclable_clean$local_authority_name)
+# Mode   FALSE    TRUE    NA's
+# logical   12445  172340    1188
+traffic_cyclable_clean_no_la = traffic_cyclable_clean %>%
+  filter(is.na(name))
+traffic_cyclable_clean_no_la_joined = traffic_cyclable_clean_no_la %>%
+  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
+  select(count_point_id) %>%
+  sf::st_join(., counties_uas_gb %>% select(name_updated = ctyua19nm)) %>%
+  sf::st_drop_geometry()
+
+table(traffic_cyclable_clean_no_la_joined$name_updated)
+# Glasgow City North Lanarkshire South Lanarkshire
+# 611               562                 1
+
+traffic_cyclable_clean = traffic_cyclable_clean %>%
+  left_join(., traffic_cyclable_clean_no_la_joined)
+summary(as.factor(traffic_cyclable_clean$name_updated))
+summary(as.factor(traffic_cyclable_clean$name))
+
+traffic_cyclable_clean$name[is.na(traffic_cyclable_clean$name)] =
+  traffic_cyclable_clean$name_updated[is.na(traffic_cyclable_clean$name)]
+summary(as.factor(traffic_cyclable_clean$name))
+traffic_cyclable_clean %>%
+  filter(is.na(name)) %>%
+  select(count_point_id, name, easting) %>%
+  count(count_point_id)
+
+# where is it?
+missing_count_point = traffic_aadf_sf %>%
+  filter(count_point_id == 50974)
+
+mapview::mapview(missing_count_point)
+
+traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 50974] =
+  "Glasgow City"
+
+saveRDS(traffic_cyclable_clean, "traffic_cyclable_clean.Rds")
+piggyback::pb_upload("traffic_cyclable_clean.Rds")
 
 # test code ---------------------------------------------------------------
 
