@@ -295,17 +295,17 @@ traffic_bam = traffic_bam %>%
 
 
 
-# count points with at least 3 years of counted data 2009-2019
+# Points counted every single year 2010-2019
 repeat_points = traffic_bam %>%
   filter(year %in% 2010:2019) %>%
   group_by(count_point_id) %>%
   tally() %>%
-  filter(n >= 5)
-# 9622
+  filter(n >= 10)
+# 3049
 traffic_repeats = traffic_bam %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_repeats) #54620
+dim(traffic_repeats) #30490
 
 #filter out any count points that don't appear within both the first and second periods of 2009-2013 and 2014-2019?
 early_year = traffic_bam %>%
@@ -345,7 +345,14 @@ forplot = traffic_repeats %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 plot(pedal_cycles ~ year, data = forplot)
 
+traffic_repeats %>%
+  group_by(road_category) %>%
+  tally()
+
 #plot by year and road category
+ttt = traffic_repeats %>% filter(road_category == "TA")
+dim(ttt)
+dim(ttt[ttt$pedal_cycles == 0,])
 
 ## all count points
 mb = traffic_bam %>%
@@ -374,6 +381,9 @@ legend(2000, 350, legend = c("PA", "MB", "MCU", "TA"), col = c("red", "blue", "g
 title(main = "Mean cycle count across all count points")
 
 ##counts repeated 3 times 2009-2019
+all = traffic_repeats %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
 mb = traffic_repeats %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
@@ -392,12 +402,13 @@ ta = traffic_repeats %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 
 plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 500), type = "n")
+lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
 lines(pedal_cycles ~ year, data = mcu, col = "green")
 lines(pedal_cycles ~ year, data = ta, col = "yellow")
-legend(2010, 500, legend = c("PA", "MB", "MCU", "TA"), col = c("red", "blue", "green", "yellow"), lty = 1)
-title(main = "Mean cycle count for points sampled >=5 times 2010 - 2019", cex.main = 0.8)
+legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
+title(main = "Mean cycle count by road category for points sampled each year 2010 - 2019", cex.main = 0.8)
 
 # road categories by year
 cats = traffic_repeats %>%
