@@ -39,6 +39,11 @@ rm(crash)
 crash_road$nn <- nn_line2(crash_road, osm, ncores = 4)
 crash_junction$nn <- nn_line2(crash_junction, junctions, ncores = 4)
 
+saveRDS(crash_road,"crash_road.Rds")
+saveRDS(crash_junction,"crash_junction.Rds")
+saveRDS(osm,"roads_london.Rds")
+saveRDS(junctions,"junction_london.Rds")
+
 crash_road_summary <- crash_road %>%
   sf::st_drop_geometry() %>%
   group_by(nn) %>%
@@ -63,16 +68,33 @@ summary(junctions$number_of_casualties)
 
 osm_cas <- osm[!is.na(osm$number_of_casualties),]
 junctions_cas <- junctions[!is.na(junctions$number_of_casualties),]
+junctions_cas_point <- st_centroid(junctions_cas)
 
 tm_shape(osm_cas) +
   tm_lines(col = "number_of_casualties",
            lwd = 3,
-           breaks = c(0,1,3,6,13,28),
+           breaks = c(1,5,10,20,50,130),
+           palette = "viridis")
+
+tm_shape(junctions_cas_point) +
+tm_dots(col = "number_of_casualties",
+        breaks = c(1,5,10,20,50,210),
+        palette = "viridis")
+
+
+#Overlay top crashes areas
+
+tm_shape(osm_cas[osm_cas$number_of_casualties > 2,]) +
+  tm_lines(col = "number_of_casualties",
+           lwd = 3,
+           breaks = c(1,5,10,20,50,210),
            palette = "viridis") +
-  tm_shape(junctions_cas) +
-  tm_fill(col = "number_of_casualties",
-          breaks = c(0,1,3,6,13,28),
+
+tm_shape(junctions_cas_point[junctions_cas_point$number_of_casualties > 2,]) +
+  tm_dots(col = "number_of_casualties",
+          breaks = c(1,5,10,20,50,210),
           palette = "viridis")
+
 
 
 # Old code ----------------------------------------------------------------
