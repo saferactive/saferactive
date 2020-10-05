@@ -36,8 +36,14 @@ crash_junction <- crash[!crash$junction_detail %in% c("Not at junction or within
 rm(crash)
 
 # Need nearest line not nearest centroid of line
-crash_road$nn <- nn_line2(crash_road, osm, ncores = 4)
-crash_junction$nn <- nn_line2(crash_junction, junctions, ncores = 4)
+crash_road_nn <- nn_line(crash_road, osm, ncores = 4)
+crash_junction_nn <- nn_line(crash_junction, junctions, ncores = 4)
+
+crash_road$road_idx <- crash_road_nn$idx
+crash_road$road_dist <- crash_road_nn$dist
+
+crash_junction$junction_idx <- crash_junction_nn$idx
+crash_junction$junction_dist <- crash_junction_nn$dist
 
 saveRDS(crash_road,"crash_road.Rds")
 saveRDS(crash_junction,"crash_junction.Rds")

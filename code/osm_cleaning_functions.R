@@ -12,11 +12,10 @@ osm_main_roads <- function(x){
 }
 
 osm_consolidate <- function(x, segment = 500){
-  x = x[,c("name", "ref", "highway")]
+  x <- x[,c("name", "ref", "highway")]
   # Group
   x <- dplyr::group_by(x, name, ref, highway)
-  x <- dplyr::summarise(x)
-  # TODO: check st_combine against st_union for dplyr::summarise(x)
+  x <- dplyr::summarise(x, do_union = FALSE)
   # merge MULITLINESTRING into LINESTRING
   xls <- x[sf::st_geometry_type(x) == "LINESTRING",]
   xmls <- x[sf::st_geometry_type(x) == "MULTILINESTRING",]
@@ -114,65 +113,57 @@ recursive_ints <- function(sub, x){
 }
 
 
-nn_line <- function(point, lines, k = 20){
-  cents <- sf::st_centroid(lines)
-  nn <- nngeo::st_nn(point, cents, k = k)
-
-  res <- list()
-  pb <- progress_bar$new(total = nrow(point))
-  for(i in seq_len(nrow(point))){
-    pb$tick()
-    nnsub <- nn[[i]]
-    suppressMessages(sub <- unlist(nngeo::st_nn(point$geometry[i], sf::st_geometry(lines)[nnsub], progress = FALSE)))
-    res[[i]] <- nnsub[sub]
+nn_line <- function(point, lines, k = 50, ncores = 1){
+  if(sf::st_is_longlat(point)){
+    stop("point must use projected coordinates")
   }
-  res <- unlist(res)
-  return(res)
-
-}
-
-
-nn_line2 <- function(point, lines, k = 50, ncores = 1){
-  cents <- sf::st_centroid(lines)
-  message(paste0(Sys.time()," finding nearest ",k," centroids"))
-  nn <- nngeo::st_nn(point, cents, k = k, parallel = ncores)
+  if(sf::st_is_longlat(lines)){
+    stop("lines must use projected coordinates")
+  }
   lines <- sf::st_geometry(lines)
-  message(paste0(Sys.time()," splitting results"))
-  lines_lst <- pbapply::pblapply(nn, function(x){lines[x]})
   point <- sf::st_geometry(point)
-  point_lst <- split(point, seq_len(length(point)))
+  cents <- sf::st_centroid(lines)
+  cents <- sf::st_coordinates(cents)
+  message(paste0(Sys.time()," finding approximate distance for nearest ",k," centroids"))
+  nn <- nabor::knn(cents, sf::st_coordinates(point), k = 50, eps = 0, searchtype = 1L, radius = 0)
+  nn <- nn$nn.idx
 
-  message(paste0(Sys.time()," finding nearest 1 of ",k," lines"))
+  message(paste0(Sys.time()," preparing inputs"))
+  input <- list()
+  for(i in seq(1, length(point))){
+    nnsub <- nn[i,]
+    sub <- list(nn = nnsub,
+                point = point[i],
+                lines = lines[nnsub])
+    input[[i]] <- sub
+  }
+
+
+  message(paste0(Sys.time()," measuring exact distances for nearest ",k," lines"))
   cl <- parallel::makeCluster(ncores)
-  res <- pbapply::pbmapply(FUN = nn_int,
-                           pt = point_lst,
-                           lns = lines_lst,
-                           nnl = nn,
-                           USE.NAMES = FALSE)
+  result <- pbapply::pblapply(input,
+                           FUN = nn_int,
+                           cl = cl)
+
   parallel::stopCluster(cl)
   rm(cl)
 
-  # qtm(point[1:100,]) +
-  #   qtm(lines[res,])
-
-
-  # res <- list()
-  # pb <- progress_bar$new(total = nrow(point))
-  # for(i in seq_len(nrow(point))){
-  #   pb$tick()
-  #   nnsub <- nn[[i]]
-  #   suppressMessages(sub <- unlist(nngeo::st_nn(point$geometry[i], sf::st_geometry(lines)[nnsub], progress = FALSE)))
-  #   res[[i]] <- nnsub[sub]
-  # }
-  # res <- unlist(res)
+  idx <- unlist(lapply(result, `[[`, 1))
+  dist <- unlist(lapply(result, `[[`, 2))
+  res <- list(idx = idx, dist = dist)
   return(res)
-
 }
 
-nn_int <- function(pt, lns, nnl){
-  suppressMessages(sub <- unlist(nngeo::st_nn(pt, lns, progress = FALSE)))
-  nnl[sub]
-  return(nnl[sub])
+
+nn_int <- function(sub){
+  dists <- as.numeric(sf::st_distance(sub$point, sub$lines))
+  dists_min <- min(dists)
+  idx <- sub$nn[dists == dists_min]
+  idx <- idx[1] # some case of equal distance
+  res <- list(idx = idx,
+              dist = dists_min)
+  return(res)
+
 }
 
 line_segment_sf <- function(l, n_segments, segment_length = NA) {
