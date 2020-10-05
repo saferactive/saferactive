@@ -52,12 +52,12 @@ saveRDS(junctions,"junction_london.Rds")
 
 crash_road_summary <- crash_road %>%
   sf::st_drop_geometry() %>%
-  group_by(nn) %>%
+  group_by(road_idx) %>%
   summarise(number_of_casualties = sum(number_of_casualties))
 
 crash_junctions_summary <- crash_junction %>%
   sf::st_drop_geometry() %>%
-  group_by(nn) %>%
+  group_by(junction_idx) %>%
   summarise(number_of_casualties = sum(number_of_casualties))
 
 osm$id <- 1:nrow(osm)
@@ -65,8 +65,8 @@ junctions <- st_sf(data.frame(id = 1:length(junctions),
                               geometry = junctions), crs = 27700)
 
 
-osm <- left_join(osm, crash_road_summary, by = c("id" = "nn"))
-junctions <- left_join(junctions, crash_junctions_summary, by = c("id" = "nn"))
+osm <- left_join(osm, crash_road_summary, by = c("id" = "road_idx"))
+junctions <- left_join(junctions, crash_junctions_summary, by = c("id" = "junction_idx"))
 
 head(osm)
 summary(osm$number_of_casualties)
@@ -101,7 +101,7 @@ tm_shape(junctions_cas_point[junctions_cas_point$number_of_casualties > 2,]) +
           breaks = c(1,5,10,20,50,210),
           palette = "viridis")
 
-
+message(Sys.time())
 
 # Old code ----------------------------------------------------------------
 
