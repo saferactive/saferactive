@@ -90,7 +90,9 @@ tm_shape(junctions_cas_point[junctions_cas_point$number_of_casualties > 3,]) +
   tm_dots(col = "number_of_casualties",
           breaks = c(1,5,10,20,50,210),
           palette = "YlOrRd",
-          size = 0.02)
+          size = 0.03)
 
 
 
+st_write(st_transform(osm_cas, 4326), "london_road_cas.geojson", delete_dsn = TRUE)
+st_write(st_transform(junctions_cas_point, 4326), "london_junction_point_cas.geojson", delete_dsn = TRUE)
