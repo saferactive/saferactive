@@ -1,4 +1,4 @@
-# Aim: generate descriptive statistics and visualisations of the AADF data, building on dft-aadf.R
+# Aim: generate descriptive statistics and visualisations of the AADF data, building on `geographic-data-cleaning.R`
 
 library(tidyverse)
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
@@ -23,3 +23,4 @@ counties_joined %>%
   plot()
 
 # make a map showing level of increase
+

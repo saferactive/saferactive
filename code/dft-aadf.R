@@ -1,91 +1,22 @@
+# Takes input from `geographic-data-cleaning.R`
+
 ##Latest DfT dataset including 2019 counts
-remotes::install_github("itsleeds/dftTrafficCounts")
-library(dftTrafficCounts)
 library(tidyverse)
 library(mgcv)
 library(ggplot2)
 
-u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_aadf.zip"
-d = dtc_import(u = u)
 
-saveRDS(d, "traffic-aadf-29092020.Rds")
-piggyback::pb_upload("traffic-aadf-29092020.Rds")
-traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
+traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
+dim(traffic_cyclable) #183884
 
-dim(traffic_aadf)
-# [1] 461948     33
-
-names(traffic_aadf)
-table(traffic_aadf$sequence)
-
-
-traffic_points = traffic_aadf %>%
+traffic_points = traffic_cyclable %>%
   select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km) %>%
   group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>%
   ungroup()
-nrow(traffic_points) / nrow(traffic_aadf)
-# [1] 0.3980621 # why are there multiple reading for each count point?
-skimr::skim(traffic_aadf)
-
-traffic_points_sequence = traffic_aadf %>%
-  select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
-  group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
-  summarise(pedal_cycles = sum(pedal_cycles)) %>%
-  ungroup()
-nrow(traffic_points_sequence) / nrow(traffic_aadf) # including sequence gives 1:1 fit - indicating repeated counts
-# [1] 1
-
-# Next step: explore how dependent the data are on sequences
-traffic_sequence = traffic_aadf %>%
-  group_by(count_point_id) %>%
-  summarise(pedal_cycles = sum(pedal_cycles), n_sequence = length(unique(sequence)))
-
-summary(traffic_sequence$n_sequence)
-# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-# 1.000   1.000   1.000   1.118   1.000   3.000
-# what does sequence mean?
-cor(traffic_aadf$year, as.numeric(traffic_aadf$sequence), use = "complete.obs")
-# [1] -0.05876427 # no relationship with year...
-
-traffic_sequence2 = traffic_aadf %>%
-  group_by(count_point_id) %>%
-  mutate(mean_pedal_cycles = mean(pedal_cycles), n_sequence = length(unique(sequence))) %>%
-  filter(n_sequence > 1) %>%
-  group_by(count_point_id, sequence) %>%
-  summarise(pedal_cycles_sequence = mean(pedal_cycles))
-traffic_sequence2
-# # A tibble: 10,600 x 3
-# # Groups:   count_point_id [5,298]
-# count_point_id sequence pedal_cycles_sequence
-# <dbl> <chr>                    <dbl>
-#   1            627 3040                     3.22
-# 2            627 5040                     5.5
-# 3            664 10                      44.8
-# 4            664 400                     36
-# 5            703 3120                     0
-# 6            703 5120                     0
-# 7           1187 3210                     0.944
-# 8           1187 5210                     0
-# 9           1189 3110                     4.67
-# 10           1189 5110                     4
-# # … with 10,590 more rows
-traffic_sequence2 %>%
-  summarise(unique_per_sequence = length(unique(pedal_cycles_sequence)))
-
-# remove motorways
-traffic_points = traffic_points %>%
-  filter(road_category != "TM",
-         road_category != "PM")
-
-# remove estimated points
-traffic_points = traffic_points %>%
-  filter(estimation_method == "Counted")
-dim(traffic_points) #183884
-# there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
-
-# exploratory data analysis
-
+# nrow(traffic_points) / nrow(traffic_cyclable)
+# # [1] 0.3980621 # why are there multiple reading for each count point?
+# skimr::skim(traffic_cyclable)
 
 
 traffic_bam = transform(traffic_points,
@@ -93,6 +24,65 @@ traffic_bam = transform(traffic_points,
                         local_authority_name = factor(local_authority_name),
                         road_category = factor(road_category),
                         link_length_km = as.numeric(link_length_km))
+
+# Assign count points to 2km grid squares # this has to use `round()` instead of `signif()`
+traffic_bam = traffic_bam %>%
+  mutate(grid_location = paste((round((traffic_bam$easting/2), digits = -3)*2),(round((traffic_bam$northing/2), digits = -3)*2)))
+
+# dim(traffic_bam) #183884
+# length(unique(traffic_bam$grid_location))
+
+# traffic_points_sequence = traffic_cyclable %>%
+#   select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+#   group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+#   summarise(pedal_cycles = sum(pedal_cycles)) %>%
+#   ungroup()
+# nrow(traffic_points_sequence) / nrow(traffic_cyclable) # including sequence gives 1:1 fit - indicating repeated counts
+# # [1] 1
+#
+# # Next step: explore how dependent the data are on sequences
+# traffic_sequence = traffic_cyclable %>%
+#   group_by(count_point_id) %>%
+#   summarise(pedal_cycles = sum(pedal_cycles), n_sequence = length(unique(sequence)))
+#
+# summary(traffic_sequence$n_sequence)
+# # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# # 1.000   1.000   1.000   1.118   1.000   3.000
+# # what does sequence mean?
+# cor(traffic_cyclable$year, as.numeric(traffic_cyclable$sequence), use = "complete.obs")
+# # [1] -0.05876427 # no relationship with year...
+#
+# traffic_sequence2 = traffic_cyclable %>%
+#   group_by(count_point_id) %>%
+#   mutate(mean_pedal_cycles = mean(pedal_cycles), n_sequence = length(unique(sequence))) %>%
+#   filter(n_sequence > 1) %>%
+#   group_by(count_point_id, sequence) %>%
+#   summarise(pedal_cycles_sequence = mean(pedal_cycles))
+# traffic_sequence2
+# # # A tibble: 10,600 x 3
+# # # Groups:   count_point_id [5,298]
+# # count_point_id sequence pedal_cycles_sequence
+# # <dbl> <chr>                    <dbl>
+# #   1            627 3040                     3.22
+# # 2            627 5040                     5.5
+# # 3            664 10                      44.8
+# # 4            664 400                     36
+# # 5            703 3120                     0
+# # 6            703 5120                     0
+# # 7           1187 3210                     0.944
+# # 8           1187 5210                     0
+# # 9           1189 3110                     4.67
+# # 10           1189 5110                     4
+# # # … with 10,590 more rows
+# traffic_sequence2 %>%
+#   summarise(unique_per_sequence = length(unique(pedal_cycles_sequence)))
+
+
+
+
+# exploratory data analysis
+
+
 
 
 
@@ -268,34 +258,14 @@ traffic_bam = traffic_bam %>%
 # for major roads, multiply link length by length of roads of the same type within the LA, divided total link lengths for that road type and LA in the dataset
 
 
-# Fix points with location errors
-error1 = traffic_bam %>%
-  filter(count_point_id == 946853)
-error2 = traffic_bam %>%
-  filter(count_point_id == 952939)
-
-error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
-  mutate(northing = 24870)
-error2 = error2 %>%
-  mutate(northing = 221460)
-
-
-traffic_bam = traffic_bam %>%
-  filter(count_point_id != 952939,
-         count_point_id != 946853)
-traffic_bam = rbind(traffic_bam, error1, error2)
-
-
-# Assign count points to 2km grid squares # this has to use `round()` instead of `signif()`
-traffic_bam = traffic_bam %>%
-  mutate(grid_location = paste((round((traffic_bam$easting/2), digits = -3)*2),(round((traffic_bam$northing/2), digits = -3)*2)))
-
-# dim(traffic_bam) #183884
-# length(unique(traffic_bam$grid_location))
 
 
 
-# Points counted every single year 2010-2019
+
+# Repeat counts -----------------------------------------------------------
+
+
+### Points counted every single year 2010-2019
 repeat_points = traffic_bam %>%
   filter(year %in% 2010:2019) %>%
   group_by(count_point_id) %>%
@@ -307,7 +277,7 @@ traffic_repeats = traffic_bam %>%
   filter(year %in% 2010:2019)
 dim(traffic_repeats) #30490
 
-#filter out any count points that don't appear within both the first and second periods of 2009-2013 and 2014-2019?
+###filter out any count points that don't appear within both the first and second periods of 2009-2013 and 2014-2019?
 early_year = traffic_bam %>%
   group_by(count_point_id, year) %>%
   filter(year %in% 2010:2014)
@@ -327,6 +297,31 @@ traffic_repeats = traffic_repeats %>%
   filter(year %in% 2010:2019)
 dim(traffic_bam) #183884
 dim(traffic_repeats) #68284
+
+### 2010-2019 counts featuring all points that were surveyed in 2011 and at least one other year
+# Points counted in at least two years 2010-2019
+repeat_points = traffic_bam %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  tally() %>%
+  filter(n >= 2)
+# 13303
+points_2011 = traffic_bam %>%
+  filter(year == 2011) %>%
+  group_by(count_point_id)
+# 7884
+traffic_with_2011 = traffic_bam %>%
+  filter(count_point_id %in% repeat_points$count_point_id,
+         count_point_id %in% points_2011$count_point_id,
+         year %in% 2010:2019)
+dim(traffic_with_2011) #54444
+
+traffic_2010_on = traffic_bam %>%
+  filter(year %in% 2010:2019)
+dim(traffic_2010_on) #87423
+
+
+# Exploratory analysis ----------------------------------------------------
 
 #Exploratory analysis
 traffic_repeats %>%
@@ -354,33 +349,37 @@ ttt = traffic_repeats %>% filter(road_category == "TA")
 dim(ttt)
 dim(ttt[ttt$pedal_cycles == 0,])
 
-## all count points
-mb = traffic_bam %>%
+## all count points 2010-2019
+all = traffic_2010_on %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+mb = traffic_2010_on %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
-pa = traffic_bam %>%
+pa = traffic_2010_on %>%
   filter(road_category == "PA") %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
-mcu = traffic_bam %>%
+mcu = traffic_2010_on %>%
   filter(road_category == "MCU") %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
-ta = traffic_bam %>%
+ta = traffic_2010_on %>%
   filter(road_category == "TA") %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 
 plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 350), type = "n")
+lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
 lines(pedal_cycles ~ year, data = mcu, col = "green")
 lines(pedal_cycles ~ year, data = ta, col = "yellow")
 legend(2000, 350, legend = c("PA", "MB", "MCU", "TA"), col = c("red", "blue", "green", "yellow"), lty = 1)
-title(main = "Mean cycle count across all count points")
+title(main = "Mean cycle count across all count points 2010-2019", cex.main = 0.9)
 
-##counts repeated 3 times 2009-2019
+##counts repeated every year 2010-2019
 all = traffic_repeats %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
@@ -410,6 +409,36 @@ lines(pedal_cycles ~ year, data = ta, col = "yellow")
 legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
 title(main = "Mean cycle count by road category for points sampled each year 2010 - 2019", cex.main = 0.8)
 
+##counts in 2011 plus another year 2010-2019
+all = traffic_with_2011 %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+mb = traffic_with_2011 %>%
+  filter(road_category == "MB") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+pa = traffic_with_2011 %>%
+  filter(road_category == "PA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+mcu = traffic_with_2011 %>%
+  filter(road_category == "MCU") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+ta = traffic_with_2011 %>%
+  filter(road_category == "TA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 500), type = "n")
+lines(pedal_cycles ~ year, data = all, col = "black")
+lines(pedal_cycles ~ year, data = pa, col = "red")
+lines(pedal_cycles ~ year, data = mb, col = "blue")
+lines(pedal_cycles ~ year, data = mcu, col = "green")
+lines(pedal_cycles ~ year, data = ta, col = "yellow")
+legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
+title(main = "Mean cycle count by road category for points sampled in 2011 and another year 2010-2019", cex.main = 0.8)
+
 # road categories by year
 cats = traffic_repeats %>%
   group_by(year, road_category) %>%
@@ -430,38 +459,71 @@ ggplot(cats,
                       labels = c("MB", "MCU", "PA", "TA")) +
   xlab("Year") + ylab("Number of counts")
 
-#gam models
+
+
+# GAM models --------------------------------------------------------------
+
+
 M = list(c(1, 0.5), NA)
+
+
+
 
 # randomise the row order of the data
 set.seed(42)
-new_order = sample(nrow(traffic_repeats))
-traffic_repeats = traffic_repeats[new_order, ]
+new_order = sample(nrow(traffic_bam))
+traffic_bam = traffic_bam[new_order, ]
 
-sample_bam = traffic_repeats[1:50000,]
+sample_bam = traffic_bam[1:50000,]
+
+system.time({m1 = bam(pedal_cycles ~
+                        s(year, bs = "cr", k = 5) +
+                        s(road_category, bs = "re") +
+                        s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)),
+                        # ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3)), #not significant
+                        # ti(year, road_category, bs = c("tp", "re")),
+                      family = nb(link = "log"),
+                      data = traffic_2010_on, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #102 seconds
+summary(m1)
+plot(m1, pages = 1, scheme = 2, shade = TRUE)
 
 system.time({m4 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
                         s(road_category, bs = "re") +
                         s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
-                        ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3)),
-                        # ti(year, road_category, bs = c("tp", "re")),
+                        ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(100, 3)), #not significant
+                      # ti(year, road_category, bs = c("tp", "re")),
                       family = nb(link = "log"),
-                      data = traffic_repeats, method = 'fREML',
+                      data = traffic_2010_on, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #102 seconds
 summary(m4)
 plot(m4, pages = 1, scheme = 2, shade = TRUE)
 
-library(nlme)
-system.time({m4 = lme(pedal_cycles ~ year,
-                      family = nb(link = "log"),
-                      data = sample_bam,
-                      random = road_category)}) #102 seconds
-summary(m4)
-plot(m4, pages = 1, scheme = 2, shade = TRUE)
+AIC(m1, m4)
 
-library(glmmTMB)
-system.time({m2 <- glmmTMB(pedal_cycles~year+(1|road_category),
-                         data=sample_bam,
-                         family=nbinom1)}) #
+system.time({m2 = bam(pedal_cycles ~
+                        s(year, bs = "cr", k = 5) +
+                        s(road_category, bs = "re"),
+                        # s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)),
+                        # ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3)), #not significant
+                      # ti(year, road_category, bs = c("tp", "re")),
+                      family = nb(link = "log"),
+                      data = traffic_repeats, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #102 seconds
+summary(m2)
 plot(m2, pages = 1, scheme = 2, shade = TRUE)
+
+# library(nlme)
+# system.time({m4 = lme(pedal_cycles ~ year,
+#                       family = nb(link = "log"),
+#                       data = sample_bam,
+#                       random = road_category)}) #102 seconds
+# summary(m4)
+# plot(m4, pages = 1, scheme = 2, shade = TRUE)
+#
+# library(glmmTMB)
+# system.time({m2 <- glmmTMB(pedal_cycles~year+(1|road_category),
+#                          data=sample_bam,
+#                          family=nbinom1)}) #
+# plot(m2, pages = 1, scheme = 2, shade = TRUE)

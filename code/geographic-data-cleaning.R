@@ -1,13 +1,32 @@
 # Aim: get clean geographic data with 2019 county and UA definitions used throughout
-
+# Script also removes counts from motorways and estimated counts
+# Output used in `dft-aadf.R` and `dft-aadf-descriptive.R`
 
 library(tidyverse)
+remotes::install_github("itsleeds/dftTrafficCounts")
+library(dftTrafficCounts)
+
+u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_aadf.zip"
+d = dtc_import(u = u)
+
+saveRDS(d, "traffic-aadf-29092020.Rds")
+piggyback::pb_upload("traffic-aadf-29092020.Rds")
+traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
+
+dim(traffic_aadf)
+# [1] 461948     33
+
+names(traffic_aadf)
+table(traffic_aadf$sequence)
+
+
 traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
 traffic_cyclable = traffic_aadf %>%
   filter(road_category != "TM",
          road_category != "PM") %>%
   filter(estimation_method == "Counted")
+# there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
 
 # Make map of LAs ---------------------------------------------------------
 
