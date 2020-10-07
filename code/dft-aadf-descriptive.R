@@ -85,7 +85,12 @@ ggplot(traffic_change_2011, aes(x = year, y = multiplier, group = local_authorit
   ) +
   ylim(c(0, 2)) +
   scale_x_continuous(breaks = c(2011, 2015, 2019))
+ggsave("figures/aadf-counts-la-multipliers.png")
 
+readr::write_csv(traffic_change_2011, "small-output-datasets/traffic_change_2011.csv")
+
+
+# the las with most cycles counted...
 traffic_change_2011 %>%
   group_by(local_authority_name) %>%
   summarise(sum_cycles = mean(sum_cycles)) %>%
