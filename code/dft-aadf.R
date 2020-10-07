@@ -7,7 +7,8 @@ library(ggplot2)
 
 
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
-dim(traffic_cyclable) #183884
+dim(traffic_cyclable)
+# [1] 183884     35
 
 traffic_points = traffic_cyclable %>%
   select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km) %>%
