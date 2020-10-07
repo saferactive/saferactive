@@ -30,6 +30,7 @@ traffic_latest = readRDS("traffic-data-29092020.Rds")
 
 
 # Get local authority names
+la_lookup = readRDS("la-lookup.Rds")
 traffic_latest = traffic_latest %>%
   inner_join(la_lookup, by = c("LocalAuthority" = "local_authority_id"))
 
@@ -143,6 +144,9 @@ bam_repeats = traffic_bam %>%
 dim(traffic_bam) #2098824
 dim(bam_repeats) #1180116
 
+bam_2010_on = traffic_bam %>%
+  filter(year %in% 2010:2019)
+dim(bam_2010_on) #986736
 
 #number of count points per year
 traffic_days %>%
@@ -195,7 +199,7 @@ annual_totals = cats %>% group_by(year) %>%
 cats = cats %>%
   inner_join(annual_totals, by = "year") %>%
   mutate(proportion = n/total)
- View(cats)
+ # View(cats)
 
 ggplot(cats,
        aes(x = year, y = n, fill = factor(road_category))) +
@@ -231,19 +235,19 @@ plot(pedal_cycles ~ road_category, data = forplot)
 
 # randomise the row order of the data
 set.seed(42)
-new_order = sample(nrow(traffic_bam))
-traffic_bam = traffic_bam[new_order, ]
+new_order = sample(nrow(bam_2010_on))
+bam_2010_on = bam_2010_on[new_order, ]
 
 # Fit GAM model using national grid locations--------------------------------------------
 
 M = list(c(1, 0.5), NA)
 
-sample_bam = traffic_bam[1:50000,]
+sample_bam = bam_2010_on[1:50000,]
 
 system.time({m4 = bam(pedal_cycles ~
           s(year, bs = "cr", k = 5),
         family = nb(link = "log"),
-        data = traffic_bam, method = 'fREML',
+        data = sample_bam, method = 'fREML',
         nthreads = 4, discrete = TRUE)}) #102 seconds
 summary(m4)
 
@@ -252,7 +256,7 @@ plot(m4, pages = 1, scheme = 2, shade = TRUE)
 system.time({m2 = bam(pedal_cycles ~
            s(DoY, bs = "cr", k = 3),
          family = nb(link = "log"),
-         data = traffic_bam, method = 'fREML',
+         data = sample_bam, method = 'fREML',
          nthreads = 4, discrete = TRUE)}) #96 seconds
 summary(m2)
 

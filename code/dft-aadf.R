@@ -32,6 +32,12 @@ traffic_bam = traffic_bam %>%
 # dim(traffic_bam) #183884
 # length(unique(traffic_bam$grid_location))
 
+#Get London Borough boundaries
+lads = readRDS("lads.Rds")
+boroughs = as.character(spData::lnd$NAME)
+lads = lads %>%
+  filter(Name %in% boroughs)
+
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
 #   group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
@@ -277,6 +283,17 @@ traffic_repeats = traffic_bam %>%
   filter(year %in% 2010:2019)
 dim(traffic_repeats) #30490
 
+### Points counted in 5 years 2010-2019
+repeat_points = traffic_bam %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  tally() %>%
+  filter(n >= 5) #5895
+traffic_y5 = traffic_bam %>%
+  filter(count_point_id %in% repeat_points$count_point_id) %>%
+  filter(year %in% 2010:2019)
+dim(traffic_y5) #51928
+
 ###filter out any count points that don't appear within both the first and second periods of 2009-2013 and 2014-2019?
 early_year = traffic_bam %>%
   group_by(count_point_id, year) %>%
@@ -316,9 +333,15 @@ traffic_with_2011 = traffic_bam %>%
          year %in% 2010:2019)
 dim(traffic_with_2011) #54444
 
+# 2010-2019 all counts
 traffic_2010_on = traffic_bam %>%
   filter(year %in% 2010:2019)
 dim(traffic_2010_on) #87423
+
+to_dim = traffic_bam %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  tally() #30755
 
 
 # Exploratory analysis ----------------------------------------------------
@@ -334,11 +357,36 @@ forplot = traffic_bam %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 plot(pedal_cycles ~ year, data = forplot)
 
-forplot = traffic_repeats %>%
+#### for graph
+fortab = traffic_repeats %>%
   # filter(road_category == "TA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
-plot(pedal_cycles ~ year, data = forplot)
+  summarise(counts_10_yrs = mean(pedal_cycles))
+plot(pedal_cycles ~ year, data = fortab)
+
+tab2 = traffic_2010_on %>%
+  group_by(year) %>%
+  summarise(counts_all = mean(pedal_cycles))
+
+tab3 = traffic_y5 %>%
+  group_by(year) %>%
+  summarise(counts_5_yrs = mean(pedal_cycles))
+
+fullgraph = inner_join(tab2, tab3) %>%
+  inner_join(fortab)
+
+ggplot(fullgraph, aes(x = year)) +
+  geom_line(aes(y = counts_all, col = "darkred")) +
+  geom_line(aes(y = counts_5_yrs, col = "green")) +
+  geom_line(aes(y = counts_10_yrs, col = "steelblue")) +
+  scale_color_discrete(name = "Years of data", labels = c("At least 1", "At least 5", "10")) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  theme_grey() +
+  labs(x = "Year", y = "Mean pedal cycle AADF")
+  # guides(color=guide_legend("Years of data"))
+
+
+######
 
 traffic_repeats %>%
   group_by(road_category) %>%
@@ -439,6 +487,41 @@ lines(pedal_cycles ~ year, data = ta, col = "yellow")
 legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
 title(main = "Mean cycle count by road category for points sampled in 2011 and another year 2010-2019", cex.main = 0.8)
 
+#####London
+
+traffic_london = traffic_repeats %>%
+  filter(local_authority_name %in% lads$Name)
+
+##counts repeated every year 2010-2019
+all = traffic_london %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+mb = traffic_london %>%
+  filter(road_category == "MB") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+pa = traffic_london %>%
+  filter(road_category == "PA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+mcu = traffic_london %>%
+  filter(road_category == "MCU") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+ta = traffic_london %>%
+  filter(road_category == "TA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles))
+
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 1000), type = "n")
+lines(pedal_cycles ~ year, data = all, col = "black")
+lines(pedal_cycles ~ year, data = pa, col = "red")
+lines(pedal_cycles ~ year, data = mb, col = "blue")
+lines(pedal_cycles ~ year, data = mcu, col = "green")
+lines(pedal_cycles ~ year, data = ta, col = "yellow")
+legend(2010, 1000, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
+title(main = "Mean cycle count by road category for points sampled each year 2010 - 2019", cex.main = 0.8)
+
 # road categories by year
 cats = traffic_repeats %>%
   group_by(year, road_category) %>%
@@ -484,9 +567,9 @@ system.time({m1 = bam(pedal_cycles ~
                         # ti(year, road_category, bs = c("tp", "re")),
                       family = nb(link = "log"),
                       data = traffic_2010_on, method = 'fREML',
-                      nthreads = 4, discrete = TRUE)}) #102 seconds
+                      nthreads = 4, discrete = TRUE)}) #12 seconds
 summary(m1)
-plot(m1, pages = 1, scheme = 2, shade = TRUE)
+plot(m1, pages = 3, scheme = 2, shade = TRUE)
 
 system.time({m4 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
@@ -496,7 +579,7 @@ system.time({m4 = bam(pedal_cycles ~
                       # ti(year, road_category, bs = c("tp", "re")),
                       family = nb(link = "log"),
                       data = traffic_2010_on, method = 'fREML',
-                      nthreads = 4, discrete = TRUE)}) #102 seconds
+                      nthreads = 4, discrete = TRUE)}) #12 seconds
 summary(m4)
 plot(m4, pages = 1, scheme = 2, shade = TRUE)
 
@@ -510,7 +593,7 @@ system.time({m2 = bam(pedal_cycles ~
                       # ti(year, road_category, bs = c("tp", "re")),
                       family = nb(link = "log"),
                       data = traffic_repeats, method = 'fREML',
-                      nthreads = 4, discrete = TRUE)}) #102 seconds
+                      nthreads = 4, discrete = TRUE)}) #12 seconds
 summary(m2)
 plot(m2, pages = 1, scheme = 2, shade = TRUE)
 
@@ -527,3 +610,26 @@ plot(m2, pages = 1, scheme = 2, shade = TRUE)
 #                          data=sample_bam,
 #                          family=nbinom1)}) #
 # plot(m2, pages = 1, scheme = 2, shade = TRUE)
+
+
+# GAM model for London 2010-2019 ------------------------------------------
+
+
+
+# Filter London counts
+# Assign count points to 1km grid squares
+traffic_london_bam = traffic_2010_on %>%
+  filter(local_authority_name %in% lads$Name)
+dim(traffic_london_bam) #8130
+
+ml = bam(pedal_cycles ~
+          s(year, bs = "cr", k = 5) +
+          s(road_category, bs = 're') +
+          s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+          ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'),
+             m = M, k = c(25, 5)),
+        family = nb(link = "log"),
+        data = traffic_london_bam, method = 'fREML',
+        nthreads = 4, discrete = TRUE)
+summary(ml)
+plot(ml, pages = 4, scheme = 2, shade = TRUE)
