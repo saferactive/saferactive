@@ -18,7 +18,6 @@ traffic_points = traffic_cyclable %>%
 # # [1] 0.3980621 # why are there multiple reading for each count point?
 # skimr::skim(traffic_cyclable)
 
-
 traffic_bam = transform(traffic_points,
                         count_point_id = factor(count_point_id),
                         local_authority_name = factor(local_authority_name),
@@ -81,6 +80,9 @@ traffic_bam %>%
   ggplot(., aes(x = year, y = change_cycles, group = local_authority_name)) +
   geom_line(aes(alpha = mean_cycles/100)) +
   ylim(c(0,2))
+
+las_of_interest = c("Leeds", "Derby", "Southampton",
+                    "Nottingham", "Birmingham")
 
 
 # Get London Borough boundaries -------------------------------------------
@@ -698,3 +700,19 @@ ml = bam(pedal_cycles ~
         nthreads = 4, discrete = TRUE)
 summary(ml)
 plot(ml, pages = 4, scheme = 2, shade = TRUE)
+
+# old unnused code:
+
+# # just about works - but simpler approach used
+# traffic_bam %>%
+#   mutate(local_authority_name = as.character(local_authority_name)) %>%
+#   group_by(year, local_authority_name) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles),
+#             mean_cycles = mean(mean_cycles)) %>%
+#   mutate(name = case_when(
+#     local_authority_name %in% las_of_interest ~ local_authority_name,
+#     TRUE ~ "Other")
+#   ) %>%
+#   ggplot(., aes(x = year, y = change_cycles, group = local_authority_name, colour = name)) +
+#   geom_line(aes(alpha = mean_cycles/100)) +
+#   ylim(c(0,2))
