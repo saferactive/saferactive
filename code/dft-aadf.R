@@ -32,7 +32,59 @@ traffic_bam = traffic_bam %>%
 # dim(traffic_bam) #183884
 # length(unique(traffic_bam$grid_location))
 
-#Get London Borough boundaries
+# Remove pre-2010 counts and count points with only 1 year of data --------
+
+repeat_points = traffic_bam %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  tally() %>%
+  filter(n > 1)
+traffic_bam = traffic_bam %>%
+  filter(count_point_id %in% repeat_points$count_point_id) %>%
+  filter(year %in% 2010:2019)
+dim(traffic_bam) #69971
+
+##surveyed in 2011
+repeat_points = traffic_bam %>%
+  filter(year == 2011) %>%
+  group_by(count_point_id) %>%
+  tally()
+traffic_bam = traffic_bam %>%
+  filter(count_point_id %in% repeat_points$count_point_id) %>%
+  filter(year %in% 2010:2019)
+dim(traffic_bam) #54444
+
+
+# Get relative change in cycle counts  ------------------------------------
+
+traffic_bam = traffic_bam %>%
+  group_by(count_point_id) %>%
+  mutate(mean_cycles = mean(pedal_cycles)) %>%
+  ungroup() %>%
+  mutate(change_cycles = pedal_cycles/mean_cycles)
+traffic_bam$change_cycles[is.na(traffic_bam$change_cycles)] = 0
+sum(is.na(traffic_bam$change_cycles))/nrow(traffic_bam) #0.012
+# nas = traffic_bam %>%
+#   filter(is.na(change_cycles))
+# View(nas)
+
+traffic_bam %>%
+  group_by(year) %>%
+  summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles)) %>%
+  ggplot(., aes(x = year, y = change_cycles)) +
+  geom_line()
+
+traffic_bam %>%
+  group_by(year, local_authority_name) %>%
+  summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles),
+            mean_cycles = mean(mean_cycles)) %>%
+  ggplot(., aes(x = year, y = change_cycles, group = local_authority_name)) +
+  geom_line(aes(alpha = mean_cycles/100)) +
+  ylim(c(0,2))
+
+
+# Get London Borough boundaries -------------------------------------------
+
 lads = readRDS("lads.Rds")
 boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%
@@ -336,7 +388,7 @@ dim(traffic_with_2011) #54444
 # 2010-2019 all counts
 traffic_2010_on = traffic_bam %>%
   filter(year %in% 2010:2019)
-dim(traffic_2010_on) #87423
+dim(traffic_2010_on) #69971
 
 to_dim = traffic_bam %>%
   filter(year %in% 2010:2019) %>%
@@ -361,16 +413,19 @@ plot(pedal_cycles ~ year, data = forplot)
 fortab = traffic_repeats %>%
   # filter(road_category == "TA") %>%
   group_by(year) %>%
-  summarise(counts_10_yrs = mean(pedal_cycles))
-plot(pedal_cycles ~ year, data = fortab)
+  summarise(counts_10_yrs = mean(pedal_cycles),
+            change_10_yrs = mean(change_cycles))
+# plot(pedal_cycles ~ year, data = fortab)
 
-tab2 = traffic_2010_on %>%
+tab2 = traffic_bam %>%
   group_by(year) %>%
-  summarise(counts_all = mean(pedal_cycles))
+  summarise(counts_all = mean(pedal_cycles),
+            change_all = mean(change_cycles))
 
 tab3 = traffic_y5 %>%
   group_by(year) %>%
-  summarise(counts_5_yrs = mean(pedal_cycles))
+  summarise(counts_5_yrs = mean(pedal_cycles),
+            change_5_yrs = mean(change_cycles))
 
 fullgraph = inner_join(tab2, tab3) %>%
   inner_join(fortab)
@@ -379,11 +434,20 @@ ggplot(fullgraph, aes(x = year)) +
   geom_line(aes(y = counts_all, col = "darkred")) +
   geom_line(aes(y = counts_5_yrs, col = "green")) +
   geom_line(aes(y = counts_10_yrs, col = "steelblue")) +
-  scale_color_discrete(name = "Years of data", labels = c("At least 1", "At least 5", "10")) +
+  scale_color_discrete(name = "Years of data", labels = c("At least 2", "At least 5", "10")) +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
   theme_grey() +
   labs(x = "Year", y = "Mean pedal cycle AADF")
   # guides(color=guide_legend("Years of data"))
+
+ggplot(fullgraph, aes(x = year)) +
+  geom_line(aes(y = change_all, col = "darkred")) +
+  geom_line(aes(y = change_5_yrs, col = "green")) +
+  geom_line(aes(y = change_10_yrs, col = "steelblue")) +
+  scale_color_discrete(name = "Years of data", labels = c("At least 2", "At least 5", "10")) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  theme_grey() +
+  labs(x = "Year", y = "Mean change in pedal cycle AADF")
 
 
 ######
@@ -541,6 +605,7 @@ ggplot(cats,
   scale_fill_discrete(name = "Road category",
                       labels = c("MB", "MCU", "PA", "TA")) +
   xlab("Year") + ylab("Number of counts")
+
 
 
 
