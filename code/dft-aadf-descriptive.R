@@ -25,9 +25,11 @@ traffic_change = traffic_2010 %>%
   mutate(mean_cycles = mean(pedal_cycles)) %>%
   ungroup() %>%
   mutate(change_cycles = pedal_cycles/mean_cycles)
-
-sum(is.na(traffic_bam$change_cycles))/nrow(traffic_bam)
-# [1] 0 # no NAs - why was it different in the dft-aadf.R script?
+sum(is.na(traffic_change$change_cycles))/nrow(traffic_change)
+# [1] 0.0204
+traffic_change$change_cycles[is.na(traffic_change$change_cycles)] = 0
+sum(is.na(traffic_change$change_cycles))/nrow(traffic_change)
+# [1] 0
 
 traffic_change %>%
   group_by(year) %>%
@@ -36,18 +38,27 @@ traffic_change %>%
   geom_line()
 
 summary(traffic_change$change_cycles)
-sum(is.na(traffic_change$change_cycles)) / nrow(traffic_change) # 2% nas
+sum(is.na(traffic_change$change_cycles)) / nrow(traffic_change) # 0% nas
 
 traffic_change_las = traffic_change %>%
-  filter(!is.na(change_cycles)) %>%
-  mutate(sum_cycles = sum(pedal_cycles)) %>%
-  group_by(year, local_authority_name) %>%
+  group_by(local_authority_name) %>%
+  mutate(sum_cycles = sum(pedal_cycles)) %>% # sum across all years
+  ungroup() %>%
+  group_by(year, local_authority_name, sum_cycles) %>%
   summarise(
-    # take the sum not the mean of cycle counters so that LAs with more counters rank higher
-    change_cycles = weighted.mean(change_cycles, w = sum_cycles),
+    # change_cycles = weighted.mean(change_cycles, w = sum_cycles),
+    change_cycles = mean(change_cycles), # this is the wrong place for a weighted mean
     mean_cycles = mean(mean_cycles),
-    sum_cycles = sum(mean_cycles)
+    n_cycles = n()
     )
+View(traffic_change_las)
+
+#weighted mean - needs changing
+traffic_change_weighted = traffic_change_las %>%
+  group_by(local_authority_name) %>%
+  mutate(weighted_change = weighted.mean(change_cycles, w = sum_cycles))
+View(traffic_change_weighted)
+
 
 summary(traffic_change_las)
 ggplot(traffic_change_las, aes(x = year, y = change_cycles, group = local_authority_name)) +

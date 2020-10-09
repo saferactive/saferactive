@@ -39,6 +39,7 @@ repeat_points = traffic_bam %>%
   group_by(count_point_id) %>%
   tally() %>%
   filter(n > 1)
+#13303
 traffic_bam = traffic_bam %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
