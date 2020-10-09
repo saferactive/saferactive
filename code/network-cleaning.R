@@ -3,6 +3,7 @@
 remotes::install_github("itsleeds/osmextract")
 library(osmextract)
 library(dplyr)
+
 library(sf)
 # osm_lines = oe_get("Greater London", extra_tags = c("ref", "maxspeed"))
 # names(osm_lines)
@@ -43,3 +44,5 @@ oe_download("Greater London", provider = "geofrabrik")
 # osmextract::oe_update(place = "Isle of Wight")
 # iow_roads = osmextract::oe_get("Isle of Wight")
 # city_centre = tmaptools::geocode_OSM()
+
+mapview::mapview(iow_roads[1:100, ])
