@@ -1,0 +1,12 @@
+name: tests
+title: tests
+username: robin
+account: robin
+server: connect.saferactive.com
+hostUrl: https://connect.saferactive.com/__api__
+appId: 1
+bundleId: 1
+url: https://connect.saferactive.com/content/1/
+when: 1600725734.29748
+asMultiple: FALSE
+asStatic: FALSE

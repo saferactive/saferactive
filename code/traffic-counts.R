@@ -8,16 +8,31 @@ traffic_data_original = readr::read_csv("./dft_traffic_counts_raw_counts-2000-20
 
 names(traffic_data_original)
 
+summary(traffic_data_original$latitude)
+summary(traffic_data_original$longitude)
+
+summary(traffic_data_original$northing)
+summary(traffic_data_original$easting)
+
+# Kirkstall Road Leeds example
 counter_16598 = traffic_data_original %>%
   filter(count_point_id == "16598")
 
 counter_16598 %>%
   filter(year == 2016) %>%
-  summarise(pedal_cycles = sum(pedal_cycles)) # 326 why not 366???
+  summarise(pedal_cycles = sum(pedal_cycles)) # 326 why not 366 like in https://roadtraffic.dft.gov.uk/manualcountpoints/16598? this is because of adjustments made to the raw data
 counter_16598$link_length_km
 
-##London Boroughs
+# Remove unnecessary variables
+traffic_data_national = traffic_data_original %>%
+  select(count_point_id, direction_of_travel, year, count_date, hour, local_authority_id, local_authority_name, easting, northing, pedal_cycles)
 
+saveRDS(traffic_data_national, "traffic_data_national.Rds")
+
+# Select London data ------------------------------------------------------
+
+
+##London Boroughs
 lads = readRDS("lads.Rds")
 boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%
@@ -44,17 +59,147 @@ min(traffic_london$easting)
 max(traffic_london$northing)
 min(traffic_london$northing)
 
+summary(traffic_london$northing)
+summary(traffic_london$latitude)
+summary(traffic_london$longitude)
+
+## the latitude data has errors and should not be used. Eastings and northings are accurate.
+
+saveRDS(traffic_london, "traffic_london.Rds")
+piggyback::pb_upload("traffic_london.Rds")
+traffic_london = readRDS("traffic_london.Rds")
+
 traffic_london = traffic_london %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
-saveRDS(traffic_london, "traffic_london.Rds")
+traffic_london_points = traffic_london %>%
+  select(year, count_date, local_authority_name, count_point_id, easting, northing, pedal_cycles) %>%
+  group_by(year, count_date, local_authority_name, count_point_id, easting, northing) %>%
+  summarise(pedal_cycles = sum(pedal_cycles)) %>%
+  ungroup()
 
-traffic_london = readRDS("traffic_london.Rds")
+traffic_london_points = traffic_london_points %>%
+  sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
 # there are different numbers of traffic count points for each year. I think this includes only the actual counts, not the intermediate years where estimates were made.
+
+traffic_london = traffic_london %>%
+  mutate(month = lubridate::month(count_date),
+         yearmonth = lubridate::floor_date(count_date, "month"))
+
+## Regression by year
+y1 = lm(pedal_cycles ~ year, data = traffic_london)
+summary(y1)
+
+y2 = traffic_london %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles)) %>%
+  st_drop_geometry()
+plot(y2)
+my = lm(pedal_cycles ~year, data = y2)
+abline(lm(pedal_cycles ~ year, data = traffic_london))
+
+# traffic_london_points = traffic_london %>%
+#          st_drop_geometry() %>%
+#          select(count_point_id, direction_of_travel, year, count_date, month, yearmonth, local_authority_name, pedal_cycles, latitude, longitude) %>%
+#          group_by(year, month, yearmonth, count_date, local_authority_name, count_point_id, direction_of_travel, latitude, longitude) %>%
+#          summarise(pedal_cycles = sum(pedal_cycles)) %>%
+#          ungroup()
+# traffic_london_points = traffic_london_points %>%
+#          mutate(id = paste(count_point_id, direction_of_travel, year))
+# traffic_london_points = traffic_london_points[!duplicated(traffic_london_points$id), ]
+
+y3 = lm(pedal_cycles ~ year, data = traffic_london_points)
+summary(y3)
+# plot(traffic_london_points$pedal_cycles ~ traffic_london_points$year)
+plot(pedal_cycles ~ year, data = y2)
+abline(lm(pedal_cycles ~ year, data = traffic_london_points))
+# abline(lm(pedal_cycles ~ year, data = y2))
+
+###############Fill in the gaps for the intervening years
+
+traffic_london_points %>% count()
+
+
+
+
+
+##################
+
+# traffic_london_boroughs = traffic_london %>%
+#   st_drop_geometry() %>%
+#   select(count_point_id, direction_of_travel, year, count_date, month, local_authority_name, pedal_cycles) %>%
+#   group_by(year, local_authority_name) %>%
+#   summarise(pedal_cycles = mean(pedal_cycles)) %>%
+#   ungroup()
+# View(traffic_london_boroughs)
+#
+# ggplot(data = traffic_london_boroughs, aes(x=year, y=pedal_cycles)) + geom_line(aes(colour=local_authority_name))
+
+# traffic_london_points = traffic_london %>%
+#   st_drop_geometry() %>%
+#   select(count_point_id, direction_of_travel, year, count_date, month, local_authority_name, pedal_cycles) %>%
+#   group_by(year, local_authority_name) %>%
+#   summarise(pedal_cycles = mean(pedal_cycles)) %>%
+#   ungroup()
+#
+# traffic_london_points = traffic_london_points %>%
+#   mutate(id = paste(count_point_id, direction_of_travel, year))
+# traffic_london_points = traffic_london_points[!duplicated(traffic_london_points$id), ]
+
+select(traffic_london_points)
+
+## year
 traffic_london %>%
   st_drop_geometry() %>%
   count(year)
+
+y2 = traffic_london %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles)) %>%
+  st_drop_geometry()
+plot(y2)
+my = lm(pedal_cycles ~year, data = y2)
+abline(lm(pedal_cycles ~ year, data = y2))
+
+y1 = lm(pedal_cycles ~ year, data = traffic_london)
+summary(y1)
+
+require(ggplot2)
+ggplot(traffic_london,aes(y=pedal_cycles,x=year))+geom_point()+geom_smooth(method="lm")
+
+## month
+traffic_london_points %>%
+  st_drop_geometry() %>%
+  count(month)
+
+m2 = traffic_london %>%
+  group_by(month) %>%
+  filter(month != 11) %>%
+  summarise(pedal_cycles = mean(pedal_cycles)) %>%
+  st_drop_geometry()
+plot(m2)
+my = lm(pedal_cycles ~ month, data = m2)
+abline(lm(pedal_cycles ~ month, data = m2))
+
+## hour
+traffic_london %>%
+  st_drop_geometry() %>%
+  count(hour)
+
+m2 = traffic_london %>%
+  group_by(hour) %>%
+  filter(month != 11) %>%
+  summarise(pedal_cycles = mean(pedal_cycles)) %>%
+  st_drop_geometry()
+plot(m2, ylim = c(0, 35))
+my = lm(pedal_cycles ~ month, data = m2)
+abline(lm(pedal_cycles ~ month, data = m2))
+
+## combined
+model = lm(data = traffic_london, pedal_cycles ~ year + month)
+summary(model)
+plot(traffic_london$pedal_cycles ~ traffic_london$year)
 
 ###Select peak hours only, sum counts by year and direction of travel (could remove direction of travel since PCT data doesn't use this)
 traffic_london_points = traffic_london %>%
@@ -87,15 +232,15 @@ traffic_london_points$road_name
 
 # we need to get road names/refs for the PCT data, to be sure the right roads are getting joined, not just the nearest ones.
 
-# # this code joins without using road refs
-# pct_cent = readRDS("cent.Rds") %>%
-#   st_transform(27700)
-#
-# join_by_dist = st_join(traffic_london_points, pct_cent, join = st_nearest_feature)
-#
-# join_2011 = join_by_dist %>%
-#   filter(year == 2011)
-# plot(join_2011$pedal_cycles ~ join_2011$bicycle)
+# this code joins without using road refs
+pct_cent = readRDS("cent.Rds") %>%
+  st_transform(27700)
+
+join_by_dist = st_join(traffic_london_points, pct_cent, join = st_nearest_feature)
+
+join_2011 = join_by_dist %>%
+  filter(year == 2011)
+plot(join_by_dist$pedal_cycles ~ join_by_dist$bicycle)
 
 
 
