@@ -14,6 +14,5 @@ lads.Rds
 crashes_active_london.*
 *.Rds
 *.zip
-*.gif
 raw*
 counties-*

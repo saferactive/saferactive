@@ -10,7 +10,7 @@ repeat_points = traffic_cyclable %>%
   group_by(count_point_id) %>%
   tally() %>%
   filter(n > 1)
-traffic_2010 = traffic_bam %>%
+traffic_2010 = traffic_cyclable %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
 
@@ -41,27 +41,26 @@ summary(traffic_change$change_cycles)
 sum(is.na(traffic_change$change_cycles)) / nrow(traffic_change) # 0% nas
 
 traffic_change_las = traffic_change %>%
-  group_by(local_authority_name) %>%
+  group_by(name) %>%
   mutate(sum_cycles = sum(pedal_cycles)) %>% # sum across all years
   ungroup() %>%
-  group_by(year, local_authority_name, sum_cycles) %>%
+  group_by(year, name, sum_cycles) %>%
   summarise(
     # change_cycles = weighted.mean(change_cycles, w = sum_cycles),
     change_cycles = mean(change_cycles), # this is the wrong place for a weighted mean
     mean_cycles = mean(mean_cycles),
     n_cycles = n()
     )
-View(traffic_change_las)
+# View(traffic_change_las)
 
 #weighted mean - needs changing
 traffic_change_weighted = traffic_change_las %>%
-  group_by(local_authority_name) %>%
+  group_by(name) %>%
   mutate(weighted_change = weighted.mean(change_cycles, w = sum_cycles))
-View(traffic_change_weighted)
-
+# View(traffic_change_weighted)
 
 summary(traffic_change_las)
-ggplot(traffic_change_las, aes(x = year, y = change_cycles, group = local_authority_name)) +
+ggplot(traffic_change_las, aes(x = year, y = change_cycles, group = name)) +
   geom_line(aes(alpha = sum_cycles)) +
   ylim(c(0,2))
 
@@ -69,7 +68,7 @@ ggplot(traffic_change_las, aes(x = year, y = change_cycles, group = local_author
 traffic_change_2011 = traffic_change_las %>%
   ungroup() %>%
   mutate(cycling_2011 = case_when(year == 2011 ~ change_cycles)) %>%
-  group_by(local_authority_name) %>%
+  group_by(name) %>%
   mutate(multiplier = change_cycles / mean(cycling_2011, na.rm = TRUE)) %>%
   ungroup()
 
@@ -80,16 +79,16 @@ las_of_interest = c("Leeds", "Derby", "Southampton",
                     )
 
 traffic_interest = traffic_change_2011 %>%
-  filter(local_authority_name %in% las_of_interest)
+  filter(name %in% las_of_interest)
 
-ggplot(traffic_change_2011, aes(x = year, y = multiplier, group = local_authority_name)) +
+ggplot(traffic_change_2011, aes(x = year, y = multiplier, group = name)) +
   geom_line(aes(alpha = sum_cycles)) +
   geom_line(
     aes(
       x = year,
       y = multiplier,
-      colour = local_authority_name,
-      group = local_authority_name
+      colour = name,
+      group = name
     ),
     lwd = 1.2,
     data = traffic_interest
@@ -100,10 +99,29 @@ ggsave("figures/aadf-counts-la-multipliers.png")
 
 readr::write_csv(traffic_change_2011, "small-output-datasets/traffic_change_2011.csv")
 
+# Create animated map...
+counties_uas_gb = readRDS("counties_uas_gb_2019_ubc.Rds")
+counties_uas_gb$name = counties_uas_gb$ctyua19nm
+counties_joined = right_join(counties_uas_gb, traffic_change_2011)
+summary(counties_uas_gb$name %in% traffic_change_2011$name)
+
+summary(traffic_change_2011$name %in% counties_uas_gb$name)
+
+summary({sel = traffic_cyclable$name %in% counties_uas_gb$name})
+# Mode   FALSE    TRUE
+# logical      47  183837
+traffic_cyclable$name[!sel]
+
+library(tmap)
+mf = tm_shape(counties_joined) +
+  tm_polygons("multiplier") +
+  tm_facets(along = "year")
+tmap_animation(mf, filename = "la-multipliers.gif")
+browseURL("la-multipliers.gif")
 
 # the las with most cycles counted...
 traffic_change_2011 %>%
-  group_by(local_authority_name) %>%
+  group_by(name) %>%
   summarise(sum_cycles = mean(sum_cycles)) %>%
   top_n(n = 5, wt = sum_cycles)
 
