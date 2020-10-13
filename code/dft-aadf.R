@@ -11,8 +11,8 @@ dim(traffic_cyclable)
 # [1] 183884     35
 
 traffic_points = traffic_cyclable %>%
-  select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km) %>%
-  group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km) %>%
+  select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km) %>%
+  group_by(year, name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>%
   ungroup()
 # nrow(traffic_points) / nrow(traffic_cyclable)
@@ -21,7 +21,7 @@ traffic_points = traffic_cyclable %>%
 
 traffic_bam = transform(traffic_points,
                         count_point_id = factor(count_point_id),
-                        local_authority_name = factor(local_authority_name),
+                        name = factor(name),
                         road_category = factor(road_category),
                         link_length_km = as.numeric(link_length_km))
 
@@ -76,10 +76,10 @@ traffic_bam %>%
   geom_line()
 
 traffic_bam %>%
-  group_by(year, local_authority_name) %>%
+  group_by(year, name) %>%
   summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles),
             mean_cycles = mean(mean_cycles)) %>%
-  ggplot(., aes(x = year, y = change_cycles, group = local_authority_name)) +
+  ggplot(., aes(x = year, y = change_cycles, group = name)) +
   geom_line(aes(alpha = mean_cycles/100)) +
   ylim(c(0,2))
 
@@ -95,8 +95,8 @@ lads = lads %>%
   filter(Name %in% boroughs)
 
 # traffic_points_sequence = traffic_cyclable %>%
-#   select(year, local_authority_name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
-#   group_by(year, local_authority_name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+#   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
+#   group_by(year, name, count_point_id, road_category, easting, northing, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
 #   summarise(pedal_cycles = sum(pedal_cycles)) %>%
 #   ungroup()
 # nrow(traffic_points_sequence) / nrow(traffic_cyclable) # including sequence gives 1:1 fit - indicating repeated counts
@@ -381,7 +381,7 @@ title(main = "Mean cycle count by road category for points sampled in 2011 and a
 #####London
 
 traffic_london = traffic_repeats %>%
-  filter(local_authority_name %in% lads$Name)
+  filter(name %in% lads$Name)
 
 ##counts repeated every year 2010-2019
 all = traffic_london %>%
@@ -512,7 +512,7 @@ plot(m2, pages = 1, scheme = 2, shade = TRUE)
 # Filter London counts
 # Assign count points to 1km grid squares
 traffic_london_bam = traffic_2010_on %>%
-  filter(local_authority_name %in% lads$Name)
+  filter(name %in% lads$Name)
 dim(traffic_london_bam) #8130
 
 ml = bam(pedal_cycles ~
@@ -531,14 +531,14 @@ plot(ml, pages = 4, scheme = 2, shade = TRUE)
 
 # # just about works - but simpler approach used
 # traffic_bam %>%
-#   mutate(local_authority_name = as.character(local_authority_name)) %>%
-#   group_by(year, local_authority_name) %>%
+#   mutate(name = as.character(name)) %>%
+#   group_by(year, name) %>%
 #   summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles),
 #             mean_cycles = mean(mean_cycles)) %>%
 #   mutate(name = case_when(
-#     local_authority_name %in% las_of_interest ~ local_authority_name,
+#     name %in% las_of_interest ~ name,
 #     TRUE ~ "Other")
 #   ) %>%
-#   ggplot(., aes(x = year, y = change_cycles, group = local_authority_name, colour = name)) +
+#   ggplot(., aes(x = year, y = change_cycles, group = name, colour = name)) +
 #   geom_line(aes(alpha = mean_cycles/100)) +
 #   ylim(c(0,2))

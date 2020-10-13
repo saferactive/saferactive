@@ -46,19 +46,20 @@ traffic_change_las = traffic_change %>%
   ungroup() %>%
   group_by(year, name, sum_cycles) %>%
   summarise(
-    # change_cycles = weighted.mean(change_cycles, w = sum_cycles),
-    change_cycles = mean(change_cycles), # this is the wrong place for a weighted mean
+    change_cycles = weighted.mean(change_cycles, w = mean_cycles), # within a year and LA, this is weighted by the mean count of each point
     mean_cycles = mean(mean_cycles),
-    n_cycles = n()
+    n_counts = n()
     )
 # View(traffic_change_las)
 
-#weighted mean - needs changing
-traffic_change_weighted = traffic_change_las %>%
-  group_by(name) %>%
-  mutate(weighted_change = weighted.mean(change_cycles, w = sum_cycles))
-# View(traffic_change_weighted)
+# #weighted mean again - to weight among LAs using sum_cycles if calculating national mean change_cycles
+# traffic_change_national = traffic_change_las %>%
+#   group_by(year) %>%
+#   mutate(weighted_change = weighted.mean(change_cycles, w = sum_cycles))
+# # View(traffic_change_weighted)
 
+
+# Line width relates to the sum of cycle counts across all years within the LA
 summary(traffic_change_las)
 ggplot(traffic_change_las, aes(x = year, y = change_cycles, group = name)) +
   geom_line(aes(alpha = sum_cycles)) +
@@ -81,6 +82,7 @@ las_of_interest = c("Leeds", "Derby", "Southampton",
 traffic_interest = traffic_change_2011 %>%
   filter(name %in% las_of_interest)
 
+# This is Figure 3.7 in Report 2
 ggplot(traffic_change_2011, aes(x = year, y = multiplier, group = name)) +
   geom_line(aes(alpha = sum_cycles)) +
   geom_line(
@@ -93,7 +95,7 @@ ggplot(traffic_change_2011, aes(x = year, y = multiplier, group = name)) +
     lwd = 1.2,
     data = traffic_interest
   ) +
-  ylim(c(0, 2)) +
+  ylim(c(0, 2.5)) +
   scale_x_continuous(breaks = c(2011, 2015, 2019))
 ggsave("figures/aadf-counts-la-multipliers.png")
 
