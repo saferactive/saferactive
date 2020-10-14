@@ -1,6 +1,8 @@
 # Aim: generate descriptive statistics and visualisations of the AADF data, building on `geographic-data-cleaning.R`
 # Takes input from `geographic-data-cleaning.R`
 
+# need to remove points with estimation_method_detailed == "dependent on a nearby count point" for all other than the LA level analyses
+
 library(tidyverse)
 
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")

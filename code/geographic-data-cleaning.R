@@ -28,6 +28,38 @@ traffic_cyclable = traffic_aadf %>%
   filter(estimation_method == "Counted")
 # there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
 
+# Fix points with location errors
+error1 = traffic_cyclable %>%
+  filter(count_point_id == 946853)
+error2 = traffic_cyclable %>%
+  filter(count_point_id == 952939)
+
+error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
+  mutate(northing = 24870)
+error2 = error2 %>%
+  mutate(northing = 221460)
+
+traffic_cyclable = traffic_cyclable %>%
+  filter(count_point_id != 952939,
+         count_point_id != 946853)
+traffic_cyclable = rbind(traffic_cyclable, error1, error2)
+
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Argyll & Bute"] = "Argyll and Bute"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Bournemouth"] = "Bournemouth, Christchurch and Poole"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Comhairle nan Eilean Siar"] = "Na h-Eileanan Siar"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Cornwall excluding Isles of Scilly"] = "Cornwall"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Dumfries & Galloway"] = "Dumfries and Galloway"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Durham"] = "County Durham"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "East Cheshire"] = "Cheshire East"
+# traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Isles of Scilly"] = "Cornwall"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Perth & Kinross"] = "Perth and Kinross"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Poole"] = "Bournemouth, Christchurch and Poole"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "Rhondda, Cynon, Taff"] = "Rhondda Cynon Taf"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "West Cheshire"] = "Cheshire West and Chester"
+traffic_cyclable$local_authority_name[traffic_cyclable$local_authority_name == "The Vale of Glamorgan"] = "Vale of Glamorgan"
+traffic_cyclable$local_authority_name[traffic_cyclable$count_point_id == 943953] = "Cheshire East"
+
+
 # Make map of LAs ---------------------------------------------------------
 
 # download uas/counties - bfc
@@ -51,7 +83,7 @@ traffic_aadf_sf = traffic_cyclable %>%
   summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 nrow(traffic_aadf_sf)
-# [1] 42541 ([1] 41980 when local_authority_name is omitted)
+# [1] 42543 ([1] 41980 when local_authority_name is omitted)
 summary(sf::st_geometry_type(traffic_aadf_sf))
 mapview::mapview(traffic_aadf_sf)
 
@@ -63,7 +95,7 @@ traffic_aadf_sf_las = traffic_cyclable %>%
   summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 nrow(traffic_aadf_sf_las)
-# [1] 210
+# [1] 208
 mapview::mapview(traffic_aadf_sf_las)
 traffic_aadf_sf_las_joined = sf::st_join(
   traffic_aadf_sf_las,
@@ -102,8 +134,10 @@ table(aadf_la_county_lookup_point_n$n)
 # 95  18   2   4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
 View(aadf_la_county_lookup_point_n)
 aadf_la_county_lookup_point_n_filtered = aadf_la_county_lookup_point_n %>%
-  filter(n >= 14)
+  filter(n >= 13)
 aadf_la_county_lookup_point_n_filtered
+
+traffic_aadf_yrs_la_summary = read_csv("small-output-datasets/traffic_aadf_yrs_la_summary.csv")
 
 summary(sel <- counties_uas_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
 counties_gb$ctyua19nm[!sel]
@@ -115,9 +149,9 @@ aadf_la_county_lookup_point2 = aadf_la_county_lookup_point %>%
 readr::write_csv(aadf_la_county_lookup_point2, "small-output-datasets/aadf_la_county_lookup.csv")
 
 corrections = aadf_la_county_lookup_point2 %>% select(count_point_id, name)
-corrections$name[corrections$count_point_id == 943953] = "Cheshire East"
 remove = duplicated(corrections)
 corrections2 = corrections[remove == FALSE,]
+
 # length(unique(corrections2$count_point_id))
 # dim(corrections2)
 # corrections2 %>%
@@ -128,21 +162,6 @@ corrections2 = corrections[remove == FALSE,]
 #   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>% mapview()
 
 
-# Fix points with location errors
-error1 = traffic_cyclable %>%
-  filter(count_point_id == 946853)
-error2 = traffic_cyclable %>%
-  filter(count_point_id == 952939)
-
-error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
-  mutate(northing = 24870)
-error2 = error2 %>%
-  mutate(northing = 221460)
-
-traffic_cyclable = traffic_cyclable %>%
-  filter(count_point_id != 952939,
-         count_point_id != 946853)
-traffic_cyclable = rbind(traffic_cyclable, error1, error2)
 
 traffic_cyclable_clean = traffic_cyclable %>%
   left_join(., corrections2)
@@ -153,7 +172,7 @@ traffic_cyclable_clean$name[is.na(traffic_cyclable_clean$name)] =
   traffic_cyclable_clean$local_authority_name[is.na(traffic_cyclable_clean$name)]
 summary(traffic_cyclable_clean$name == traffic_cyclable_clean$local_authority_name)
 # Mode   FALSE    TRUE    NA's
-# logical   12445  172340    1188
+# logical   2021  180675    1188
 traffic_cyclable_clean_no_la = traffic_cyclable_clean %>%
   filter(is.na(name))
 traffic_cyclable_clean_no_la_joined = traffic_cyclable_clean_no_la %>%
@@ -182,11 +201,32 @@ traffic_cyclable_clean %>%
 # where is it?
 missing_count_point = traffic_aadf_sf %>%
   filter(count_point_id == 50974)
+missing_count_point2 = traffic_aadf_sf %>%
+  filter(count_point_id == 10820)
+missing_count_point3 = traffic_aadf_sf %>%
+  filter(count_point_id == 50728)
+missing_count_point4 = traffic_aadf_sf %>%
+  filter(count_point_id == 82090)
+missing_count_point5 = traffic_aadf_sf %>%
+  filter(count_point_id == 940855)
 
 mapview::mapview(missing_count_point)
+mapview::mapview(missing_count_point2)
+mapview::mapview(missing_count_point3)
+mapview::mapview(missing_count_point4)
+mapview::mapview(missing_count_point5)
 
 traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 50974] =
   "Glasgow City"
+traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 10820] =
+  "Glasgow City"
+traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 50728] =
+  "Glasgow City"
+traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 82090] =
+  "Glasgow City"
+
+traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 940855] =
+  "Cambridgeshire"
 
 #remove duplicate rows to prevent error in Glasgow/Lanarkshire NAs
 remove = duplicated(traffic_cyclable_clean)

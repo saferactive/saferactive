@@ -64,7 +64,7 @@ traffic_bam = traffic_bam %>%
   ungroup() %>%
   mutate(change_cycles = pedal_cycles/mean_cycles)
 traffic_bam$change_cycles[is.na(traffic_bam$change_cycles)] = 0
-sum(is.na(traffic_bam$change_cycles))/nrow(traffic_bam) #0.012
+sum(is.na(traffic_bam$change_cycles))/nrow(traffic_bam) #0
 # nas = traffic_bam %>%
 #   filter(is.na(change_cycles))
 # View(nas)
