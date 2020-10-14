@@ -50,10 +50,10 @@ repeat_points = traffic_bam %>%
   filter(year == 2011) %>%
   group_by(count_point_id) %>%
   tally()
-traffic_bam = traffic_bam %>%
+traffic_with_2011 = traffic_bam %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_bam) #54444
+dim(traffic_with_2011) #54444
 
 
 # Get relative change in cycle counts  ------------------------------------
@@ -76,11 +76,14 @@ traffic_bam %>%
   geom_line()
 
 traffic_bam %>%
-  group_by(year, name) %>%
+  group_by(name) %>%
+  mutate(sum_cycles = sum(pedal_cycles)) %>% # sum across all years
+  ungroup() %>%
+  group_by(year, name, sum_cycles) %>%
   summarise(change_cycles = weighted.mean(change_cycles, w = mean_cycles),
             mean_cycles = mean(mean_cycles)) %>%
   ggplot(., aes(x = year, y = change_cycles, group = name)) +
-  geom_line(aes(alpha = mean_cycles/100)) +
+  geom_line(aes(alpha = sum_cycles)) +
   ylim(c(0,2))
 
 las_of_interest = c("Leeds", "Derby", "Southampton",
@@ -305,35 +308,36 @@ ttt = traffic_repeats %>% filter(road_category == "TA")
 dim(ttt)
 dim(ttt[ttt$pedal_cycles == 0,])
 
-## all count points 2010-2019
-all = traffic_2010_on %>%
+## weighted mean change - counts in at least 2 years 2010-2019
+# change this to ggplot
+all = traffic_bam %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
-mb = traffic_2010_on %>%
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
+mb = traffic_bam %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
-pa = traffic_2010_on %>%
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
+pa = traffic_bam %>%
   filter(road_category == "PA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
-mcu = traffic_2010_on %>%
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
+mcu = traffic_bam %>%
   filter(road_category == "MCU") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
-ta = traffic_2010_on %>%
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
+ta = traffic_bam %>%
   filter(road_category == "TA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 350), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.7, 1.2), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
 lines(pedal_cycles ~ year, data = mcu, col = "green")
 lines(pedal_cycles ~ year, data = ta, col = "yellow")
-legend(2000, 350, legend = c("PA", "MB", "MCU", "TA"), col = c("red", "blue", "green", "yellow"), lty = 1)
-title(main = "Mean cycle count across all count points 2010-2019", cex.main = 0.9)
+legend(2017, 0.9, legend = c("PA", "MB", "MCU", "TA"), col = c("red", "blue", "green", "yellow"), lty = 1)
+title(main = "Change in AADF across all count points 2010-2019", cex.main = 0.9)
 
 ##counts repeated every year 2010-2019
 all = traffic_repeats %>%
@@ -368,25 +372,25 @@ title(main = "Mean cycle count by road category for points sampled each year 201
 ##counts in 2011 plus another year 2010-2019
 all = traffic_with_2011 %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 mb = traffic_with_2011 %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 pa = traffic_with_2011 %>%
   filter(road_category == "PA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 mcu = traffic_with_2011 %>%
   filter(road_category == "MCU") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 ta = traffic_with_2011 %>%
   filter(road_category == "TA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = mean(pedal_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 500), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.5), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
@@ -394,6 +398,37 @@ lines(pedal_cycles ~ year, data = mcu, col = "green")
 lines(pedal_cycles ~ year, data = ta, col = "yellow")
 legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
 title(main = "Mean cycle count by road category for points sampled in 2011 and another year 2010-2019", cex.main = 0.8)
+
+##weighted mean flow - counts in at least two years 2010-2019. weighted by mean cycles
+all = traffic_y5 %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+mb = traffic_y5 %>%
+  filter(road_category == "MB") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+pa = traffic_y5 %>%
+  filter(road_category == "PA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+mcu = traffic_y5 %>%
+  filter(road_category == "MCU") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+ta = traffic_y5 %>%
+  filter(road_category == "TA") %>%
+  group_by(year) %>%
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 4000), type = "n")
+lines(pedal_cycles ~ year, data = all, col = "black")
+lines(pedal_cycles ~ year, data = pa, col = "red")
+lines(pedal_cycles ~ year, data = mb, col = "blue")
+lines(pedal_cycles ~ year, data = mcu, col = "green")
+lines(pedal_cycles ~ year, data = ta, col = "yellow")
+legend(2010, 350, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "red", "blue", "green", "yellow"), lty = 1)
+title(main = "Mean cycle count by road category for points sampled in 2011 and another year 2010-2019", cex.main = 0.8)
+
 
 #####London
 
