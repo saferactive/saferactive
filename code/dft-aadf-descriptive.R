@@ -132,9 +132,9 @@ traffic_cyclable$name[!sel]
 
 library(tmap)
 mf = tm_shape(counties_joined) +
-  tm_polygons("multiplier") +
+  tm_polygons("multiplier", breaks = c(0, 0.5, 1, 1.5, 2, 6)) +
   tm_facets(along = "year")
-tmap_animation(mf, filename = "la-multipliers.gif")
+tmap_animation(mf, filename = "la-multipliers.gif", delay = 100)
 browseURL("la-multipliers.gif")
 
 # the las with most cycles counted...
