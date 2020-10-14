@@ -402,25 +402,25 @@ title(main = "Mean cycle count by road category for points sampled in 2011 and a
 ##weighted mean flow - counts in at least two years 2010-2019. weighted by mean cycles
 all = traffic_y5 %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 mb = traffic_y5 %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 pa = traffic_y5 %>%
   filter(road_category == "PA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 mcu = traffic_y5 %>%
   filter(road_category == "MCU") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 ta = traffic_y5 %>%
   filter(road_category == "TA") %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = mean_cycles))
+  summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 4000), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.2), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
@@ -503,6 +503,19 @@ new_order = sample(nrow(traffic_bam))
 traffic_bam = traffic_bam[new_order, ]
 
 sample_bam = traffic_bam[1:50000,]
+
+system.time({m1 = bam(change_cycles ~
+                        s(year, bs = "cr", k = 5) +
+                        s(road_category, bs = "re") +
+                        s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
+                      ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3)), #not significant
+                      # ti(year, road_category, bs = c("tp", "re")),
+                      weights = mean_cycles,
+                      family = nb(link = "log"),
+                      data = traffic_bam, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #8 seconds
+summary(m1)
+plot(m1, pages = 3, scheme = 2, shade = TRUE)
 
 system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +

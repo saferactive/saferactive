@@ -92,7 +92,7 @@ traffic_change_2011 = traffic_change_las %>%
 las_of_interest = c("Leeds", "Derby", "Southampton",
                     "Nottingham", "Birmingham"
                     , "City of London"
-                    # , "Waltham Forest", "Hackney"
+                    , "Waltham Forest", "Hackney"
                     )
 
 traffic_interest = traffic_change_2011 %>%
@@ -126,8 +126,8 @@ summary(counties_uas_gb$name %in% traffic_change_2011$name)
 summary(traffic_change_2011$name %in% counties_uas_gb$name)
 
 summary({sel = traffic_cyclable$name %in% counties_uas_gb$name})
-# Mode   FALSE    TRUE
-# logical      47  183837
+# Mode    TRUE
+# logical  183884
 traffic_cyclable$name[!sel]
 
 library(tmap)
