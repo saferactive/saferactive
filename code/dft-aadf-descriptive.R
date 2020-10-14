@@ -40,6 +40,20 @@ traffic_change %>%
 summary(traffic_change$change_cycles)
 sum(is.na(traffic_change$change_cycles)) / nrow(traffic_change) # 0% nas
 
+traffic_change %>%
+  group_by(name) %>%
+  mutate(sum_cycles = sum(pedal_cycles)) %>% # sum across all years
+  ungroup() %>%
+  group_by(year, name) %>%
+  summarise(
+    change_cycles = weighted.mean(change_cycles, w = mean_cycles), # within each year and LA, we weight the contribution of count points by their mean count
+    mean_cycles = mean(mean_cycles),
+    n_cycles = n()
+            ) %>%
+  ggplot(., aes(x = year, y = change_cycles, group = name)) +
+  geom_line(aes(alpha = mean_cycles/100)) +
+  ylim(c(0,2))
+
 traffic_change_las = traffic_change %>%
   group_by(name) %>%
   mutate(sum_cycles = sum(pedal_cycles)) %>% # sum across all years
