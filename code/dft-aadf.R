@@ -183,39 +183,39 @@ length(late)
 
 repeat_points = intersect(early, late)
 
-traffic_repeats = traffic_repeats %>%
+traffic_el = traffic_bam %>%
   filter(count_point_id %in% repeat_points) %>%
   filter(year %in% 2010:2019)
-dim(traffic_bam) #183884
-dim(traffic_repeats) #68284
+dim(traffic_bam) #69971
+dim(traffic_el) #68284
 
 ### 2010-2019 counts featuring all points that were surveyed in 2011 and at least one other year
-# Points counted in at least two years 2010-2019
-repeat_points = traffic_bam %>%
-  filter(year %in% 2010:2019) %>%
-  group_by(count_point_id) %>%
-  tally() %>%
-  filter(n >= 2)
-# 13303
 points_2011 = traffic_bam %>%
-  filter(year == 2011) %>%
+  filter(year == 2011,
+         # pedal_cycles > 0
+         ) %>%
   group_by(count_point_id)
 # 7884
 traffic_with_2011 = traffic_bam %>%
-  filter(count_point_id %in% repeat_points$count_point_id,
-         count_point_id %in% points_2011$count_point_id,
-         year %in% 2010:2019)
+  filter(count_point_id %in% points_2011$count_point_id)
 dim(traffic_with_2011) #54444
 
-# 2010-2019 all counts
-traffic_2010_on = traffic_bam %>%
-  filter(year %in% 2010:2019)
-dim(traffic_2010_on) #69971
+# Get relative change in cycle counts, relative to 2011  -----------------------
+t2011 = traffic_with_2011 %>%
+  filter(year == 2011) %>%
+  select(count_point_id, cycles_2011 = pedal_cycles)
+t2011$cycles_2011[t2011$cycles_2011 == 0] = 1 #changing 0 counts to 1 to prevent problems of infite increase, while still including these count locations
+traffic_with_2011 = traffic_with_2011 %>%
+  inner_join(t2011) %>%
+  mutate(change_from_2011 = pedal_cycles/cycles_2011)
+# traffic_with_2011$change_from_2011[is.na(traffic_with_2011$change_from_2011)] = 0
+sum(is.na(traffic_bam$change_from_2011))/nrow(traffic_bam) #0
 
-to_dim = traffic_bam %>%
-  filter(year %in% 2010:2019) %>%
-  group_by(count_point_id) %>%
-  tally() #30755
+
+# to_dim = traffic_bam %>%
+#   filter(year %in% 2010:2019) %>%
+#   group_by(count_point_id) %>%
+#   tally() #30755
 
 
 # Exploratory analysis ----------------------------------------------------
@@ -241,18 +241,18 @@ fortab = traffic_repeats %>%
   # filter(road_category == "TA") %>%
   group_by(year) %>%
   summarise(counts_10_yrs = mean(pedal_cycles),
-            change_10_yrs = mean(change_cycles))
+            change_10_yrs = weighted.mean(change_cycles, w = mean_cycles))
 # plot(pedal_cycles ~ year, data = fortab)
 
 tab2 = traffic_bam %>%
   group_by(year) %>%
   summarise(counts_all = mean(pedal_cycles),
-            change_all = mean(change_cycles))
+            change_all = weighted.mean(change_cycles, w = mean_cycles))
 
 tab3 = traffic_y5 %>%
   group_by(year) %>%
   summarise(counts_5_yrs = mean(pedal_cycles),
-            change_5_yrs = mean(change_cycles))
+            change_5_yrs = weighted.mean(change_cycles, w = mean_cycles))
 
 fullgraph = inner_join(tab2, tab3) %>%
   inner_join(fortab)
@@ -276,7 +276,24 @@ ggplot(fullgraph, aes(x = year)) +
   theme_grey() +
   labs(x = "Year", y = "Mean change in pedal cycle AADF")
 
+# change from 2011 graph
+# change from a 2011 baseline has a very similar shape to change from the mean. So the results are not caused by 'shifting baseline syndrome'
+# traffic_with_2011 = traffic_with_2011 %>%
+#   filter(cycles_2011 > 5)
 
+tab4 = traffic_with_2011 %>%
+  group_by(year) %>%
+  summarise(counts_all = mean(pedal_cycles),
+            change_t2011 = weighted.mean(change_from_2011, w = cycles_2011),
+            change_mean = weighted.mean(change_cycles, w = mean_cycles))
+
+ggplot(tab4, aes(x = year)) +
+  geom_line(aes(y = change_t2011, col = "darkred")) +
+  geom_line(aes(y = change_mean, col = "steelblue")) +
+  scale_color_discrete(name = "Change", labels = c("From 2011", "From mean")) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  theme_grey() +
+  labs(x = "Year", y = "Mean change in pedal cycle AADF")
 ######
 
 traffic_repeats %>%
@@ -459,7 +476,7 @@ system.time({m1 = bam(pedal_cycles ~
                         # ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3)), #not significant
                         # ti(year, road_category, bs = c("tp", "re")),
                       family = nb(link = "log"),
-                      data = traffic_2010_on, method = 'fREML',
+                      data = traffic_bam, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #12 seconds
 summary(m1)
 plot(m1, pages = 3, scheme = 2, shade = TRUE)
