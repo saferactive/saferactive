@@ -90,12 +90,16 @@ las_of_interest = c("Leeds", "Derby", "Southampton",
                     "Nottingham", "Birmingham")
 
 
+
 # Get London Borough boundaries -------------------------------------------
 
 lads = readRDS("lads.Rds")
 boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%
   filter(Name %in% boroughs)
+
+traffic_london = traffic_bam %>%
+  inner_join(lads, by = c("name" = "Name"))
 
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
@@ -192,18 +196,22 @@ traffic_el = traffic_bam %>%
 dim(traffic_bam) #69971
 dim(traffic_el) #68284
 
+
+# Multiplier of change from 2011 ------------------------------------------
+
+
 ### 2010-2019 counts featuring all points that were surveyed in 2011 and at least one other year
-points_2011 = traffic_bam %>%
+points_2011 = traffic_london %>%
   filter(year == 2011,
          # pedal_cycles > 0
          ) %>%
   group_by(count_point_id)
 # 7884
-traffic_with_2011 = traffic_bam %>%
+traffic_with_2011 = traffic_london %>%
   filter(count_point_id %in% points_2011$count_point_id)
-dim(traffic_with_2011) #54444
+dim(traffic_with_2011) #54444 #4807 in london
 
-# Get relative change in cycle counts, relative to 2011  -----------------------
+# Get change in cycle counts, relative to 2011  -----------------------
 t2011 = traffic_with_2011 %>%
   filter(year == 2011) %>%
   select(count_point_id, cycles_2011 = pedal_cycles)
@@ -212,8 +220,14 @@ traffic_with_2011 = traffic_with_2011 %>%
   inner_join(t2011) %>%
   mutate(change_from_2011 = pedal_cycles/cycles_2011)
 # traffic_with_2011$change_from_2011[is.na(traffic_with_2011$change_from_2011)] = 0
-sum(is.na(traffic_bam$change_from_2011))/nrow(traffic_bam) #0
+sum(is.na(traffic_with_2011$change_from_2011))/nrow(traffic_with_2011) #0
 
+# # calculate change in cycling uptake relative to 2011
+# traffic_bam = traffic_bam %>%
+#   mutate(cycling_2011 = case_when(year == 2011 ~ change_cycles)) %>%
+#   group_by(count_point_id) %>%
+#   mutate(multiplier = change_cycles / mean(cycling_2011, na.rm = TRUE)) %>%
+#   ungroup()
 
 # to_dim = traffic_bam %>%
 #   filter(year %in% 2010:2019) %>%
@@ -504,7 +518,7 @@ traffic_bam = traffic_bam[new_order, ]
 
 sample_bam = traffic_bam[1:50000,]
 
-system.time({m1 = bam(change_cycles ~
+system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
                         s(road_category, bs = "re") +
                         s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
@@ -512,10 +526,11 @@ system.time({m1 = bam(change_cycles ~
                       # ti(year, road_category, bs = c("tp", "re")),
                       weights = mean_cycles,
                       family = nb(link = "log"),
-                      data = traffic_bam, method = 'fREML',
-                      nthreads = 4, discrete = TRUE)}) #8 seconds
+                      data = traffic_with_2011, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #15 seconds
 summary(m1)
-plot(m1, pages = 3, scheme = 2, shade = TRUE)
+plot(m1, pages = 4, scheme = 2, shade = TRUE)
+
 
 system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
