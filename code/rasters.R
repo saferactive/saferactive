@@ -34,6 +34,7 @@ if(file.exists("acc_with_cas.Rds")){
 # Filter to London
 # acc <- acc[acc$police_force %in% c("Metropolitan Police","City of London"), ]
 
+#TODO: NAs in the year field due to NA datetime
 
 # Make Raster Bricks ------------------------------------------------------
 
