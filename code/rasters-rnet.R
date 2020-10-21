@@ -36,7 +36,7 @@ saveRDS(rnet_cents, "rnet_cents.Rds")
 # Rasterising the results - see rasters.R
 rast_template = raster::raster("rasters/allmode_alltime_all.tif")
 system.time({
-  raster_rnet_bicycle = raster::rasterize(rnet_cents, rast_template, field = "km_cycled_yr", fun = "sum")
+  raster_rnet_bicycle = raster::rasterize(rnet_cents, rast_template, field = "km_cycled_yr", fun = sum, na.rm = TRUE)
 })
 mapview::mapview(raster_rnet_bicycle)
 
@@ -44,3 +44,9 @@ writeRaster(raster_rnet_bicycle, "raster_rnet_bicycle.tif", overwrite=TRUE, data
 piggyback::pb_upload("raster_rnet_bicycle.tif")
 system("cp -v *.tif rasters")
 # 'raster_rnet_bicycle.tif' -> 'rasters/raster_rnet_bicycle.tif'
+
+library(tmap)
+tmap_mode("view")
+qtm(raster_rnet_bicycle, "bicycle")
+# why are so many points empty? https://github.com/saferactive/saferactive/issues/48#issuecomment-713869812
+rnet_cents %>% sample_frac(size = 0.01) %>% mapview::mapview()
