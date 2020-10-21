@@ -14,6 +14,13 @@ population_england$population_wales = population_wales[[2]]
 population_england$wales_multiplier = (population_england$population + population_england$population_wales) / population_england$population
 plot(population_england$wales_multiplier)
 
+# percent of population living in scotland given that its population is ~3.1 million
+u = "https://www.ons.gov.uk/generator?format=csv&uri=/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/scpop/pop"
+population_scotland = readr::read_csv(u, skip = 7)
+population_england$population_scotland = population_scotland[[2]]
+population_england$scotland_multiplier = (population_england$population + population_england$population_scotland) / population_england$population
+plot(population_england$scotland_multiplier)
+
 u = "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/905948/nts0303.ods"
 f = basename(u)
 download.file(u, f)
@@ -29,10 +36,13 @@ distance_cycled = nts_dist_long %>%
   filter(Mode == "Bicycle")
 distance_cycled_joined = inner_join(distance_cycled, population_england)
 distance_cycled_total = distance_cycled_joined %>%
-  mutate(km_cycled_yr = miles_person_yr * population * wales_multiplier * 1.61)
+  mutate(km_cycled_yr_ew = miles_person_yr * population * wales_multiplier * 1.61)
 distance_cycled_total # in 2011
-summary(distance_cycled_total$km_cycled_yr)
+summary(distance_cycled_total$km_cycled_yr_ew)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
 # 3.273e+09 3.685e+09 4.361e+09 4.362e+09 5.016e+09 5.628e+09
 plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr, ylim = c(0, 6e9))
+distance_cycled_total = distance_cycled_joined %>%
+  mutate(km_cycled_yr_gb = miles_person_yr * (population + population_wales + population_scotland) * 1.61)
+summary(distance_cycled_total$km_cycled_yr_gb)
 readr::write_csv(distance_cycled_total, "small-output-datasets/distance_cycled_total.csv")
