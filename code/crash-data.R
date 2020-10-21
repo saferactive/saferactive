@@ -2,7 +2,7 @@ library(sf)
 library(stats19)
 library(tidyverse)
 
-years = 2009:2018
+years = 2009:2019
 crashes_all = get_stats19(year = years, type = "ac")
 casualties_all = readRDS("casualties_adjusted.Rds")
 vehicles_all = get_stats19(year = years, type = "veh")
