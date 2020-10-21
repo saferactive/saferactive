@@ -29,9 +29,10 @@ distance_cycled = nts_dist_long %>%
   filter(Mode == "Bicycle")
 distance_cycled_joined = inner_join(distance_cycled, population_england)
 distance_cycled_total = distance_cycled_joined %>%
-  mutate(km_cycled_yr = miles_person_yr * population * wales_multiplier * 0.62)
+  mutate(km_cycled_yr = miles_person_yr * population * wales_multiplier * 1.61)
+distance_cycled_total # in 2011
 summary(distance_cycled_total$km_cycled_yr)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
-# 1.260e+09 1.419e+09 1.679e+09 1.680e+09 1.932e+09 2.167e+09
-plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr, ylim = c(0, 2.2e9))
+# 3.273e+09 3.685e+09 4.361e+09 4.362e+09 5.016e+09 5.628e+09
+plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr, ylim = c(0, 6e9))
 readr::write_csv(distance_cycled_total, "small-output-datasets/distance_cycled_total.csv")
