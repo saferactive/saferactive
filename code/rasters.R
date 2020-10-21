@@ -4,32 +4,72 @@ library(raster)
 library(sf)
 library(stars)
 
+piggyback::pb_download_url("acc_with_cas.Rds")
+u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/acc_with_cas.Rds"
+f = basename(u)
+
 if(file.exists("acc_with_cas.Rds")){
   acc <- readRDS("acc_with_cas.Rds")
 } else {
+  download.file(u, r)
+  acc <- readRDS("acc_with_cas.Rds")
+  # uncomment the following to reproduce:
   # Bring in Crash Data
-  cas <- stats19::get_stats19(2010:2019, type = "cas")
-  acc <- stats19::get_stats19(2010:2019, type = "acc", output_format = "sf")
-
-  cas <- cas[,c("accident_index","casualty_type","age_band_of_casualty","casualty_severity")]
-  acc <- acc[,c("accident_index","datetime","accident_severity","day_of_week",
-                "junction_detail","junction_control","police_force")]
-
-    # Identify Active Travelers and Commuters
-  cas_summary <- group_by(cas, accident_index) %>%
-    summarise(total_cas = n(),
-              total_cas_ksi = length(casualty_type[casualty_severity != "Slight"]),
-              cycle_cas = length(casualty_type[casualty_type == "Cyclist"]),
-              ped_cas = length(casualty_type[casualty_type == "Pedestrian"]),
-              cycle_cas_ksi = length(casualty_type[casualty_type == "Cyclist" & casualty_severity != "Slight"]),
-              ped_cas_ksi = length(casualty_type[casualty_type == "Pedestrian" & casualty_severity != "Slight"]),
-    )
-
-
-  acc <- left_join(acc, cas_summary, by = "accident_index")
-  acc$year <- year(acc$datetime)
-  saveRDS(acc, "acc_with_cas.Rds")
+  # cas <- stats19::get_stats19(2010:2019, type = "cas")
+  # acc <- stats19::get_stats19(2010:2019, type = "acc", output_format = "sf")
+  #
+  # cas <- cas[,c("accident_index","casualty_type","age_band_of_casualty","casualty_severity")]
+  # acc <- acc[,c("accident_index","datetime","accident_severity","day_of_week",
+  #               "junction_detail","junction_control","police_force")]
+  #
+  #   # Identify Active Travelers and Commuters
+  # cas_summary <- group_by(cas, accident_index) %>%
+  #   summarise(total_cas = n(),
+  #             total_cas_ksi = length(casualty_type[casualty_severity != "Slight"]),
+  #             cycle_cas = length(casualty_type[casualty_type == "Cyclist"]),
+  #             ped_cas = length(casualty_type[casualty_type == "Pedestrian"]),
+  #             cycle_cas_ksi = length(casualty_type[casualty_type == "Cyclist" & casualty_severity != "Slight"]),
+  #             ped_cas_ksi = length(casualty_type[casualty_type == "Pedestrian" & casualty_severity != "Slight"]),
+  #   )
+  #
+  #
+  # acc <- left_join(acc, cas_summary, by = "accident_index")
+  # acc$year <- year(acc$datetime)
+  # saveRDS(acc, "acc_with_cas.Rds")
 }
+
+piggyback::pb_upload("acc_with_cas.Rds")
+piggyback::pb_download_url("acc_with_cas.Rds")
+# [1] "https://github.com/saferactive/saferactive/releases/download/0.1.1/acc_with_cas.Rds"
+
+
+summary(acc)
+
+# accident_index        datetime                   accident_severity  day_of_week        junction_detail    junction_control
+# Length:1383135     Min.   :2010-01-01 00:01:00   Length:1383135     Length:1383135     Length:1383135     Length:1383135
+# Class :character   1st Qu.:2012-04-16 09:02:30   Class :character   Class :character   Class :character   Class :character
+# Mode  :character   Median :2014-09-15 14:00:00   Mode  :character   Mode  :character   Mode  :character   Mode  :character
+# Mean   :2014-10-14 02:31:12
+# 3rd Qu.:2017-03-10 14:44:30
+# Max.   :2019-12-31 23:53:00
+# NA's   :132
+#  police_force                geometry         total_cas      total_cas_ksi       cycle_cas          ped_cas        cycle_cas_ksi
+#  Length:1383135     POINT        :1383135   Min.   : 1.000   Min.   : 0.0000   Min.   : 0.0000   Min.   : 0.0000   Min.   :0.0000
+#  Class :character   epsg:27700   :      0   1st Qu.: 1.000   1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.:0.0000
+#  Mode  :character   +proj=tmer...:      0   Median : 1.000   Median : 0.0000   Median : 0.0000   Median : 0.0000   Median :0.0000
+#                                             Mean   : 1.329   Mean   : 0.1834   Mean   : 0.1347   Mean   : 0.1747   Mean   :0.0248
+#                                             3rd Qu.: 1.000   3rd Qu.: 0.0000   3rd Qu.: 0.0000   3rd Qu.: 0.0000   3rd Qu.:0.0000
+#                                             Max.   :93.000   Max.   :20.0000   Max.   :10.0000   Max.   :22.0000   Max.   :5.0000
+#
+#   ped_cas_ksi            year
+#  Min.   : 0.00000   Min.   :2010
+#  1st Qu.: 0.00000   1st Qu.:2012
+#  Median : 0.00000   Median :2014
+#  Mean   : 0.04187   Mean   :2014
+#  3rd Qu.: 0.00000   3rd Qu.:2017
+#  Max.   :11.00000   Max.   :2019
+#                     NA's   :132
+
 
 # Filter to London
 # acc <- acc[acc$police_force %in% c("Metropolitan Police","City of London"), ]

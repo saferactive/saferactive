@@ -8,11 +8,13 @@ library(sf)
 library(stats19)
 tmap_mode("view")
 source("code/osm_cleaning_functions.R")
+library(trafficalmr)
 
 # Read in PBF
 osm = oe_read("E:/OneDrive - University of Leeds/Data/opentripplanner/graphs/london/greater-london-latest.osm.pbf",
                     extra_tags = c("ref", "maxspeed"))
-
+osm = oe_get("Greater London", extra_tags = c("ref", "maxspeed"))
+osm = oe_get("Isle of Wight", extra_tags = c("ref", "maxspeed"))
 # Clean and prepare
 osm <- osm_main_roads(osm)
 osm <- sf::st_transform(osm, 27700)
@@ -22,7 +24,8 @@ junction_clusters <- cluster_junction(junctions)
 
 # Bring in Stats19 at
 crash <- readRDS("ac10.Rds")
-crash <- crash[crash$police_force %in% c("Metropolitan Police","City of London"), ]
+# crash <- crash[crash$police_force %in% c("Metropolitan Police","City of London"), ]
+crash <- crash[crash$police_force %in% c("Isle of Wight"), ]
 crash <- crash[!is.na(crash$longitude),] #TODO: What to do with crashes with no location?
 crash <- st_as_sf(crash, coords = c("longitude","latitude"), crs = 4326)
 crash <- st_transform(crash, 27700)
