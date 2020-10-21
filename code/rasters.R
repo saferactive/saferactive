@@ -34,7 +34,9 @@ if(file.exists("acc_with_cas.Rds")){
 # Filter to London
 # acc <- acc[acc$police_force %in% c("Metropolitan Police","City of London"), ]
 
-#TODO: NAs in the year field due to NA datetime
+acc <- acc[!is.na(acc$year),]
+acc <- acc[!st_is_empty(acc),]
+
 
 # Make Raster Bricks ------------------------------------------------------
 
@@ -43,7 +45,6 @@ if(file.exists("acc_with_cas.Rds")){
 # KSI / Slight
 
 rast_template <- raster(acc, resolution = c(500,500))
-
 
 rast_cycle_commute_all <- brick(rast_template)
 rast_cycle_commute_ksi <- brick(rast_template)
@@ -58,7 +59,7 @@ for(i in 2010:2019){
   acc_sub <- acc_sub[!acc_sub$day_of_week %in% c("Saturday","Sunday"), ]
   acc_sub <- acc_sub[(hour(acc_sub$datetime) > 7 & hour(acc_sub$datetime) < 10) |
                                            (hour(acc_sub$datetime) > 16 & hour(acc_sub$datetime) < 19), ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
+
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "cycle_cas", fun = "sum")
@@ -67,8 +68,8 @@ for(i in 2010:2019){
   rast_cycle_commute_ksi <- addLayer(rast_cycle_commute_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_cycle_commute_all,"rasters/cycle_commute_all.tif", overwrite=TRUE)
-writeRaster(rast_cycle_commute_ksi,"rasters/cycle_commute_ksi.tif", overwrite=TRUE)
+writeRaster(rast_cycle_commute_all,"rasters/cycle_commute_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_cycle_commute_ksi,"rasters/cycle_commute_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 rast_cycle_alltime_all <- brick(rast_template)
 rast_cycle_alltime_ksi <- brick(rast_template)
@@ -76,7 +77,6 @@ rast_cycle_alltime_ksi <- brick(rast_template)
 for(i in 2010:2019){
   acc_sub <- acc[acc$year == i,]
   acc_sub <- acc_sub[acc_sub$ped_cas > 0, ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "cycle_cas", fun = "sum")
@@ -85,8 +85,8 @@ for(i in 2010:2019){
   rast_cycle_alltime_ksi <- addLayer(rast_cycle_alltime_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_cycle_alltime_all,"rasters/cycle_alltime_all.tif", overwrite=TRUE)
-writeRaster(rast_cycle_alltime_ksi,"rasters/cycle_alltime_ksi.tif", overwrite=TRUE)
+writeRaster(rast_cycle_alltime_all,"rasters/cycle_alltime_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_cycle_alltime_ksi,"rasters/cycle_alltime_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 # Walking -----------------------------------------------------------------
 
@@ -99,7 +99,6 @@ for(i in 2010:2019){
   acc_sub <- acc_sub[!acc_sub$day_of_week %in% c("Saturday","Sunday"), ]
   acc_sub <- acc_sub[(hour(acc_sub$datetime) > 7 & hour(acc_sub$datetime) < 10) |
                        (hour(acc_sub$datetime) > 16 & hour(acc_sub$datetime) < 19), ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "ped_cas", fun = "sum")
@@ -108,8 +107,8 @@ for(i in 2010:2019){
   rast_walk_commute_ksi <- addLayer(rast_walk_commute_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_walk_commute_all,"rasters/walk_commute_all.tif", overwrite=TRUE)
-writeRaster(rast_walk_commute_ksi,"rasters/walk_commute_ksi.tif", overwrite=TRUE)
+writeRaster(rast_walk_commute_all,"rasters/walk_commute_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_walk_commute_ksi,"rasters/walk_commute_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 
 rast_walk_alltime_all <- brick(rast_template)
@@ -119,7 +118,6 @@ rast_walk_alltime_ksi <- brick(rast_template)
 for(i in 2010:2019){
   acc_sub <- acc[acc$year == i,]
   acc_sub <- acc_sub[acc_sub$ped_cas > 0, ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "ped_cas", fun = "sum")
@@ -128,8 +126,8 @@ for(i in 2010:2019){
   rast_walk_alltime_ksi <- addLayer(rast_walk_alltime_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_walk_alltime_all,"rasters/walk_alltime_all.tif", overwrite=TRUE)
-writeRaster(rast_walk_alltime_ksi,"rasters/walk_alltime_ksi.tif", overwrite=TRUE)
+writeRaster(rast_walk_alltime_all,"rasters/walk_alltime_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_walk_alltime_ksi,"rasters/walk_alltime_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 
 # All Mode ----------------------------------------------------------------
@@ -143,7 +141,6 @@ for(i in 2010:2019){
   acc_sub <- acc_sub[!acc_sub$day_of_week %in% c("Saturday","Sunday"), ]
   acc_sub <- acc_sub[(hour(acc_sub$datetime) > 7 & hour(acc_sub$datetime) < 10) |
                        (hour(acc_sub$datetime) > 16 & hour(acc_sub$datetime) < 19), ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "total_cas", fun = "sum")
@@ -152,8 +149,8 @@ for(i in 2010:2019){
   rast_allmode_commute_ksi <- addLayer(rast_allmode_commute_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_allmode_commute_all,"rasters/allmode_commute_all.tif", overwrite=TRUE)
-writeRaster(rast_allmode_commute_ksi,"rasters/allmode_commute_ksi.tif", overwrite=TRUE)
+writeRaster(rast_allmode_commute_all,"rasters/allmode_commute_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_allmode_commute_ksi,"rasters/allmode_commute_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 
 rast_allmode_alltime_all <- brick(rast_template)
@@ -163,7 +160,6 @@ rast_allmode_alltime_ksi <- brick(rast_template)
 for(i in 2010:2019){
   acc_sub <- acc[acc$year == i,]
   acc_sub <- acc_sub[acc_sub$total_cas > 0, ]
-  acc_sub <- acc_sub[!st_is_empty(acc_sub),]
 
   message(Sys.time()," Year: ",i, " crashes: ",nrow(acc_sub))
   rast_sub_all <- rasterize(acc_sub, rast_template, field = "total_cas", fun = "sum")
@@ -172,5 +168,5 @@ for(i in 2010:2019){
   rast_allmode_alltime_ksi <- addLayer(rast_allmode_alltime_ksi, rast_sub_ksi)
 }
 
-writeRaster(rast_allmode_alltime_all,"rasters/allmode_alltime_all.tif", overwrite=TRUE)
-writeRaster(rast_allmode_alltime_ksi,"rasters/allmode_alltime_ksi.tif", overwrite=TRUE)
+writeRaster(rast_allmode_alltime_all,"rasters/allmode_alltime_all.tif", overwrite=TRUE, datatype = "INT2U")
+writeRaster(rast_allmode_alltime_ksi,"rasters/allmode_alltime_ksi.tif", overwrite=TRUE, datatype = "INT2U")
