@@ -1,0 +1,13 @@
+file_name,size,timestamp,tag,owner,repo
+allmode_alltime_all.tif,1445506,2020-10-21T10:21:52Z,0.1.1,saferactive,saferactive
+allmode_alltime_ksi.tif,1289469,2020-10-21T10:21:55Z,0.1.1,saferactive,saferactive
+allmode_commute_all.tif,996542,2020-10-21T10:21:57Z,0.1.1,saferactive,saferactive
+allmode_commute_ksi.tif,953257,2020-10-21T10:22:00Z,0.1.1,saferactive,saferactive
+cycle_alltime_all.tif,803473,2020-10-21T10:22:02Z,0.1.1,saferactive,saferactive
+cycle_alltime_ksi.tif,801631,2020-10-21T10:22:05Z,0.1.1,saferactive,saferactive
+cycle_commute_all.tif,699347,2020-10-21T10:22:08Z,0.1.1,saferactive,saferactive
+cycle_commute_ksi.tif,698133,2020-10-21T10:21:45Z,0.1.1,saferactive,saferactive
+walk_alltime_all.tif,851685,2020-10-21T10:21:46Z,0.1.1,saferactive,saferactive
+walk_alltime_ksi.tif,840798,2020-10-21T10:21:47Z,0.1.1,saferactive,saferactive
+walk_commute_all.tif,709874,2020-10-21T10:21:48Z,0.1.1,saferactive,saferactive
+walk_commute_ksi.tif,710677,2020-10-21T10:21:49Z,0.1.1,saferactive,saferactive

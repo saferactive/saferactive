@@ -223,3 +223,15 @@ pbras = readr::read_csv("small-output-datasets/raster-filenames.csv")
 for(i in seq(nrow(pbras))) {
   download.file(url = pbras$url[i], paste0("rasters/", pbras$file_name[i]))
 }
+
+r1 = raster::raster("rasters/allmode_alltime_all.tif")
+r1 = raster::raster("rasters/cycle_commute_ksi.tif")
+
+r1
+plot(r1)
+mapview::mapview(r1)
+raster::plotRGB(r1)
+
+b1 = raster::brick("rasters/cycle_commute_ksi.tif")
+b1
+plot(b1)
