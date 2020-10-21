@@ -212,12 +212,14 @@ writeRaster(rast_allmode_alltime_all,"rasters/allmode_alltime_all.tif", overwrit
 writeRaster(rast_allmode_alltime_ksi,"rasters/allmode_alltime_ksi.tif", overwrite=TRUE, datatype = "INT2U")
 
 # get raster datasets:
-system("echo *.tif >> .gitignore")
-dir.create("rasters")
-pbdls = piggyback::pb_list()
-pbras = pbdls %>% filter(stringr::str_detect(string = file_name, pattern = ".tif"))
-pbras[1, ] %>% pull(file_name) %>% piggyback::pb_download_url()
-pbras$url = paste0("https://github.com/saferactive/saferactive/releases/download/0.1.1/", pbras$file_name)
+# system("echo *.tif >> .gitignore")
+# dir.create("rasters")
+# pbdls = piggyback::pb_list()
+# pbras = pbdls %>% filter(stringr::str_detect(string = file_name, pattern = ".tif"))
+# pbras[1, ] %>% pull(file_name) %>% piggyback::pb_download_url()
+# pbras$url = paste0("https://github.com/saferactive/saferactive/releases/download/0.1.1/", pbras$file_name)
+# readr::write_csv(pbras, "small-output-datasets/raster-filenames.csv")
+pbras = readr::read_csv("small-output-datasets/raster-filenames.csv")
 for(i in seq(nrow(pbras))) {
   download.file(url = pbras$url[i], paste0("rasters/", pbras$file_name[i]))
 }
