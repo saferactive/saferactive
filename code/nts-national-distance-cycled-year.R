@@ -37,7 +37,7 @@ distance_cycled = nts_dist_long %>%
 distance_cycled_joined = inner_join(distance_cycled, population_england)
 distance_cycled_total = distance_cycled_joined %>%
   mutate(km_cycled_yr_ew = miles_person_yr * population * wales_multiplier * 1.61)
-distance_cycled_total # in 2011
+distance_cycled_total # in 2011: 4475741485
 summary(distance_cycled_total$km_cycled_yr_ew)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
 # 3.273e+09 3.685e+09 4.361e+09 4.362e+09 5.016e+09 5.628e+09
