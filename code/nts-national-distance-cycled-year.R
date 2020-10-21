@@ -41,8 +41,9 @@ distance_cycled_total # in 2011
 summary(distance_cycled_total$km_cycled_yr_ew)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
 # 3.273e+09 3.685e+09 4.361e+09 4.362e+09 5.016e+09 5.628e+09
-plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr, ylim = c(0, 6e9))
-distance_cycled_total = distance_cycled_joined %>%
+distance_cycled_total = distance_cycled_total %>%
   mutate(km_cycled_yr_gb = miles_person_yr * (population + population_wales + population_scotland) * 1.61)
+plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr_ew, ylim = c(0, 6e9))
+points(distance_cycled_total$year, distance_cycled_total$km_cycled_yr_gb, ylim = c(0, 6e9))
 summary(distance_cycled_total$km_cycled_yr_gb)
 readr::write_csv(distance_cycled_total, "small-output-datasets/distance_cycled_total.csv")
