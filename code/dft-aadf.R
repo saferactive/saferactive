@@ -76,7 +76,19 @@ dim(traffic_bam) #66323
 #   filter(is.na(change_cycles))
 # View(nas)
 
-traffic_bam = traffic_bam %>%
+# remove points with at least one year of 0 count
+# remove points with mean_cycles <5
+traffic_0 = traffic_bam %>%
+  group_by(count_point_id) %>%
+  filter(pedal_cycles == 0)
+traffic_nonzero = traffic_bam %>%
+  filter(! count_point_id %in% traffic_0$count_point_id,
+         mean_cycles >= 5.0)
+dim(traffic_nonzero) #51753
+
+
+
+traffic_nonzero = traffic_nonzero %>%
   group_by(grid_location, year) %>%
   mutate(smooth_change = mean(change_cycles),
          smotth_mean = mean(mean_cycles)) %>%
@@ -111,9 +123,9 @@ boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%
   filter(Name %in% boroughs)
 
-traffic_london = traffic_bam %>%
+traffic_london = traffic_nonzero %>%
   inner_join(lads, by = c("name" = "Name"))
-dim(traffic_london) #6390
+dim(traffic_london) #5215
 
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
@@ -170,15 +182,15 @@ points_2011 = traffic_london %>%
          # pedal_cycles > 0
   ) %>%
   group_by(count_point_id)
-dim(points_2011) # 2050
+dim(points_2011) # 1671
 repeat_points = traffic_london %>%
   filter(count_point_id %in% points_2011$count_point_id) %>%
   group_by(count_point_id) %>%
   tally() %>%
-  filter(n >= 2) #1133
+  filter(n >= 2) #986
 traffic_with_2011 = traffic_london %>%
   filter(count_point_id %in% repeat_points$count_point_id)
-dim(traffic_with_2011) #54444 #5868 in london
+dim(traffic_with_2011) #54444 #4705 in london
 
 # Get change in cycle counts, relative to 2010-12  -----------------------
 t2011 = unique(traffic_with_2011 %>%
@@ -188,7 +200,7 @@ t2011 = unique(traffic_with_2011 %>%
   ungroup() %>%
   select(count_point_id, cycles_2011))
 
-t2011$cycles_2011[t2011$cycles_2011 == 0] = 1 #changing 0 counts to 1 to prevent problems of infinite increase, while still including these count locations
+# t2011$cycles_2011[t2011$cycles_2011 == 0] = 1 #changing 0 counts to 1 to prevent problems of infinite increase, while still including these count locations. no longer required.
 traffic_with_2011 = traffic_with_2011 %>%
   inner_join(t2011) %>%
   mutate(change_from_2011 = pedal_cycles/cycles_2011)
@@ -226,36 +238,36 @@ traffic_with_2011$logchange = log(traffic_with_2011$change_cycles)
 
 
 ### Points counted every single year 2010-2019
-repeat_points = traffic_with_2011 %>%
+repeat_points = traffic_london %>%
   filter(year %in% 2010:2019) %>%
   group_by(count_point_id) %>%
   tally() %>%
   filter(n >= 10)
-# 3049 160 london
-traffic_repeats = traffic_with_2011 %>%
+# 3049 132 london
+traffic_repeats = traffic_london %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_repeats) #30490 1600 london
+dim(traffic_repeats) #30490 1320 london
 
 ### Points counted in 5 years 2010-2019
-repeat_points = traffic_with_2011 %>%
+repeat_points = traffic_london %>%
   filter(year %in% 2010:2019) %>%
   group_by(count_point_id) %>%
   tally() %>%
-  filter(n >= 5) #5895 581 london
-traffic_y5 = traffic_with_2011 %>%
+  filter(n >= 5) #5895 394 london
+traffic_y5 = traffic_london %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_y5) #51928 4770 london
+dim(traffic_y5) #51928 3277 london
 
 ###filter out any count points that don't appear within both the first and second periods of 2009-2013 and 2014-2019?
-early_year = traffic_bam %>%
+early_year = traffic_nonzero %>%
   group_by(count_point_id, year) %>%
   filter(year %in% 2010:2014)
 early = unique(early_year$count_point_id)
 length(early)
 
-late_year = traffic_bam %>%
+late_year = traffic_nonzero %>%
   group_by(count_point_id, year) %>%
   filter(year %in% 2015:2019)
 late = unique(late_year$count_point_id)
@@ -263,11 +275,11 @@ length(late)
 
 repeat_points = intersect(early, late)
 
-traffic_el = traffic_bam %>%
+traffic_el = traffic_nonzero %>%
   filter(count_point_id %in% repeat_points) %>%
   filter(year %in% 2010:2019)
-dim(traffic_bam) #69971
-dim(traffic_el) #68284
+dim(traffic_nonzero) #51753
+dim(traffic_el) #50799
 
 
 
@@ -295,18 +307,18 @@ fortab = traffic_repeats %>%
   # filter(road_category == "TA") %>%
   group_by(year) %>%
   summarise(counts_10_yrs = mean(pedal_cycles),
-            change_10_yrs = weighted.mean(change_from_2011, w = mean_cycles))
+            change_10_yrs = weighted.mean(change_cycles, w = mean_cycles))
 # plot(pedal_cycles ~ year, data = fortab)
 
-tab2 = traffic_with_2011 %>%
+tab2 = traffic_london %>%
   group_by(year) %>%
   summarise(counts_all = mean(pedal_cycles),
-            change_all = weighted.mean(change_from_2011, w = mean_cycles))
+            change_all = weighted.mean(change_cycles, w = mean_cycles))
 
 tab3 = traffic_y5 %>%
   group_by(year) %>%
   summarise(counts_5_yrs = mean(pedal_cycles),
-            change_5_yrs = weighted.mean(change_from_2011, w = mean_cycles))
+            change_5_yrs = weighted.mean(change_cycles, w = mean_cycles))
 
 fullgraph = inner_join(tab2, tab3) %>%
   inner_join(fortab)
@@ -421,27 +433,27 @@ legend(2017, 500, legend = c("All", "PA", "MB", "MCU", "TA"), col = c("black", "
 title(main = "Mean cycle count by road category for points sampled each year 2010 - 2019", cex.main = 0.8)
 
 ##counts in 2011 plus another year 2010-2019
-all = with_2014 %>%
+all = traffic_london %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
-mb = with_2014 %>%
+mb = traffic_london %>%
   filter(road_category == "MB") %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
-pa = with_2014 %>%
+pa = traffic_london %>%
   filter(road_category == "PA") %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
-mcu = with_2014 %>%
+mcu = traffic_london %>%
   filter(road_category == "MCU") %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
-ta = with_2014 %>%
+ta = traffic_london %>%
   filter(road_category == "TA") %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.5), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.3), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
@@ -471,7 +483,7 @@ ta = traffic_y5 %>%
   group_by(year) %>%
   summarise(pedal_cycles = weighted.mean(change_cycles, w = mean_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.2), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0.8, 1.3), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
@@ -483,8 +495,8 @@ title(main = "Mean cycle count by road category for points sampled in 2011 and a
 
 #####London
 
-traffic_london = traffic_repeats %>%
-  filter(name %in% lads$Name)
+# traffic_london = traffic_repeats %>%
+#   filter(name %in% lads$Name)
 
 ##counts repeated every year 2010-2019
 all = traffic_london %>%
@@ -507,7 +519,7 @@ ta = traffic_london %>%
   group_by(year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 
-plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 1000), type = "n")
+plot(pedal_cycles ~ year, data = pa, col = "red", ylim = c(0, 2000), type = "n")
 lines(pedal_cycles ~ year, data = all, col = "black")
 lines(pedal_cycles ~ year, data = pa, col = "red")
 lines(pedal_cycles ~ year, data = mb, col = "blue")
@@ -556,16 +568,16 @@ traffic_bam = traffic_bam[new_order, ]
 sample_bam = traffic_bam[1:50000,]
 
 system.time({m1 = bam(change_cycles ~
-                        s(year, bs = "cr", k = 5) +
-                        s(road_category, bs = "re")
-                        # s(mean_year, bs = "cr", k = 3) +
-                      #   s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5)) +
-                      # ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+                        s(year, bs = "cr", k = 5)
+                        + s(road_category, bs = "re")
+                        # + s(mean_year, bs = "cr", k = 3)
+                        # + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+                        # + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
                       , #not significant
                       # ti(year, road_category, bs = c("tp", "re")),
                       weights = mean_cycles,
-                      family = nb(link = "log"),
-                      data = traffic_bam, method = 'fREML',
+                      # family = nb(link = "log"),
+                      data = traffic_nonzero, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
 summary(m1)
 plot(m1, pages = 4, scheme = 2, shade = TRUE)
