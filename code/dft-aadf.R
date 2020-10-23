@@ -567,21 +567,44 @@ traffic_bam = traffic_bam[new_order, ]
 
 sample_bam = traffic_bam[1:50000,]
 
-system.time({m1 = bam(change_cycles ~
+system.time({m1 = bam(change_from_2011 ~
                         s(year, bs = "cr", k = 5)
                         + s(road_category, bs = "re")
                         # + s(mean_year, bs = "cr", k = 3)
-                        # + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
-                        # + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
-                      , #not significant
+                        + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+                        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+                      ,
                       # ti(year, road_category, bs = c("tp", "re")),
                       weights = mean_cycles,
-                      # family = nb(link = "log"),
+                      family = gaussian(link = "log"),
+                      data = traffic_with_2011, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #15 seconds
+summary(m1)
+plot(m1, pages = 4, scheme = 2, shade = TRUE)
+
+View(traffic_with_2011 %>%
+  group_by(name, year) %>%
+  summarise(change_from_2011 = mean(change_from_2011)))
+
+system.time({m1 = bam(change_cycles ~
+                        s(year, bs = "cr", k = 5)
+                      + s(mean_year, bs = "cr", k = 3)
+                      + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+                      + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+                      ,
+                      weights = mean_cycles,
+                      family = gaussian(link = "log"),
                       data = traffic_nonzero, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
 summary(m1)
 plot(m1, pages = 4, scheme = 2, shade = TRUE)
 
+gam.check(m1)
+plot(fitted(m1), residuals(m1))
+plot(traffic_nonzero$year, residuals(m1))
+plot(traffic_nonzero$easting, residuals(m1))
+plot(traffic_nonzero$northing, residuals(m1))
+plot(traffic_nonzero$mean_year, residuals(m1))
 
 system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
