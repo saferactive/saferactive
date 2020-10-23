@@ -139,7 +139,7 @@ aadf_la_county_lookup_point_n_filtered
 
 traffic_aadf_yrs_la_summary = read_csv("small-output-datasets/traffic_aadf_yrs_la_summary.csv")
 
-summary(sel <- counties_uas_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
+summary(sel = counties_uas_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
 counties_gb$ctyua19nm[!sel]
 
 aadf_la_county_lookup_point2 = aadf_la_county_lookup_point %>%
@@ -249,7 +249,7 @@ piggyback::pb_upload("traffic_cyclable_clean.Rds")
 # # [1] 174
 # setwd("..")
 # getwd() # in the right directory again 🎉
-# summary(sel <- counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# summary(sel = counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
 # summary(traffic_aadf_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
 # lads_not_in_aadf1 = counties_gb[!sel, ]
 # mapview::mapview(lads_not_in_aadf1)
@@ -301,7 +301,7 @@ piggyback::pb_upload("traffic_cyclable_clean.Rds")
 # lads = readRDS("lads.Rds")
 # nrow(lads)
 # length(unique(traffic_aadf$local_authority_name))
-# summary(sel <- lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# summary(sel = lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
 # # Mode   FALSE    TRUE
 # # logical     219     163
 # summary(traffic_aadf_yrs_la_summary$local_authority_name %in% lads$Name)

@@ -630,7 +630,7 @@ plot(m2, pages = 1, scheme = 2, shade = TRUE)
 # plot(m4, pages = 1, scheme = 2, shade = TRUE)
 #
 # library(glmmTMB)
-# system.time({m2 <- glmmTMB(pedal_cycles~year+(1|road_category),
+# system.time({m2 = glmmTMB(pedal_cycles~year+(1|road_category),
 #                          data=sample_bam,
 #                          family=nbinom1)}) #
 # plot(m2, pages = 1, scheme = 2, shade = TRUE)

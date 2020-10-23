@@ -25,9 +25,9 @@ r = gp_explore(agg_geo)
 #' take a screen shot? not.
 #' ################
 library(webdriver)
-pjs <- run_phantomjs()
+pjs = run_phantomjs()
 pjs$process
-ses <- Session$new(port = pjs$port)
+ses = Session$new(port = pjs$port)
 ses$go("http://localhost:8000/explore")
 grep("main.", ses$getSource()) == 1
 # for some reason webdriver does not execute js to a screenshot

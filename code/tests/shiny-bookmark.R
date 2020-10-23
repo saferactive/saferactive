@@ -104,8 +104,8 @@ server = function(input, output, session) {
   # onRestore(function(state) {
   #   updateTextInput(session, inputId = "lat", value = round(as.numeric(state$values$map_center$lat), digits = 4))
   #   updateTextInput(session, inputId = "lng", value = round(as.numeric(state$values$map_center$lng), digits = 4))
-  #   # input$lng <- state$values$map_center$lng
-  #   # input$lat <- state$values$map_center$lat
+  #   # input$lng = state$values$map_center$lng
+  #   # input$lat = state$values$map_center$lat
   # })
 
   output$text = renderText(input$map_zoom)
