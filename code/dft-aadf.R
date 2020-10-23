@@ -567,7 +567,7 @@ traffic_bam = traffic_bam[new_order, ]
 
 sample_bam = traffic_bam[1:50000,]
 
-system.time({m1 = bam(change_from_2011 ~
+system.time({m = bam(change_from_2011 ~
                         s(year, bs = "cr", k = 5)
                         + s(road_category, bs = "re")
                         # + s(mean_year, bs = "cr", k = 3)
@@ -576,15 +576,27 @@ system.time({m1 = bam(change_from_2011 ~
                       ,
                       # ti(year, road_category, bs = c("tp", "re")),
                       weights = mean_cycles,
-                      family = gaussian(link = "log"),
+                      family = scat,
                       data = traffic_with_2011, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
-summary(m1)
+summary(m)
 plot(m1, pages = 4, scheme = 2, shade = TRUE)
 
 View(traffic_with_2011 %>%
   group_by(name, year) %>%
   summarise(change_from_2011 = mean(change_from_2011)))
+
+gam.check(m)
+plot(fitted(m), residuals(m))
+plot(traffic_nonzero$year, residuals(m))
+plot(traffic_nonzero$easting, residuals(m))
+plot(traffic_nonzero$northing, residuals(m))
+plot(traffic_nonzero$mean_year, residuals(m))
+qqnorm(residuals(m))
+qqline(residuals(m))
+
+traffic_nonzero$boot = boot::inv.logit(traffic_nonzero$change_cycles)
+traffic_nonzero$logo = log(traffic_nonzero$change_cycles)
 
 system.time({m1 = bam(change_cycles ~
                         s(year, bs = "cr", k = 5)
@@ -593,8 +605,8 @@ system.time({m1 = bam(change_cycles ~
                       + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
                       ,
                       weights = mean_cycles,
-                      family = gaussian(link = "log"),
-                      data = traffic_nonzero, method = 'fREML',
+                      family = scat,
+                      data = traffic_with_2011, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
 summary(m1)
 plot(m1, pages = 4, scheme = 2, shade = TRUE)
@@ -605,6 +617,25 @@ plot(traffic_nonzero$year, residuals(m1))
 plot(traffic_nonzero$easting, residuals(m1))
 plot(traffic_nonzero$northing, residuals(m1))
 plot(traffic_nonzero$mean_year, residuals(m1))
+qqnorm(residuals(m1))
+qqline(residuals(m1))
+
+
+# assign the framework that will be used as a basis for predictions
+pdata = with(traffic_with_2011,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         easting = seq(signif(min(easting), digits = 3), signif(max(easting), digits = 3), by = 1000), # changed this to make regular 1km grid squares
+                         northing  = seq(signif(min(northing), digits = 3), signif(max(northing), digits = 3), by = 1000)))
+# make predictions according to the GAM model
+fit_excl_DoYhour = predict(m1, newdata = pdata, type = "response", exclude = "mean_year", newdata.guaranteed = TRUE)
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
+fit_excl_DoYhour[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fit_excl_DoYhour)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
 
 system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
