@@ -7,6 +7,10 @@ library(tidyverse)
 
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
 
+#do this unless we are taking average counts for LAs
+traffic_cyclable = traffic_cyclable %>%
+  filter(estimation_method_detailed != "Dependent on a neighbouring counted link")
+
 repeat_points = traffic_cyclable %>%
   filter(year %in% 2010:2019) %>%
   group_by(count_point_id) %>%
