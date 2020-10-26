@@ -50,3 +50,22 @@ tmap_mode("view")
 qtm(raster_rnet_bicycle, "bicycle")
 # why are so many points empty? https://github.com/saferactive/saferactive/issues/48#issuecomment-713869812
 rnet_cents %>% sample_frac(size = 0.01) %>% mapview::mapview()
+
+# Next step: estimate smooth surface of million km cycled/500m cell
+# see: https://keen-swartz-3146c4.netlify.app/interpolation.html
+rast_template = raster::raster("rasters/allmode_alltime_all.tif")
+summary(raster::values(rast_template))
+raster::values(rast_template) = NA
+grd = stars::st_as_stars(rast_template)
+identical(sf::st_crs(grd), sf::st_crs(rnet_cents))
+sf::st_crs(grd) = sf::st_crs(rnet_cents)
+
+rnet_cents = readRDS("rnet_cents.Rds")
+nrow(rnet_cents) # ~1/2 million
+rnet_cents
+
+
+remotes::install_cran("gstat")
+library(gstat)
+
+rnet_krige1 = gstat::krige(formula = bicycle~1, rnet_cents, grd)
