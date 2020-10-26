@@ -1,4 +1,6 @@
 # Aim: get raster grid cell estimate of cycling levels based on rnet from pct
+library(sf)
+library(tidyverse)
 
 rnet_national_sp = readRDS("~/npct/pct-outputs-national/commute/lsoa/rnet_all.Rds")
 system.time({
@@ -67,5 +69,8 @@ rnet_cents
 
 remotes::install_cran("gstat")
 library(gstat)
+
+# test for london
+london = spData::lnd
 
 rnet_krige1 = gstat::krige(formula = bicycle~1, rnet_cents, grd)
