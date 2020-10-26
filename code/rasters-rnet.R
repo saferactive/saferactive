@@ -71,6 +71,16 @@ remotes::install_cran("gstat")
 library(gstat)
 
 # test for london
-london = spData::lnd
+london = spData::lnd %>% sf::st_transform(27700)
+grd_lnd = grd[london, ]
+rnet_lnd = rnet_cents[london, ]
+mapview::mapview(grd_lnd)
+ggplot() + stars::geom_stars(data = grd_lnd, aes(fill = values, x = x, y = y))
+v = variogram(bicycle~1, rnet_lnd, cutoff = 5000)
+plot(v)
 
-rnet_krige1 = gstat::krige(formula = bicycle~1, rnet_cents, grd)
+vm = fit.variogram(v, vgm(1, "Exp", 50000, 1))
+
+rnet_krige1 = gstat::krige(formula = bicycle~1, rnet_lnd, grd_lnd)
+rnet_krige1
+plot(rnet_krige1)
