@@ -1,0 +1,12 @@
+name: bookmark-minimal-leaflet
+title: bookmark-minimal-leaflet
+username: robin
+account: robin
+server: apps.saferactive.org
+hostUrl: https://apps.saferactive.org/__api__
+appId: 3
+bundleId: 3
+url: https://apps.saferactive.org/content/3/
+when: 1603403197.8934
+asMultiple: FALSE
+asStatic: FALSE

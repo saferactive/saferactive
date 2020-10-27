@@ -1,6 +1,7 @@
 # Aim: get raster grid cell estimate of cycling levels based on rnet from pct
 library(sf)
 library(tidyverse)
+library(raster)
 # get osm cleaning code:
 remotes::install_github("saferactive/trafficalmr")
 
@@ -14,78 +15,93 @@ rnet_national_sf_27700 = readRDS("rnet_national_sf_27700.Rds")
 
 # Split-up rnet (run once) ------------------------------------------------
 # details: https://github.com/saferactive/saferactive/issues/54
-
 # system.time({
 #   output = qgis_run_algorithm(
 #     algorithm = "grass7:v.split",
 #     input = rnet_national_sf_27700,
-#     length = 500
+#     length = 200
 #   )
 # })
 # # user  system elapsed
-# # 213.813 204.001 297.571
+# # 322.370 312.737 429.157
 # rnet_split = sf::st_read(output[[1]][1])
 # nrow(rnet_split) / nrow(rnet_all)
-# [1] 1.374662
+# # [1] 2.279942
 # sf::st_crs(rnet_split) = 27700
 # saveRDS(rnet_split, "rnet_split.Rds")
 # piggyback::pb_upload("rnet_split.Rds")
 # piggyback::pb_download_url("rnet_split.Rds")
 # [1] "https://github.com/saferactive/saferactive/releases/download/0.1.1/rnet_split.Rds"
+
 if(!file.exists("rnet_split.Rds")) {
   u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/rnet_split.Rds"
   f = basename(u)
   download.file(u, f)
 }
 rnet_updated = readRDS("rnet_split.Rds")
-
+rnet_updated$length = as.numeric(sf::st_length(rnet_updated))
+summary(rnet_updated$length)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+# 0.0   117.3   172.5   147.3   192.4   200.0
 rast_template = raster::raster("rasters/allmode_alltime_all.tif")
 
 
-system.time({
-  rnet_cents = sf::st_centroid(rnet_updated)
-})
+rnet_cents = sf::st_centroid(rnet_updated) # ~10s
 names(rnet_cents)
 # See https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/888754/amat-user-guidance.pdf
 # for 253 days per year estimate
 rnet_cents$km_cycled_yr = rnet_cents$length * rnet_cents$bicycle * 253 * 2 / 1000
 rnet_cents$kkm_cycled_yr = rnet_cents$length * rnet_cents$bicycle * 253 * 2 / 1000000
 sum(rnet_cents$km_cycled_yr) / 4475741485
-# [1] 0.2499664 # nearly quarter of the ~4.5 billion bkm cycled in England and Wales according to the NTS: NTS0303
+# [1] 0.25 # nearly quarter of the ~4.5 billion bkm cycled in England and Wales according to the NTS: NTS0303
 # see code/nts-national-distance-cycled-year.R script for details
-saveRDS(rnet_cents, "rnet_cents.Rds")
+saveRDS(rnet_cents, "rnet_cents_split.Rds")
 
 # Rasterising the results - see rasters.R
-system.time({
-  raster_rnet_bicycle = raster::rasterize(rnet_cents, rast_template, field = "kkm_cycled_yr", fun = sum, na.rm = TRUE)
-})
-# 7 s
+# This takes ~10 s
+raster_rnet_bicycle = raster::rasterize(rnet_cents, rast_template, field = "kkm_cycled_yr", fun = sum, na.rm = TRUE)
 mapview::mapview(raster_rnet_bicycle)
 
 writeRaster(raster_rnet_bicycle, "raster_rnet_bicycle.tif", overwrite = TRUE)
 piggyback::pb_upload("raster_rnet_bicycle.tif")
-system("mv -v *.tif rasters")
+piggyback::pb_download_url("raster_rnet_bicycle.tif")
+system("mv -v raster_rnet_bicycle.tif rasters")
 # 'raster_rnet_bicycle.tif' -> 'rasters/raster_rnet_bicycle.tif'
 
-library(tmap)
-tmap_mode("view")
-qtm(raster_rnet_bicycle, "bicycle")
-# why are so many points empty? https://github.com/saferactive/saferactive/issues/48#issuecomment-713869812
-rnet_cents %>% sample_frac(size = 0.01) %>% mapview::mapview()
 
-rnet_cents_updated = sf::st_centroid(rnet_updated)
-names(rnet_cents_updated)
-# for 253 days per year estimate
-rnet_cents_updated$km_cycled_yr = rnet_cents_updated$length * rnet_cents_updated$bicycle * 253 * 2 / 1000
-rnet_cents_updated$kkm_cycled_yr = rnet_cents_updated$length * rnet_cents_updated$bicycle * 253 * 2 / 1000000
-sum(rnet_cents_updated$km_cycled_yr) / 4475741485
-# [1] 0.2499664 # nearly quarter of the ~4.5 billion bkm cycled in England and Wales according to the NTS: NTS0303
-# see code/nts-national-distance-cycled-year.R script for details
-saveRDS(rnet_cents_updated, "rnet_cents_updated.Rds")
-rast_template = raster::raster("rasters/allmode_alltime_all.tif")
-rast_template = raster::raster(london, resolution = 500)
-raster_rnet_bicycle = raster::rasterize(rnet_cents_updated, rast_template, field = "kkm_cycled_yr", fun = sum, na.rm = TRUE)
-mapview::mapview(raster_rnet_bicycle)
+# Reproducible example - vis results --------------------------------------
+library(sf)
+u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/raster_rnet_bicycle.tif"
+f = file.path("rasters", basename(u))
+if(!file.exists(f)) {
+  dir.create("rasters")
+  download.file(u, f)
+}
+raster_rnet_bicycle = raster::raster(f)
+hereford = pct::get_pct_zones("hereford-and-worcester") %>% sf::st_transform(27700)
+raster_rnet_hereford = raster::crop(raster_rnet_bicycle, hereford)
+mapview::mapview(raster_rnet_hereford)
+london = pct::get_pct_zones("london") %>% sf::st_transform(27700)
+raster_rnet_london = raster::crop(raster_rnet_bicycle, london)
+mapview::mapview(raster_rnet_london)
+
+# why are so many points empty? https://github.com/saferactive/saferactive/issues/48#issuecomment-713869812
+# fixed
+# rnet_cents %>% sample_frac(size = 0.01) %>% mapview::mapview()
+
+# rnet_cents_updated = sf::st_centroid(rnet_updated)
+# names(rnet_cents_updated)
+# # for 253 days per year estimate
+# rnet_cents_updated$km_cycled_yr = rnet_cents_updated$length * rnet_cents_updated$bicycle * 253 * 2 / 1000
+# rnet_cents_updated$kkm_cycled_yr = rnet_cents_updated$length * rnet_cents_updated$bicycle * 253 * 2 / 1000000
+# sum(rnet_cents_updated$km_cycled_yr) / 4475741485
+# # [1] 0.2499664 # nearly quarter of the ~4.5 billion bkm cycled in England and Wales according to the NTS: NTS0303
+# # see code/nts-national-distance-cycled-year.R script for details
+# saveRDS(rnet_cents_updated, "rnet_cents_updated.Rds")
+# rast_template = raster::raster("rasters/allmode_alltime_all.tif")
+# rast_template = raster::raster(london, resolution = 500)
+# raster_rnet_bicycle = raster::rasterize(rnet_cents_updated, rast_template, field = "kkm_cycled_yr", fun = sum, na.rm = TRUE)
+# mapview::mapview(raster_rnet_bicycle)
 
 # Fill NAs ----------------------------------------------------------------
 
