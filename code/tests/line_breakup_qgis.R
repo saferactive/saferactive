@@ -58,4 +58,40 @@ rnet_split
 nrow(rnet)
 nrow(rnet_split)
 500000 / nrow(rnet)
+300 * 3 / 60
 
+rnet_all = readRDS("rnet_national_sf_27700.Rds")
+rnet_1pc = rnet_all %>% sample_frac(0.01)
+system.time({
+  output = qgis_run_algorithm(
+    algorithm = "grass7:v.split",
+    input = rnet_1pc,
+    length = 500
+  )
+})
+# user  system elapsed
+# 3.872   2.339   4.772
+# 5 * 100 / 60
+rnet_split = sf::st_read(output[[1]][1])
+nrow(rnet_1pc)
+nrow(rnet_split)
+sum(sf::st_length(rnet_1pc))
+sum(sf::st_length(rnet_split))
+sum(sf::st_length(rnet_split) * rnet_split$bicycle)
+sum(sf::st_length(rnet_1pc) * rnet_1pc$bicycle) # the same
+
+# run on national dataset
+system.time({
+  output = qgis_run_algorithm(
+    algorithm = "grass7:v.split",
+    input = rnet_all,
+    length = 500
+  )
+})
+# user  system elapsed
+# 213.813 204.001 297.571
+rnet_split = sf::st_read(output[[1]][1])
+nrow(rnet_split) / nrow(rnet_all)
+# [1] 1.374662
+sf::st_crs(rnet_split) = 27700
+saveRDS(rnet_split, "rnet_split.Rds")
