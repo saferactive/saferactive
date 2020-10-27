@@ -2,15 +2,14 @@
 library(sf)
 library(tidyverse)
 # get osm cleaning code:
-# remotes::install_github("saferactive/trafficalmr")
-#
-# if(file.exists("rnet_national_sf_27700.Rds")){
-#   rnet_national_sf_27700 <- readRDS("rnet_national_sf_27700.Rds")
-# } else {
-#   rnet_national_sf_27700 <- read_sf("https://github.com/npct/pct-outputs-national/raw/master/commute/lsoa/rnet_all.geojson")
-#   rnet_national_sf_27700 <- st_transform(rnet_national_sf_27700, 27700)
-#   saveRDS(rnet_national_sf_27700, "rnet_national_sf_27700.Rds")
-# }
+remotes::install_github("saferactive/trafficalmr")
+
+if(!file.exists("rnet_national_sf_27700.Rds")){
+  u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/rnet_national_sf_27700.Rds"
+  f = basename(u)
+  download.file(u, f)
+}
+rnet_national_sf_27700 = readRDS("rnet_national_sf_27700.Rds")
 
 
 # Split-up rnet (run once) ------------------------------------------------
