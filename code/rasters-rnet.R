@@ -2,26 +2,38 @@
 library(sf)
 library(tidyverse)
 
-rnet_national_sp = readRDS("~/npct/pct-outputs-national/commute/lsoa/rnet_all.Rds")
-system.time({
-  rnet_centroids = rgeos::gCentroid(rnet_national_sp, byid = TRUE)
-})
+if(file.exists("rnet_national_sf_27700.Rds")){
+  rnet_national_sf_27700 <- readRDS("rnet_national_sf_27700.Rds")
+} else {
+  rnet_national_sf_27700 <- read_sf("https://github.com/npct/pct-outputs-national/raw/master/commute/lsoa/rnet_all.geojson")
+  rnet_national_sf_27700 <- st_transform(rnet_national_sf_27700, 27700)
+  saveRDS(rnet_national_sf_27700, "rnet_national_sf_27700.Rds")
+}
 
-class(rnet_centroids)
-length(rnet_centroids)
-names(rnet_centroids)
+# rnet_national_sp = readRDS("~/npct/pct-outputs-national/commute/lsoa/rnet_all.Rds")
+# system.time({
+#   rnet_centroids = rgeos::gCentroid(rnet_national_sp, byid = TRUE)
+# })
+#
+# class(rnet_centroids)
+# length(rnet_centroids)
+# names(rnet_centroids)
+#
+# system.time({
+#   rnet_national_sf = sf::st_as_sf(rnet_national_sp)
+#   rnet_national_sf$length = as.numeric(sf::st_length(rnet_national_sf))
+# })
+#
+# system.time({
+#   rnet_national_sf_27700 = sf::st_transform(rnet_national_sf, 27700)
+# })
+source("code/osm_cleaning_functions.R")
 
-system.time({
-  rnet_national_sf = sf::st_as_sf(rnet_national_sp)
-  rnet_national_sf$length = as.numeric(sf::st_length(rnet_national_sf))
-})
-
-system.time({
-  rnet_national_sf_27700 = sf::st_transform(rnet_national_sf, 27700)
-})
-saveRDS(rnet_national_sf_27700, "rnet_national_sf_27700.Rds")
 rast_template = raster::raster("rasters/allmode_alltime_all.tif")
 names(rast_template)
+
+rnet_split = line_segment_sf(l = rnet_national_sf_27700, segment_length = 50)
+
 
 # preprocessing step: break-up long segments
 rnet_longest_1000 = rnet_national_sf_27700 %>% filter(length > 1000)

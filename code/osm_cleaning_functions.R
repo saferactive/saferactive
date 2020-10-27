@@ -366,36 +366,70 @@ nn_int <- function(sub){
 line_segment_sf <- function(l, n_segments, segment_length = NA) {
   if (!is.na(segment_length)) {
     l_length <- as.numeric(sf::st_length(l))
-    n_segments <- round(l_length / segment_length)
+    l$n_segments <- ceiling(l_length / segment_length)
   }
 
-  attrib <- sf::st_drop_geometry(l)
-  geom <- sf::st_geometry(l)
+  l_nosplit <- l[l$n_segments < 2, ]
+  l_split <- l[l$n_segments >= 2, ]
 
-  attrib <- attrib[rep(seq(1,nrow(attrib)), times = n_segments),]
+  l_split$split_id <- seq(1,nrow(l_split))
+  l_split <- dplyr::group_by(l_split, split_id)
+  l_split <- dplyr::group_split(l_split)
 
-  split_int <- function(i){
-    ln <- geom[i]
-    n <- n_segments[i]
+  #attrib <- sf::st_drop_geometry(l_split)
+  #geom <- sf::st_geometry(l_split)
+
+  #attrib <- attrib[rep(seq(1,nrow(attrib)), times = l_split$n_segments),]
+
+  split_int <- function(x){
+    ln <- sf::st_geometry(x)
+    att <- sf::st_drop_geometry(x)
+    n <- att$n_segments
+    att <- att[rep(1, n),]
+
+    # ln <- geom[i]
+    # n <- l_split$n_segments[i]
+    # if(n < 2){
+    #   return(ln)
+    # }
     pts <- sf::st_cast(sf::st_sfc(ln),"POINT")
+    pts <- pts[!duplicated(pts)]
     lth <- length(pts)
+    if(lth < (n + 1)){
+      # Not enough points to do a simple split
+      ln <- sf::st_segmentize(ln, ceiling(as.numeric(sf::st_length(ln)) / n ))
+      pts <- sf::st_cast(sf::st_sfc(ln),"POINT")
+      pts <- pts[!duplicated(pts)]
+      lth <- length(pts)
+    }
+
     brks <- seq_len(lth)[!duplicated(ceiling(seq_len(lth)/(lth/n)))]
     brks <- brks[seq(2,length(brks))]
     pts <- pts[brks]
     res <- lwgeom::st_split(ln, pts)
     res <- sf::st_collection_extract(res, "LINESTRING")
-    return(res)
+    sf::st_geometry(att) <- res
+
+    return(att)
   }
 
-  geom <- pbapply::pblapply(seq(1, length(geom)),
-                           FUN = split_int)
-  geom <- unlist(geom, recursive = FALSE)
-  geom <- st_as_sfc(geom)
+  res_split <- pbapply::pblapply(l_split[12405], FUN = split_int)
+  res_split <- dplyr::bind_rows(res_final)
 
-  st_geometry(attrib) <- geom
-  st_crs(attrib) <- st_crs(l)
+  res_split <- rbind(res_split, l_nosplit)
+  return(res_split)
 
-  return(attrib)
+  # geom <- pbapply::pblapply(seq(1, length(geom)),
+  #                          FUN = split_int)
+  # geom <- unlist(geom, recursive = FALSE)
+  # geom <- st_as_sfc(geom)
+  #
+  # st_geometry(attrib) <- geom
+  # st_crs(attrib) <- st_crs(l)
+
+
+
+  # return(attrib)
 }
 
 
