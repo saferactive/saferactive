@@ -3,6 +3,7 @@
 ##Latest DfT dataset including 2019 counts
 library(tidyverse)
 library(mgcv)
+library(viridis)
 
 
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
@@ -91,7 +92,7 @@ dim(traffic_nonzero) #51753
 traffic_nonzero = traffic_nonzero %>%
   group_by(grid_location, year) %>%
   mutate(smooth_change = mean(change_cycles),
-         smotth_mean = mean(mean_cycles)) %>%
+         smooth_mean = mean(mean_cycles)) %>%
   ungroup()
 
 traffic_bam %>%
@@ -123,9 +124,16 @@ boroughs = as.character(spData::lnd$NAME)
 lads = lads %>%
   filter(Name %in% boroughs)
 
-traffic_london = traffic_nonzero %>%
+traffic_london = traffic_bam %>%
   inner_join(lads, by = c("name" = "Name"))
-dim(traffic_london) #5215
+dim(traffic_london) #5215 6390 with zeroes
+
+View(traffic_london %>%
+       group_by(name, year) %>%
+       summarise(pedal_cycles = mean(pedal_cycles),
+                 change_cycles = mean(change_cycles),
+                 n_year = mean(n_year),
+                 n_counts = n()))
 
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
@@ -285,6 +293,8 @@ dim(traffic_el) #50799
 
 
 # Exploratory analysis ----------------------------------------------------
+
+
 
 #Exploratory analysis
 traffic_bam %>%
@@ -580,7 +590,7 @@ system.time({m = bam(change_from_2011 ~
                       data = traffic_with_2011, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
 summary(m)
-plot(m1, pages = 4, scheme = 2, shade = TRUE)
+plot(m, pages = 4, scheme = 2, shade = TRUE)
 
 View(traffic_with_2011 %>%
   group_by(name, year) %>%
@@ -598,44 +608,171 @@ qqline(residuals(m))
 traffic_nonzero$boot = boot::inv.logit(traffic_nonzero$change_cycles)
 traffic_nonzero$logo = log(traffic_nonzero$change_cycles)
 
-system.time({m1 = bam(change_cycles ~
+# assign the framework that will be used as a basis for predictions
+pdata = with(traffic_with_2011,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         road_category = "PA",
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+# make predictions according to the GAM model
+fitted = predict(m, newdata = pdata, type = "response", exclude = "road_category", newdata.guaranteed = TRUE)
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      traffic_london$easting, traffic_london$northing, dist = 0.02)
+fitted[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
+
+
+
+system.time({m2 = bam(change_cycles ~
                         s(year, bs = "cr", k = 5)
                       + s(mean_year, bs = "cr", k = 3)
                       + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
                       + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
                       ,
-                      weights = mean_cycles,
+                      weights = (mean_cycles*n_year),
+                      # weights = (mean_cycles),
                       family = scat,
-                      data = traffic_with_2011, method = 'fREML',
+                      data = traffic_london, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
-summary(m1)
-plot(m1, pages = 4, scheme = 2, shade = TRUE)
+summary(m2)
+plot(m2, pages = 4, scheme = 2, shade = TRUE)
 
-gam.check(m1)
-plot(fitted(m1), residuals(m1))
-plot(traffic_nonzero$year, residuals(m1))
-plot(traffic_nonzero$easting, residuals(m1))
-plot(traffic_nonzero$northing, residuals(m1))
-plot(traffic_nonzero$mean_year, residuals(m1))
-qqnorm(residuals(m1))
-qqline(residuals(m1))
+gam.check(m2)
+plot(fitted(m2), residuals(m2))
+plot(traffic_london$year, residuals(m2))
+plot(traffic_london$easting, residuals(m2))
+plot(traffic_london$northing, residuals(m2))
+plot(traffic_london$mean_year, residuals(m2))
+qqnorm(residuals(m2))
+qqline(residuals(m2))
 
 
 # assign the framework that will be used as a basis for predictions
 pdata = with(traffic_with_2011,
              expand.grid(year = seq(min(year), max(year), by = 1),
-                         easting = seq(signif(min(easting), digits = 3), signif(max(easting), digits = 3), by = 1000), # changed this to make regular 1km grid squares
-                         northing  = seq(signif(min(northing), digits = 3), signif(max(northing), digits = 3), by = 1000)))
+                         mean_year = 2012,
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
 # make predictions according to the GAM model
-fit_excl_DoYhour = predict(m1, newdata = pdata, type = "response", exclude = "mean_year", newdata.guaranteed = TRUE)
+fitted = predict(m2, newdata = pdata, type = "response", exclude = "mean_year", newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
-                      traffic_london_bam$easting, traffic_london_bam$northing, dist = 0.02)
-fit_excl_DoYhour[ind] = NA
+                      traffic_london$easting, traffic_london$northing, dist = 0.02)
+fitted[ind] = NA
 # join the predictions with the framework data
-pred_all_points_year = cbind(pdata, Fitted = fit_excl_DoYhour)
+pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
+
+
+
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
+  geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
+  scale_fill_viridis(name = "Change in pedal cycles", option = 'plasma',
+                     na.value = 'transparent') +
+  coord_fixed(ratio = 1) +
+  # geom_line(lads, alpha(0.1)) +
+  theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+saveRDS(pred_all_points_year, "pred-london-change-cycles.Rds")
+
+borough_geom = lads %>%
+  dplyr::select(Name) %>%
+  st_transform(27700)
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean annual predictions for each borough
+pb_preds_year = point_to_borough %>%
+  drop_na() %>%
+  group_by(Name, year) %>%
+  summarise(borough_change_cycles = mean(Fitted))
+View(pb_preds_year)
+
+saveRDS(pb_preds_year, "pred-borough-change-cycles.Rds")
+
+
+#########
+
+
+system.time({m3 = bam(pedal_cycles ~
+                        s(year, bs = "cr", k = 5)
+                      # + s(road_category, bs = "re")
+                      + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+                      + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+                      ,
+                      # weights = (n_year),
+                      family = nb(link = "log"),
+                      data = traffic_london, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)}) #15 seconds
+summary(m3)
+plot(m3, pages = 4, scheme = 2, shade = TRUE)
+
+gam.check(m3)
+plot(fitted(m2), residuals(m2))
+plot(traffic_london$year, residuals(m2))
+plot(traffic_london$easting, residuals(m2))
+plot(traffic_london$northing, residuals(m2))
+plot(traffic_london$mean_year, residuals(m2))
+qqnorm(residuals(m2))
+qqline(residuals(m2))
+
+
+# assign the framework that will be used as a basis for predictions
+pdata = with(traffic_london,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+# make predictions according to the GAM model
+fitted = predict(m3, newdata = pdata, type = "response", exclude = "road_category", newdata.guaranteed = TRUE)
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      traffic_london$easting, traffic_london$northing, dist = 0.02)
+fitted[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
+
+
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
+  geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
+  scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+                     na.value = 'transparent') +
+  coord_fixed(ratio = 1) +
+  # geom_line(lads, alpha(0.1)) +
+  theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+
+borough_geom = lads %>%
+  dplyr::select(Name) %>%
+  st_transform(27700)
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean annual predictions for each borough
+pb_preds_year = point_to_borough %>%
+  drop_na() %>%
+  group_by(Name, year) %>%
+  summarise(borough_mean_cycles = mean(Fitted))
+View(pb_preds_year)
+
+
+############
 
 system.time({m1 = bam(pedal_cycles ~
                         s(year, bs = "cr", k = 5) +
