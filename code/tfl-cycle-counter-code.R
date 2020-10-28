@@ -118,3 +118,18 @@ tm_shape(lads_data) +
 #   tm_facets(along = "year")
 # tmap_animation(m, filename = "london-counter-results-tfl.gif", loop = FALSE, delay = 100)
 # browseURL("london-counter-results-tfl.gif")
+
+
+# Verification of GAM predictions -----------------------------------------
+
+
+gam_preds = readRDS("pred-borough-change-cycles.Rds")
+
+counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
+
+verify = left_join(counter_la_results, gam_preds, by = c("year", "Borough" = "Name"))
+verify = verify %>%
+  filter(year != 2015)
+dim(verify)
+cor(verify$relative_to_2015, verify$pred_relative_to_2015)^2 #R squared = 0.00189
+plot(verify$relative_to_2015, verify$pred_relative_to_2015)

@@ -625,7 +625,7 @@ pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
-
+#################
 
 system.time({m2 = bam(change_cycles ~
                         s(year, bs = "cr", k = 5)
@@ -652,19 +652,21 @@ qqline(residuals(m2))
 
 
 # assign the framework that will be used as a basis for predictions
-pdata = with(traffic_with_2011,
+pdata = with(traffic_london,
              expand.grid(year = seq(min(year), max(year), by = 1),
                          mean_year = 2012,
                          easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
                          northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
 # make predictions according to the GAM model
-fitted = predict(m2, newdata = pdata, type = "response", exclude = "mean_year", newdata.guaranteed = TRUE)
+fitted2 = predict(m2, newdata = pdata, type = "response",
+                  exclude = "mean_year",
+                  newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                       traffic_london$easting, traffic_london$northing, dist = 0.02)
-fitted[ind] = NA
+fitted2[ind] = NA
 # join the predictions with the framework data
-pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = cbind(pdata, Fitted = fitted2)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
@@ -674,6 +676,7 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
   scale_fill_viridis(name = "Change in pedal cycles", option = 'plasma',
                      na.value = 'transparent') +
+  # geom_rect(xmin = 504000, xmax = 557500, ymin = 157500, ymax = 200000) + #doesn't work, maybe geom_tile would? but geom_raster is probably fine
   coord_fixed(ratio = 1) +
   # geom_line(lads, alpha(0.1)) +
   theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
@@ -697,6 +700,14 @@ pb_preds_year = point_to_borough %>%
   group_by(Name, year) %>%
   summarise(borough_change_cycles = mean(Fitted))
 View(pb_preds_year)
+
+#change per borough relative to 2015 (for TfL verification)
+pb_preds_year = pb_preds_year %>%
+  mutate(baseline_2015 = case_when(
+    year == 2015 ~ borough_change_cycles)) %>%
+  group_by(Name) %>%
+  mutate(pred_relative_to_2015 = borough_change_cycles/mean(baseline_2015, na.rm = TRUE)) %>%
+  ungroup()
 
 saveRDS(pb_preds_year, "pred-borough-change-cycles.Rds")
 
