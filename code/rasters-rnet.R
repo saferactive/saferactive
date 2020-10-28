@@ -8,7 +8,7 @@ remotes::install_github("saferactive/trafficalmr")
 if(!file.exists("rnet_national_sf_27700.Rds")){
   u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/rnet_national_sf_27700.Rds"
   f = basename(u)
-  download.file(u, f)
+  download.file(u, f, mode = "wb")
 }
 rnet_national_sf_27700 = readRDS("rnet_national_sf_27700.Rds")
 
@@ -36,7 +36,7 @@ rnet_national_sf_27700 = readRDS("rnet_national_sf_27700.Rds")
 if(!file.exists("rnet_split.Rds")) {
   u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/rnet_split.Rds"
   f = basename(u)
-  download.file(u, f)
+  download.file(u, f, mode = "wb")
 }
 rnet_updated = readRDS("rnet_split.Rds")
 rnet_updated$length = as.numeric(sf::st_length(rnet_updated))
