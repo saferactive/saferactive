@@ -128,12 +128,15 @@ traffic_london = traffic_bam %>%
   inner_join(lads, by = c("name" = "Name"))
 dim(traffic_london) #5215 6390 with zeroes
 
-View(traffic_london %>%
+dft_counts_by_borough = traffic_london %>%
        group_by(name, year) %>%
        summarise(pedal_cycles = mean(pedal_cycles),
                  change_cycles = mean(change_cycles),
                  n_year = mean(n_year),
-                 n_counts = n()))
+                 n_counts = n())
+# View(dft_counts_by_borough)
+
+saveRDS(dft_counts_by_borough, "dft-counts-by-borough.Rds")
 
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%

@@ -62,12 +62,27 @@ counter_df$year = lubridate::year(counter_df$`Survey date`)
 counter_df = left_join(counter_df, sf::st_drop_geometry(counter_locations %>% select(`Site ID`, Borough)))
 table(counter_df$year)
 table(counter_df$Borough)
+
+# Calculate change in TfL counts ------------------------------------------
+
+counter_df = counter_df %>%
+  group_by(`Site ID`) %>%
+  mutate(mean_cycles = mean(`Total cycles`)) %>%
+  ungroup() %>%
+  filter(mean_cycles > 0) %>% # remove counts where there has never been a cyclist
+  mutate(change_cycles = `Total cycles`/mean_cycles)
+sum(is.na(counter_df$change_cycles))/nrow(counter_df) #0
+dim(counter_df) #1262784
+
+############
+
 counter_means_year = counter_df %>%
   group_by(year, Borough) %>%
   summarise(
     n_counters = length(unique(`Site ID`)),
     total_counts = sum(`Total cycles`, na.rm = TRUE),
-    mean_counts = mean(`Total cycles`, na.rm = TRUE)
+    mean_counts = mean(`Total cycles`, na.rm = TRUE),
+    change_tfl_cycles = weighted.mean(change_cycles, w = mean_cycles, na.rm = TRUE)
   )
 
 plot(counter_means_year$year, counter_means_year$n_counters)
@@ -85,9 +100,15 @@ counter_means_2015 = counter_means_year %>%
   mutate(mean_counts_2015 = mean_counts) %>%
   select(Borough, mean_counts_2015)
 
+
+
+
+########
+
 counter_la_results = inner_join(counter_means_year, counter_means_2015) %>%
   mutate(relative_to_2015 = mean_counts / mean_counts_2015) %>%
   filter(year > 2014)
+counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
 
 ggplot(counter_la_results) +
   geom_line(aes(year, relative_to_2015, colour = Borough))
@@ -120,16 +141,44 @@ tm_shape(lads_data) +
 # browseURL("london-counter-results-tfl.gif")
 
 
+
+
 # Verification of GAM predictions -----------------------------------------
 
 
 gam_preds = readRDS("pred-borough-change-cycles.Rds")
 
-counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
-
 verify = left_join(counter_la_results, gam_preds, by = c("year", "Borough" = "Name"))
+
+cor(verify$change_tfl_cycles, verify$borough_change_cycles)^2 #R squared = 0.00063
+plot(x = verify$change_tfl_cycles, y = verify$borough_change_cycles, xlab = "TfL change in cycle counts (15 minute flow)", ylab = "GAM predictions of change in AADF")
+# ggsave(plot = tosave, "figures/gam-change-comparison.png")
+
 verify = verify %>%
   filter(year != 2015)
 dim(verify)
-cor(verify$relative_to_2015, verify$pred_relative_to_2015)^2 #R squared = 0.00189
-plot(verify$relative_to_2015, verify$pred_relative_to_2015)
+cor(verify$relative_to_2015, verify$pred_relative_to_2015)^2 #R squared = 0.0019
+plot(x = verify$relative_to_2015, y = verify$pred_relative_to_2015, xlab = "TfL counts relative to 2015", ylab = "GAM predictions of change relative to 2015")
+# ggsave(plot = tosave, "figures/change-relative-to-2015.png")
+
+
+# Correlation between TfL and DfT counts (by borough) ---------------------
+
+
+dft_counts_by_borough = readRDS("dft-counts-by-borough.Rds")
+
+verify_raw = left_join(counter_la_results, dft_counts_by_borough, by = c("year", "Borough" = "name"))
+dim(verify_raw)
+
+# Absolute counts
+cor(verify_raw$mean_counts, verify_raw$pedal_cycles)^2 #R squared = 0.7437849
+plot(verify_raw$mean_counts, verify_raw$pedal_cycles, xlab = "Mean TfL counts (flow per 15 minutes)", ylab = "Mean AADF from DfT counts")
+text(verify_raw$mean_counts, verify_raw$pedal_cycles, verify_raw$year, pos = 1, cex = 0.7)
+text(verify_raw$mean_counts, verify_raw$pedal_cycles, verify_raw$Borough, pos = 1, cex = 0.7)
+
+# Raw change
+cor(verify_raw$change_tfl_cycles, verify_raw$change_cycles)^2 #R squared = 0.0010
+plot(verify_raw$change_tfl_cycles, verify_raw$change_cycles, xlab = "Mean change in TfL counts (flow per 15 minutes)", ylab = "Mean change in DfT counts (AADF)")
+text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$year, pos = 1, cex = 0.7)
+text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$Borough, pos = 1, cex = 0.7)
+
