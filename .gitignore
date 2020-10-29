@@ -19,3 +19,4 @@ counties-*
 *.tif
 *.tif
 *.ods
+rnet_split.gpkg
