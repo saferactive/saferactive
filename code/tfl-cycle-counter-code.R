@@ -141,6 +141,21 @@ tm_shape(lads_data) +
 # browseURL("london-counter-results-tfl.gif")
 
 
+# GAM model for TfL counts ------------------------------------------------
+
+library(mgcv)
+
+M = list(c(1, 0.5), NA)
+
+m = bam(change_cycles ~
+                        s(year, bs = "cr", k = 5)
+                      + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+                      + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+                      ,
+                      weights = (mean_cycles),
+                      family = scat,
+                      data = counter_df, method = 'fREML',
+                      nthreads = 4, discrete = TRUE)
 
 
 # Verification of GAM predictions -----------------------------------------
