@@ -69,7 +69,7 @@ dim(counter_daytime) #929008
 
 #############
 doubles = counter_daytime %>%
-  group_by(`Survey date`, `Site ID`, Direction, year, Time) %>%
+  group_by(`Survey date`, `Site ID`, Direction, year, Time, Location, Survey_wave) %>%
   summarise(n_waves = n())
 
 doubles %>%
@@ -92,7 +92,7 @@ counter_daytime %>%
 
 
 View(ccc %>%
-       filter(`Site ID` == "CENCY201", Time == "1000 - 1015"))
+       filter(`Site ID` == "INNCY570", Time == "1000 - 1015"))
 
 View(counter_daytime)
 
