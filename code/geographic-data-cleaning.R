@@ -73,7 +73,15 @@ setwd("..")
 getwd() # in the right directory again 🎉
 counties_uas_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N"))
 saveRDS(counties_uas_gb, "counties_uas_gb_2019_bfc.Rds")
-mapview::mapview(counties_uas_gb)
+piggyback::pb_upload("counties_uas_gb_2019_bfc.Rds")
+piggyback::pb_download_url("counties_uas_gb_2019_ubc.Rds")
+ # "https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_bfc.Rds"
+ # "https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_bfc.Rds"
+
+piggyback::pb_download_url("counties_uas_gb_2019_bfc.Rds")
+mapview::mapview(counties_uas_gb) # very detailed
+
+
 
 
 traffic_aadf_sf = traffic_cyclable %>%
