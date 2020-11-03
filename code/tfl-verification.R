@@ -20,20 +20,6 @@ counter_daytime = counter_daytime %>%
   filter(! is.na(year))
 dim(counter_daytime) #945728
 
-# group by date, site and direction
-counter_daily = counter_daytime %>%
-  group_by(`Survey date`, `Site ID`, Direction, year) %>%
-  summarise(
-    n_counters = n(),
-    total_counts = sum(`Total cycles`, na.rm = TRUE),
-    mean_counts = mean(`Total cycles`, na.rm = TRUE)) %>%
-  ungroup()
-
-ccc = left_join(counter_daytime, counter_daily, by = c("Survey date", "Site ID", "Direction", "year"))
-dim(ccc %>%
-       filter(n_counters > 56))
-
-# CENCY201 Tooley Street Survey wave changes while Survey date stays the same
 
 # Select the correct survey wave only
 
@@ -67,55 +53,78 @@ counter_daytime = counter_daytime %>%
 
 dim(counter_daytime) #929008
 
-#############
+############# Weather
 doubles = counter_daytime %>%
-  group_by(`Survey date`, `Site ID`, Direction, year, Time, Location, Survey_wave) %>%
-  summarise(n_waves = n())
+  group_by(`Site ID`, Direction, year, Time, Location, Survey_wave) %>%
+  summarise(n_repeats = n()) %>%
+  ungroup()
 
-doubles %>%
-  group_by(n_waves) %>%
-  tally()
+weather_repeats = doubles %>%
+  filter(n_repeats == 2)
 
-View(doubles %>%
-  filter(n_waves == 2))
+remove5 = weather_repeats %>%
+  inner_join(counter_daytime, by = c("Site ID" = "Site ID", "Direction" = "Direction", "year" = "year", "Time" = "Time", "Location" = "Location", "Survey_wave" = "Survey_wave")) %>%
+    filter(Weather == "Dry")
 
-unique(substr(ccc$Survey_wave,6,7))
-unique(substr(ccc$`Survey date`,6,7))
+counter_daytime = counter_daytime %>%
+  filter(! id %in% remove5$id)
+dim(counter_daytime) #928816
 
-dim(counter_daytime[!is.na(substr(counter_daytime$`Survey date`,6,7) == "01"),])
-dim(counter_daytime[is.na(substr(counter_daytime$Survey_wave, 6, 7) == "F1") == FALSE,])
-dim(counter_daytime[substr(counter_daytime$`Survey date`,6,7) == "02",])
+###################
 
-counter_daytime %>%
-  filter(substr(counter_daytime$Survey_wave, 6, 7) == "Q1")
+# group by survey wave, site and direction
+# select only sites which have a full 12 hours (48 periods) of survey data (this can be across several survey dates but must be within the same survey wave/quarter)
+counter_daily = counter_daytime %>%
+  group_by(`Site ID`, Direction, year, Survey_wave) %>%
+  summarise(
+    n_counters = n(),
+    total_counts = sum(`Total cycles`, na.rm = TRUE),
+    mean_counts = mean(`Total cycles`, na.rm = TRUE)) %>%
+  ungroup()
 
+counter_clean = left_join(counter_daytime, counter_daily, by = c("Site ID", "Direction", "year", "Survey_wave")) %>%
+  filter(n_counters == 48)
+dim(counter_clean) #919440
 
+# CENCY201 Tooley Street Survey wave changes while Survey date stays the same
+# not enough hours only covers 7am - 2pm
 
-View(ccc %>%
-       filter(`Site ID` == "INNCY570", Time == "1000 - 1015"))
+# View(counter_clean %>%
+#   group_by(n_counters) %>%
+#   tally())
 
-View(counter_daytime)
+# unique(counter_clean$year)
+# unique(substr(counter_clean$Survey_wave,6,7))
+# unique(substr(counter_clean$`Survey date`,6,7))
 
-View(counter_daily %>%
-  group_by(n_counters) %>%
-  tally())
+# counter_daytime %>%
+#   filter(substr(counter_daytime$Survey_wave, 6, 7) == "Q1")
 
-View(counter_daytime %>%
+# Clean the Time strings
+counter_clean$Time = gsub("0-0", "0 - 0", counter_clean$Time)
+counter_clean$Time = gsub("5-0", "5 - 0", counter_clean$Time)
+counter_clean$Time = gsub("0-1", "0 - 1", counter_clean$Time)
+counter_clean$Time = gsub("5-1", "5 - 1", counter_clean$Time)
+
+View(counter_clean %>%
        group_by(Time) %>%
        tally())
 
-View(counter_daytime %>%
+View(counter_clean %>%
        group_by(year) %>%
        tally())
 
-View(counter_daytime %>%
-       filter(is.na(year)))
+# View(counter_clean %>%
+#   filter(`Site ID` == "CENCY010",
+#          `Survey date` == "2014-03-24",
+#          year == 2014)
+# )
 
-View(counter_daytime %>%
-  filter(`Site ID` == "CENCY010",
-         `Survey date` == "2014-03-24",
-         year == 2014)
-)
+
+
+
+# Get location data and create sf object ----------------------------------
+
 counter_sf = inner_join(counter_locations, counter_df)
 
 counter_bng = counter_sf %>%
