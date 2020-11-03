@@ -68,6 +68,20 @@ piggyback::pb_download_url("raster_rnet_bicycle.tif")
 system("mv -v raster_rnet_bicycle.tif rasters")
 # 'raster_rnet_bicycle.tif' -> 'rasters/raster_rnet_bicycle.tif'
 
+# Geneate geojson for kkm_cycled_yr or more fields and use tippecanoe to tile up
+# just st_write as .geojson
+# sf::st_write(rnet_cents[,"kkm_cycled_yr"], "ignored/rnet_bike.geojson")
+# make sure you have tippecanoe
+# https://github.com/mapbox/tippecanoe
+# then simply
+# tippecanoe -zg --output-to-directory=mytiles
+# --drop-densest-as-needed --no-tile-compression rnet_bike.geojson
+# tiles can now be served from mytiles
+# in geoplumber this is simply served from the "list()" function which
+# for saferactive-eatlas the convention is "build" so just move the mytiles
+# folder to build and API can serve tiles from "/mytiles/0/0/0.pbf"
+# For vector tile styling see our blogpost:
+# https://github.com/ITSLeeds/VectorTiles
 
 # Reproducible example - vis results --------------------------------------
 library(sf)
