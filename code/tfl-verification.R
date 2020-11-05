@@ -7,6 +7,8 @@ counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2019.csv")
 counter_df = counter_df %>% rename(Survey_wave = `Survey wave (calendar quarter)`)
 dim(counter_df) #1264064
 
+# saveRDS(counter_df, "counter_df.Rds")
+
 #filter daytime counts
 unique(counter_df$Period)
 counter_daytime = counter_df %>%
@@ -120,12 +122,18 @@ View(counter_clean %>%
 #          year == 2014)
 # )
 
+# Remove 2014 counts
+counter_clean = counter_clean %>%
+  filter(year != 2014)
+dim(counter_clean) #846528
 
-
+# saveRDS(counter_clean, "counter_clean.Rds")
 
 # Get location data and create sf object ----------------------------------
 
-counter_sf = inner_join(counter_locations, counter_df)
+counter_clean = readRDS("counter_clean.Rds")
+
+counter_sf = inner_join(counter_locations, counter_clean)
 
 counter_bng = counter_sf %>%
   st_transform(crs = 27700)
