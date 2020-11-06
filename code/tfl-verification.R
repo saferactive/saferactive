@@ -1,8 +1,6 @@
 library(tidyverse)
 library(sf)
 
-counter_locations = sf::read_sf("tfl-cycle-counter-locations.geojson")
-counter_locations = counter_locations %>% rename(`Site ID` = UnqID)
 counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2019.csv")
 counter_df = counter_df %>% rename(Survey_wave = `Survey wave (calendar quarter)`)
 dim(counter_df) #1264064
@@ -132,6 +130,9 @@ dim(counter_clean) #846528
 # Get location data and create sf object ----------------------------------
 
 counter_clean = readRDS("counter_clean.Rds")
+
+counter_locations = sf::read_sf("tfl-cycle-counter-locations.geojson")
+counter_locations = counter_locations %>% rename(`Site ID` = UnqID)
 
 counter_sf = inner_join(counter_locations, counter_clean)
 
