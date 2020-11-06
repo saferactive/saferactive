@@ -187,7 +187,7 @@ dim(counter_days %>% filter(ProgID == "OUTCY") %>% select(site_direction) %>% un
 
 # get (weighted) mean values within each wave
 counter_wave = counter_days %>%
-  filter(ProgID == "CENCY") %>%
+  # filter(ProgID == "CENCY") %>%
   group_by(year, Survey_wave, Borough, ProgID) %>%
   summarise(
     total_daily = mean(total_daily),
@@ -198,36 +198,63 @@ counter_wave = counter_days %>%
 # get mean values across the waves in each year
 counter_wave = counter_wave %>%
   group_by(year, Borough) %>%
-  mutate(mean_for_year = mean(total_daily),
-         change_for_year = mean(change_cycles),
-         wave_correction_mean = total_daily/mean_for_year,
-         wave_correction_change = change_cycles/change_for_year) %>%
+  mutate(mean_for_year = mean(total_daily)
+         , change_for_year = mean(change_cycles)
+         # , wave_correction_mean = total_daily/mean_for_year
+         , wave_correction_change = change_cycles/change_for_year
+         ) %>%
   ungroup()
+
+# Correct for missing survey wave 4 in 2019
+adjust_2019 = counter_wave %>% filter(year == 2019) %>%
+  mutate(wave_number = substr(Survey_wave, 6, 7),
+         adjusted_total = case_when(wave_number == "Q1" ~ total_daily * 1.14,
+                                    wave_number == "Q2" ~ total_daily * 0.93,
+                                    wave_number == "Q3" ~ total_daily * 0.91),
+         adjusted_change = case_when(wave_number == "Q1" ~ change_cycles * 1.14,
+                                     wave_number == "Q2" ~ change_cycles * 0.93,
+                                     wave_number == "Q3" ~ change_cycles * 0.91))
+
+new_2019 = adjust_2019 %>%
+  group_by(Borough) %>%
+  summarise(new_mean = mean(adjusted_total),
+            new_change = mean(adjusted_change))
 
 counter_year_central = counter_wave %>%
   group_by(year, Borough) %>%
   summarise(mean_for_year = mean(mean_for_year),
             change_for_year = mean(change_for_year))
 
-# Correct for missing survey wave 4 in 2019
-wave_corrections = counter_wave %>%
-  mutate(wave_number = substr(Survey_wave, 6, 7)) %>%
-  group_by(wave_number) %>%
-  summarise(mean_wave_correction = mean(wave_correction_mean),
-            change_wave_correction = mean(wave_correction_change))
+counter_new_correction = inner_join(counter_year_central, new_2019, by = "Borough") %>%
+  mutate(mean_cycles = case_when(year == 2019 ~ new_mean, TRUE ~ mean_for_year),
+         change_cycles = case_when(year == 2019 ~ new_change, TRUE ~ change_for_year))
 
-counter_year_central$mean_for_year[counter_year_central$year == 2019] = counter_year_central$mean_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,2]],wave_corrections[[2,2]],wave_corrections[[3,2]]))
-
-counter_year_central$change_for_year[counter_year_central$year == 2019] = counter_year_central$change_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,3]],wave_corrections[[2,3]],wave_corrections[[3,3]]))
-
-View(counter_year_central)
+# wave_corrections = counter_wave %>%
+#   mutate(wave_number = substr(Survey_wave, 6, 7)) %>%
+#   group_by(wave_number) %>%
+#   summarise(
+#     # mean_wave_correction = mean(wave_correction_mean),
+#             change_wave_correction = mean(wave_correction_change))
+#
+# counter_year_central$mean_for_year[counter_year_central$year == 2019] = counter_year_central$mean_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,2]],wave_corrections[[2,2]],wave_corrections[[3,2]]))
+#
+# counter_year_central$change_for_year[counter_year_central$year == 2019] = counter_year_central$change_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,2]],wave_corrections[[2,2]],wave_corrections[[3,2]]))
+#
+# View(counter_year_central)
 
 # Join back together with inner and outer london counts
 
+###test
 
-
-
-
+counter_year = counter_days %>%
+  filter(ProgID != "CENCY") %>%
+  group_by(year, Borough) %>%
+  summarise(
+    total_daily = mean(total_daily),
+    change_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
+  ) %>%
+  ungroup()
+#####
 
 system.time({counter_year = counter_days %>%
   group_by(year, site_direction, Borough, ProgID, mean_site_direction) %>%
