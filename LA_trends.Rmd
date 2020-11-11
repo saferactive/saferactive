@@ -1,0 +1,192 @@
+---
+title: "Local Authority Trend Analysis"
+output: github_document
+---
+
+THis short analysis is to highlight the variation in crashes affecting active traveling across Great Britain.
+
+Data comes from the Stats19 reports.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyr)
+library(tmap)
+```
+
+
+
+```{r get_data, echo = FALSE, include=FALSE}
+crash <- readRDS("crashes_active.Rds")
+crash <- st_as_sf(crash[!is.na(crash$latitude),], coords = c("longitude","latitude"), crs = 4326)
+
+if(!file.exists("data/counties_uas_gb_2019_ubc.Rds")){
+  download.file("https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_ubc.Rds",
+              destfile = "data/counties_uas_gb_2019_ubc.Rds", mode = "wb")
+}
+
+la <- readRDS("data/counties_uas_gb_2019_ubc.Rds")
+la$ctyua19cd[la$ctyua19cd == "E10000002"] <- "E06000060"
+
+
+pop <- read.csv("data/upper_LA_population_2019.csv")
+pop <- pop[pop$mnemonic %in% la$ctyua19cd,]
+pop <- pop[,2:3]
+names(pop) <- c("code","population_2019")
+la <- la[,c("ctyua19cd","ctyua19nm")]
+names(la) <- c("code","la_name","geometry")
+
+la <- left_join(la,pop, by = "code")
+
+crash <- st_transform(crash, 27700)
+la <- st_transform(la, 27700)
+```
+## Upper Tier Local Authorities and their population
+
+We are using upper tier local authorities for this analysis as they tend to be the local highway authority, thus have overall responsability for road safety in their areas.
+
+This first plot highlights the significant population and area variation in LAs. 
+
+```{r pressure, echo=FALSE}
+tm_shape(la) +
+  tm_fill(col = "population_2019",
+          title = "Population (2019)",
+          style = "quantile",
+          n = 10, 
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE)
+```
+
+## Crashes by LA
+
+```{r crash_la, echo=FALSE, message=FALSE}
+crash <- st_join(crash, la[,"la_name"])
+
+# Get Year and Month
+crash$year <- year(crash$date)
+
+crash_yr <- crash %>%
+  st_drop_geometry() %>%
+  group_by(la_name, year) %>%
+  summarise(total_crash = n(),
+            crash_fatal = sum(accident_severity == "Fatal"),
+            crash_serious = sum(accident_severity == "Serious"),
+            crash_slight = sum(accident_severity == "Slight"),
+            cas_fatal = sum(number_of_casualties[accident_severity == "Fatal"]),
+            cas_serious = sum(number_of_casualties[accident_severity == "Serious"]),
+            cas_slight = sum(number_of_casualties[accident_severity == "Slight"])
+            )
+
+la <- left_join(la, crash_yr[crash_yr$year == 2018,], by = c("la_name"))
+la$ksi_per100k <- la$cas_fatal + la$cas_serious / la$population_2019 * 100000
+la$slight_per100k <- la$cas_slight  / la$population_2019 * 100000
+```
+
+We can adjust the plots the KSI rate for population, England is clearly doing worse than Scotland and Wales, particularly in the home counties. No this is a count based on the most serious causality, so may slightly overestimate the KSI rate. The City of London is an extreme outlier due to it very low resident population.
+
+```{r crash_la_plot, echo=FALSE}
+tm_shape(la) +
+  tm_fill(col = "ksi_per100k",
+          title = "KSI per 100,000 people (2018)",
+          style = "quantile",
+          n = 10,
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE)
+```
+The pattern of slight casualties is different to the KSI
+
+```{r crash_la_plot2, echo=FALSE}
+tm_shape(la) +
+  tm_fill(col = "slight_per100k",
+          title = "Slight Casualties per 100,000 people (2018)",
+          style = "quantile",
+          n = 10,
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE)
+```
+
+
+```{r crash_top10, echo=FALSE}
+la_top10 <- st_drop_geometry(la)
+la_top10 <- la_top10[order(la_top10$ksi_per100k, decreasing = TRUE),]
+la_top10$rank <- seq(1,nrow(la_top10))
+la_top10 <- la_top10[c(1:10,196:205),]
+la_top10 <- la_top10[,c("la_name","rank","ksi_per100k","total_crash","crash_fatal")]
+la_top10$ksi_per100k <- round(la_top10$ksi_per100k)
+la_top10
+```
+
+City of London and Westminster are probably distorted due to there high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population. 
+
+# Historical Trends
+
+Looking at absolute number of KSI, the top 10 and bottom 10 are the same in 2009 and 2018 suggesting no overall change.
+
+```{r trends, echo=FALSE}
+rank_2018 <- crash_yr[crash_yr$year == 2018,]
+rank_2018 <- rank_2018[order(rank_2018$total_crash, decreasing = TRUE),]
+top_10_2018 <- rank_2018$la_name[1:10]
+bottom_10_2018 <- rank_2018$la_name[seq(nrow(rank_2018) - 9,nrow(rank_2018))]
+
+rank_2009 <- crash_yr[crash_yr$year == 2018,]
+rank_2009 <- rank_2009[order(rank_2009$total_crash, decreasing = TRUE),]
+top_10_2009 <- rank_2009$la_name[1:10]
+bottom_10_2009 <- rank_2009$la_name[seq(nrow(rank_2009) - 9,nrow(rank_2009))]
+
+ggplot(crash_yr[crash_yr$la_name %in% top_10_2018,],
+       aes(year, total_crash, colour = la_name)) +
+  geom_line() +
+  ylab("Crashes with active travel casualties") +
+  labs(color = "Local Authority") +
+  ggtitle("Top 10 LAs in 2018")
+
+ggplot(crash_yr[crash_yr$la_name %in% bottom_10_2018,],
+       aes(year, total_crash, colour = la_name)) +
+  geom_line() +
+  ylab("Crashes with active travel casualties") +
+  labs(color = "Local Authority") +
+  ggtitle("Bottom 10 LAs in 2018") 
+
+
+```
+
+If we look for areas with the biggest change
+
+```{r trends2, echo=FALSE}
+crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","total_crash")],
+                             values_from = "total_crash",
+                             names_from = "year")
+
+crash_yr_wide$change <- (crash_yr_wide$`2018` - crash_yr_wide$`2009`) / crash_yr_wide$`2009` * 100
+
+crash_yr_wide <- crash_yr_wide[order(crash_yr_wide$change, decreasing = TRUE),]
+
+change_top_10 <- crash_yr_wide$la_name[1:10]
+change_bottom_10 <- crash_yr_wide$la_name[seq(nrow(crash_yr_wide) - 9,nrow(crash_yr_wide))]
+
+
+ggplot(crash_yr[crash_yr$la_name %in% change_top_10,],
+       aes(year, total_crash, colour = la_name)) +
+  geom_line() +
+  ylab("Crashes with active travel casualties") +
+  labs(color = "Local Authority") +
+  ggtitle("10 LAs with greatest % increase in crashes")
+
+ggplot(crash_yr[crash_yr$la_name %in% change_bottom_10,],
+       aes(year, total_crash, colour = la_name)) +
+  geom_line() +
+  ylab("Crashes with active travel casualties") +
+  labs(color = "Local Authority") +
+  ggtitle("10 LAs with greatest % decrease in crashes")
+
+
+```
+There is a clear lesson that Scotland has done something significant in terms of reducing KSI of active travelers especially in Aberdeen. At this stage we cannot show if this is a true change in the crash rate or a change in recording practices. Due to the gradual an continuous decline it seems unlikely to be caused by a chang in data gatherin policy. It may have been caused by a reduction in active travel.
+
+
