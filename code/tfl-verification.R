@@ -210,7 +210,6 @@ counter_means_year = counter_year %>%
   group_by(year, Borough) %>%
   summarise(
     n_counters = length(unique(site_direction)),
-    borough_sum = sum(adjusted_total, na.rm = TRUE),
     borough_mean = mean(adjusted_total, na.rm = TRUE),
     change_tfl_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
   )
@@ -218,16 +217,18 @@ counter_means_year = counter_year %>%
 counter_means_2015 = counter_means_year %>%
   filter(year == 2015) %>%
   ungroup() %>%
-  mutate(borough_mean_2015 = borough_mean) %>%
-  select(Borough, borough_mean_2015)
+  mutate(borough_mean_2015 = borough_mean,
+         borough_change_2015 = change_tfl_cycles) %>%
+  select(Borough, borough_mean_2015, borough_change_2015)
 
 
 counter_la_results = inner_join(counter_means_year, counter_means_2015) %>%
-  mutate(relative_to_2015 = borough_mean / borough_mean_2015)
+  mutate(count_relative_to_2015 = borough_mean / borough_mean_2015,
+         change_relative_to_2015 = change_tfl_cycles / borough_change_2015)
 # counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
 
 ggplot(counter_la_results) +
-  geom_line(aes(year, relative_to_2015, colour = Borough))
+  geom_line(aes(year, count_relative_to_2015, colour = Borough))
 
 readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019.csv")
 piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019.csv", repo = "itsleeds/saferroadsmap")
@@ -245,7 +246,7 @@ lads_data = inner_join(lads, counter_la_results)
 
 library(tmap)
 tm_shape(lads_data) +
-  tm_polygons("relative_to_2015", palette = "BrBG", n = 6) +
+  tm_polygons("count_relative_to_2015", palette = "BrBG", n = 6) +
   tm_text(text = "Name", size = 0.7) +
   tm_facets("year")
 
@@ -254,6 +255,24 @@ counter_multiyear = lads_data %>%
   group_by(Name) %>%
   summarise(borough_mean = mean(borough_mean))
 
-tm_shape(lads_data) +
+tm_shape(counter_multiyear) +
+  tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
+  tm_text(text = "Name", size = 0.7)
+
+counter_earlyyear = lads_data %>%
+  filter(year %in% 2015:2016) %>%
+  group_by(Name) %>%
+  summarise(borough_mean = mean(borough_mean))
+
+tm_shape(counter_earlyyear) +
+  tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
+  tm_text(text = "Name", size = 0.7)
+
+counter_lateyear = lads_data %>%
+  filter(year %in% 2017:2019) %>%
+  group_by(Name) %>%
+  summarise(borough_mean = mean(borough_mean))
+
+tm_shape(counter_lateyear) +
   tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
   tm_text(text = "Name", size = 0.7)
