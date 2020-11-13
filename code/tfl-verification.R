@@ -105,14 +105,14 @@ counter_clean$Time = gsub("0-0", "0 - 0", counter_clean$Time)
 counter_clean$Time = gsub("5-0", "5 - 0", counter_clean$Time)
 counter_clean$Time = gsub("0-1", "0 - 1", counter_clean$Time)
 counter_clean$Time = gsub("5-1", "5 - 1", counter_clean$Time)
-
-View(counter_clean %>%
-       group_by(Time) %>%
-       tally())
-
-View(counter_clean %>%
-       group_by(year) %>%
-       tally())
+#
+# View(counter_clean %>%
+#        group_by(Time) %>%
+#        tally())
+#
+# View(counter_clean %>%
+#        group_by(year) %>%
+#        tally())
 
 # View(counter_clean %>%
 #   filter(`Site ID` == "CENCY010",
@@ -138,21 +138,37 @@ counter_sf = inner_join(counter_locations, counter_clean)
 
 counter_bng = counter_sf %>%
   st_transform(crs = 27700)
-
 # st_coordinates(counter_bng)[1]
+counter_nogeo = counter_sf %>%
+  st_drop_geometry()
 
+# Daily totals instead of 15 minute periods
+counter_days = counter_nogeo %>%
+  select(year, Survey_wave, Borough, `Site ID`, Direction, ProgID, Location, total_daily, mean_daily) %>%
+  unique()
+dim(counter_days) #17636
+
+# Use annual equivalent adjustment factors taken from TfL Central London grid survey data to account for seasonal variation
+# Also helps to correct central london counts for varying numbers in each survey wave (Corrects for missing survey wave 4 in 2019)
+season_adjust = counter_days %>%
+  mutate(wave_number = substr(Survey_wave, 6, 7),
+         adjusted_total = case_when(wave_number == "Q1" ~ total_daily * 1.14,
+                                    wave_number == "Q2" ~ total_daily * 0.93,
+                                    wave_number == "Q3" ~ total_daily * 0.91,
+                                    wave_number == "Q4" ~ total_daily * 1.06,
+                                    TRUE ~ total_daily * 0.93)) # inner and outer London data were surveyed in Q2
 
 # Calculate change in TfL counts ------------------------------------------
 
-counter_change = counter_bng %>%
+counter_change = season_adjust %>%
   group_by(`Site ID`, Direction) %>%
-  mutate(mean_site_direction = mean(total_daily)) %>%
+  mutate(mean_site_direction = mean(adjusted_total)) %>%
   ungroup() %>%
   filter(mean_site_direction > 0) %>% # remove counts where there has never been a cyclist
-  mutate(change_cycles = total_daily/mean_site_direction,
+  mutate(change_cycles = adjusted_total/mean_site_direction,
          site_direction = paste(`Site ID`, Direction))
 sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
-dim(counter_change) #846528
+
 
 # counter_change$site_direction = paste(counter_change$`Site ID`, counter_change$Direction)
 
@@ -161,107 +177,29 @@ dim(counter_change) #846528
 #   group_by(year, Survey_wave, `Site ID`, Direction) %>%
 #   mutate(main_weather =
 
-# Daily totals instead of 15 minute periods
-counter_days = counter_change %>%
-  select(year, Survey_wave, Borough, `Site ID`, Direction, site_direction, ProgID, Location, total_daily, mean_daily, mean_site_direction, change_cycles) %>%
-  unique()
-dim(counter_days) #17636
 
-dim(counter_days %>% filter(ProgID == "CENCY")) #7218
-dim(counter_days %>% filter(ProgID == "INNCY")) #5924
-dim(counter_days %>% filter(ProgID == "OUTCY")) #4494
+dim(counter_change %>% filter(ProgID == "CENCY")) #7218
+dim(counter_change %>% filter(ProgID == "INNCY")) #5924
+dim(counter_change %>% filter(ProgID == "OUTCY")) #4494
 
-dim(counter_days %>% filter(ProgID == "CENCY") %>% select(site_direction) %>% unique()) #420
-dim(counter_days %>% filter(ProgID == "INNCY") %>% select(site_direction) %>% unique()) #1202
-dim(counter_days %>% filter(ProgID == "OUTCY") %>% select(site_direction) %>% unique()) #906
-
+dim(counter_change %>% filter(ProgID == "CENCY") %>% select(site_direction) %>% unique()) #420
+dim(counter_change %>% filter(ProgID == "INNCY") %>% select(site_direction) %>% unique()) #1202
+dim(counter_change %>% filter(ProgID == "OUTCY") %>% select(site_direction) %>% unique()) #906
 
 # Survey wave corrections -------------------------------------------------
-
 # Group by site_direction and year so Central London counts that have been surveyed 4 times a year don't have 4 times more influence than Inner/Outer London counts
-#Correct central london counts for varying numbers in each survey wave
 
-# counter_days %>% filter(ProgID == "CENCY") %>%
-#   group_by(Survey_wave) %>%
-#   tally()
-
-# get (weighted) mean values within each wave
-counter_wave = counter_days %>%
-  # filter(ProgID == "CENCY") %>%
-  group_by(year, Survey_wave, Borough, ProgID) %>%
+# get mean values for each site_location and year
+counter_year = counter_change %>%
+  group_by(year, Borough, `Site ID`, Direction, site_direction, ProgID, Location, mean_site_direction) %>%
   summarise(
     total_daily = mean(total_daily),
-    change_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
+    adjusted_total = mean(adjusted_total),
+    change_cycles = mean(change_cycles)
   ) %>%
   ungroup()
+dim(counter_year) #12444
 
-# get mean values across the waves in each year
-counter_wave = counter_wave %>%
-  group_by(year, Borough) %>%
-  mutate(mean_for_year = mean(total_daily)
-         , change_for_year = mean(change_cycles)
-         # , wave_correction_mean = total_daily/mean_for_year
-         , wave_correction_change = change_cycles/change_for_year
-         ) %>%
-  ungroup()
-
-# Correct for missing survey wave 4 in 2019
-adjust_2019 = counter_wave %>% filter(year == 2019) %>%
-  mutate(wave_number = substr(Survey_wave, 6, 7),
-         adjusted_total = case_when(wave_number == "Q1" ~ total_daily * 1.14,
-                                    wave_number == "Q2" ~ total_daily * 0.93,
-                                    wave_number == "Q3" ~ total_daily * 0.91),
-         adjusted_change = case_when(wave_number == "Q1" ~ change_cycles * 1.14,
-                                     wave_number == "Q2" ~ change_cycles * 0.93,
-                                     wave_number == "Q3" ~ change_cycles * 0.91))
-
-new_2019 = adjust_2019 %>%
-  group_by(Borough) %>%
-  summarise(new_mean = mean(adjusted_total),
-            new_change = mean(adjusted_change))
-
-counter_year_central = counter_wave %>%
-  group_by(year, Borough) %>%
-  summarise(mean_for_year = mean(mean_for_year),
-            change_for_year = mean(change_for_year))
-
-counter_new_correction = inner_join(counter_year_central, new_2019, by = "Borough") %>%
-  mutate(mean_cycles = case_when(year == 2019 ~ new_mean, TRUE ~ mean_for_year),
-         change_cycles = case_when(year == 2019 ~ new_change, TRUE ~ change_for_year))
-
-# wave_corrections = counter_wave %>%
-#   mutate(wave_number = substr(Survey_wave, 6, 7)) %>%
-#   group_by(wave_number) %>%
-#   summarise(
-#     # mean_wave_correction = mean(wave_correction_mean),
-#             change_wave_correction = mean(wave_correction_change))
-#
-# counter_year_central$mean_for_year[counter_year_central$year == 2019] = counter_year_central$mean_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,2]],wave_corrections[[2,2]],wave_corrections[[3,2]]))
-#
-# counter_year_central$change_for_year[counter_year_central$year == 2019] = counter_year_central$change_for_year[counter_year_central$year == 2019] / mean(c(wave_corrections[[1,2]],wave_corrections[[2,2]],wave_corrections[[3,2]]))
-#
-# View(counter_year_central)
-
-# Join back together with inner and outer london counts
-
-###test
-
-counter_year = counter_days %>%
-  filter(ProgID != "CENCY") %>%
-  group_by(year, Borough) %>%
-  summarise(
-    total_daily = mean(total_daily),
-    change_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
-  ) %>%
-  ungroup()
-#####
-
-system.time({counter_year = counter_days %>%
-  group_by(year, site_direction, Borough, ProgID, mean_site_direction) %>%
-  summarise(
-    total_daily = mean(total_daily, na.rm = TRUE),
-    change_cycles = mean(change_cycles)) %>%
-  ungroup()})
 
 dim(counter_year %>% filter(ProgID == "CENCY")) #2026
 dim(counter_year %>% filter(ProgID == "INNCY")) #5924
@@ -269,12 +207,11 @@ dim(counter_year %>% filter(ProgID == "OUTCY")) #4494
 
 # Group by year and borough
 counter_means_year = counter_year %>%
-  st_drop_geometry() %>%
   group_by(year, Borough) %>%
   summarise(
     n_counters = length(unique(site_direction)),
-    borough_sum = sum(total_daily, na.rm = TRUE),
-    borough_mean = mean(total_daily, na.rm = TRUE),
+    borough_sum = sum(adjusted_total, na.rm = TRUE),
+    borough_mean = mean(adjusted_total, na.rm = TRUE),
     change_tfl_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
   )
 
