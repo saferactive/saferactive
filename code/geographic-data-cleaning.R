@@ -10,7 +10,7 @@ u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_aadf.zip"
 d = dtc_import(u = u)
 
 saveRDS(d, "traffic-aadf-29092020.Rds")
-piggyback::pb_upload("traffic-aadf-29092020.Rds")
+piggyback::pb_upload("traffic-aadf-29092020.Rds", tag = "0.1")
 traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
 dim(traffic_aadf)
@@ -22,10 +22,11 @@ table(traffic_aadf$sequence)
 
 traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
+# including estimated counts in year that were missed
 traffic_cyclable = traffic_aadf %>%
   filter(road_category != "TM",
-         road_category != "PM") %>%
-  filter(estimation_method == "Counted")
+         road_category != "PM") # %>%
+  # filter(estimation_method == "Counted")
 # there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
 
 # Fix points with location errors
@@ -91,7 +92,7 @@ traffic_aadf_sf = traffic_cyclable %>%
   summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 nrow(traffic_aadf_sf)
-# [1] 42543 ([1] 41980 when local_authority_name is omitted)
+# [1] 42543 ([1] 41980 when local_authority_name is omitted) 44359 with estimated counts
 summary(sf::st_geometry_type(traffic_aadf_sf))
 mapview::mapview(traffic_aadf_sf)
 
@@ -173,7 +174,7 @@ corrections2 = corrections[remove == FALSE,]
 
 traffic_cyclable_clean = traffic_cyclable %>%
   left_join(., corrections2)
-dim(traffic_cyclable_clean) #183884
+dim(traffic_cyclable_clean) #183884 #439688
 summary(as.factor(traffic_cyclable_clean$name))
 summary(as.factor(traffic_cyclable_clean$local_authority_name))
 traffic_cyclable_clean$name[is.na(traffic_cyclable_clean$name)] =
@@ -238,9 +239,9 @@ traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 940855] =
 
 #remove duplicate rows to prevent error in Glasgow/Lanarkshire NAs
 remove = duplicated(traffic_cyclable_clean)
-sum(remove) #10618
+sum(remove) #10618 #68656
 traffic_cyclable_clean = traffic_cyclable_clean[remove == FALSE,]
-dim(traffic_cyclable_clean) #183884
+dim(traffic_cyclable_clean) #183884 #439688
 
 saveRDS(traffic_cyclable_clean, "traffic_cyclable_clean.Rds")
 piggyback::pb_upload("traffic_cyclable_clean.Rds")
