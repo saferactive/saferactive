@@ -164,19 +164,27 @@ season_adjust = counter_days %>%
                                     wave_number == "Q4" ~ total_daily * 1.06,
                                     TRUE ~ total_daily * 0.93)) # inner and outer London data were surveyed in Q2
 
+# Combine bidirectional counts into single count for each site
+check = season_adjust %>% group_by(`Site ID`, Survey_wave, year) %>% tally()
+unique(check$n) #2
+
+season_adjust = season_adjust %>%
+  group_by(year, Survey_wave, Borough, `Site ID`, ProgID, Location, wave_number) %>%
+  summarise(total_daily = sum(total_daily),
+            adjusted_total = sum(adjusted_total))
+dim(season_adjust) #8818
+
 # Calculate change in TfL counts ------------------------------------------
 
+
 counter_change = season_adjust %>%
-  group_by(`Site ID`, Direction) %>%
-  mutate(mean_site_direction = mean(adjusted_total)) %>%
+  group_by(`Site ID`) %>%
+  mutate(mean_site = mean(adjusted_total)) %>%
   ungroup() %>%
-  filter(mean_site_direction > 0) %>% # remove counts where there has never been a cyclist
-  mutate(change_cycles = adjusted_total/mean_site_direction,
-         site_direction = paste(`Site ID`, Direction))
+  filter(mean_site > 0) %>% # remove counts where there has never been a cyclist
+  mutate(change_cycles = adjusted_total/mean_site)
 sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
 
-
-# counter_change$site_direction = paste(counter_change$`Site ID`, counter_change$Direction)
 
 #Find most common weather type through the day
 # counter_change = counter_change %>%
@@ -184,32 +192,32 @@ sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
 #   mutate(main_weather =
 
 
-dim(counter_change %>% filter(ProgID == "CENCY")) #7218
-dim(counter_change %>% filter(ProgID == "INNCY")) #5924
-dim(counter_change %>% filter(ProgID == "OUTCY")) #4494
+dim(counter_change %>% filter(ProgID == "CENCY")) #3609
+dim(counter_change %>% filter(ProgID == "INNCY")) #2962
+dim(counter_change %>% filter(ProgID == "OUTCY")) #2247
 
-dim(counter_change %>% filter(ProgID == "CENCY") %>% select(site_direction) %>% unique()) #420
-dim(counter_change %>% filter(ProgID == "INNCY") %>% select(site_direction) %>% unique()) #1202
-dim(counter_change %>% filter(ProgID == "OUTCY") %>% select(site_direction) %>% unique()) #906
+dim(counter_change %>% filter(ProgID == "CENCY") %>% select(`Site ID`) %>% unique()) #209
+dim(counter_change %>% filter(ProgID == "INNCY") %>% select(`Site ID`) %>% unique()) #597
+dim(counter_change %>% filter(ProgID == "OUTCY") %>% select(`Site ID`) %>% unique()) #451
 
 # Survey wave corrections -------------------------------------------------
-# Group by site_direction and year so Central London counts that have been surveyed 4 times a year don't have 4 times more influence than Inner/Outer London counts
+# Group by `Site ID` and year so Central London counts that have been surveyed 4 times a year don't have 4 times more influence than Inner/Outer London counts
 
 # get mean values for each site_location and year
 counter_year = counter_change %>%
-  group_by(year, Borough, `Site ID`, Direction, site_direction, ProgID, Location, mean_site_direction) %>%
+  group_by(year, Borough, `Site ID`, ProgID, Location, mean_site) %>%
   summarise(
     total_daily = mean(total_daily),
     adjusted_total = mean(adjusted_total),
     change_cycles = mean(change_cycles)
   ) %>%
   ungroup()
-dim(counter_year) #12444
+dim(counter_year) #6221
 
 
-dim(counter_year %>% filter(ProgID == "CENCY")) #2026
-dim(counter_year %>% filter(ProgID == "INNCY")) #5924
-dim(counter_year %>% filter(ProgID == "OUTCY")) #4494
+dim(counter_year %>% filter(ProgID == "CENCY")) #1012
+dim(counter_year %>% filter(ProgID == "INNCY")) #2962
+dim(counter_year %>% filter(ProgID == "OUTCY")) #2247
 
 
 
@@ -223,9 +231,9 @@ saveRDS(counter_year, "tfl-counts-by-site.Rds")
 counter_means_year = counter_year %>%
   group_by(year, Borough) %>%
   summarise(
-    n_counters = length(unique(site_direction)),
+    n_counters = length(unique(`Site ID`)),
     borough_mean = mean(adjusted_total, na.rm = TRUE),
-    change_tfl_cycles = weighted.mean(change_cycles, w = mean_site_direction, na.rm = TRUE)
+    change_tfl_cycles = weighted.mean(change_cycles, w = mean_site, na.rm = TRUE)
   )
 
 counter_means_2015 = counter_means_year %>%
@@ -282,7 +290,7 @@ counter_earlyyear = lads_data %>%
   mutate(years = "2015-16")
 
 tm_shape(counter_earlyyear) +
-  tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
+  tm_polygons("change_tfl_cycles", palette = "BrBG", n = 6, style = "jenks") +
   tm_text(text = "Name", size = 0.7)
 
 counter_lateyear = lads_data %>%
@@ -293,7 +301,7 @@ counter_lateyear = lads_data %>%
   mutate(years = "2017-19")
 
 tm_shape(counter_lateyear) +
-  tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
+  tm_polygons("change_tfl_cycles", palette = "BrBG", n = 6, style = "jenks") +
   tm_text(text = "Name", size = 0.7)
 
 tfl_early_v_late = rbind(counter_earlyyear, counter_lateyear)
@@ -303,17 +311,17 @@ tfl_early_v_late = rbind(counter_earlyyear, counter_lateyear)
 
 # loosely based on London Assembly constituencies
 
-# City, Camden, Islington
+# City of London, Tower Hamlets, Newham
+# Camden, Islington
 # Westminster, Kensington and Chelsea, Hammersmith and Fulham
 # Southwark, Lambeth
 # Lewisham, Greenwich
-# Tower Hamlets, Newham
 # Hackney, Waltham Forest
 # Wandsworth, Merton
 # Haringey, Enfield, Barnet
 # Harrow, Brent
 # Ealing, Hillingdon
-# Hounslow, Richmond upon Thames, Kingston updon Thames
+# Hounslow, Richmond upon Thames, Kingston upon Thames
 # Croydon, Sutton
 # Bromley, Bexley
 # Havering, Barking and Dagenham, Redbridge
@@ -335,7 +343,7 @@ m = bam(change_cycles ~
         + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
         + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
         ,
-        weights = (mean_site_direction),
+        weights = (mean_site),
         family = scat,
         data = counter_bam, method = 'fREML',
         nthreads = 4, discrete = TRUE)
@@ -343,12 +351,62 @@ m = bam(change_cycles ~
 summary(m)
 plot(m, pages = 4, scheme = 2, shade = TRUE)
 
+
+
+# assign the framework that will be used as a basis for predictions
+pdata = with(counter_bam,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+# make predictions according to the GAM model
+fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      counter_bam$easting, counter_bam$northing, dist = 0.02)
+fitted[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
+
+
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
+  geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
+  viridis::scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+                              na.value = 'transparent') +
+  coord_fixed(ratio = 1) +
+  # geom_line(lads, alpha(0.1)) +
+  theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+borough_geom = lads %>%
+  dplyr::select(Name) %>%
+  st_transform(27700)
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean annual predictions for each borough
+pb_preds_year = point_to_borough %>%
+  drop_na() %>%
+  group_by(Name, year) %>%
+  summarise(borough_mean_cycles = mean(Fitted))
+View(pb_preds_year)
+
+check = counter_bam %>% group_by(`Site ID`, year) %>% tally()
+check[check$n == 4,]
+View(counter_bam[counter_bam$`Site ID` == "CENCY005",])
+#####################################
+
 m2 = bam(adjusted_total ~
-          s(year, bs = "cr", k = 5)
+          s(year, k = 5)
         + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
-        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+        + ti(easting, northing, year, d = c(2,1), bs = c('ds','tp'), m = M, k = c(25, 3))
         ,
-        family = scat,
+        family = nb(link = "log"),
         data = counter_bam, method = 'fREML',
         nthreads = 4, discrete = TRUE)
 
@@ -356,13 +414,60 @@ m2 = bam(adjusted_total ~
 summary(m2)
 plot(m2, pages = 4, scheme = 2, shade = TRUE)
 
+
+# assign the framework that will be used as a basis for predictions
+pdata = with(counter_bam,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+# make predictions according to the GAM model
+fitted = predict(m2, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      counter_bam$easting, counter_bam$northing, dist = 0.02)
+fitted[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
+
+
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
+  geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
+  viridis::scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+                     na.value = 'transparent') +
+  coord_fixed(ratio = 1) +
+  # geom_line(lads, alpha(0.1)) +
+  theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+borough_geom = lads %>%
+  dplyr::select(Name) %>%
+  st_transform(27700)
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean annual predictions for each borough
+tfl_gam_preds = point_to_borough %>%
+  drop_na() %>%
+  group_by(Name, year) %>%
+  summarise(borough_mean_cycles = mean(Fitted))
+View(tfl_gam_preds)
+
+saveRDS(tfl_gam_preds, "tfl-gam-preds.Rds")
+
 # Compare TfL counts with DfT GAM predictions -----------------------------------------
 
 counter_la_results = read.csv("tfl-counter-results-london-boroughs-2015-2019.csv")
 
-gam_preds = readRDS("pred-borough-change-cycles.Rds")
+# gam_preds = readRDS("pred-borough-change-cycles.Rds")
+dft_gam_preds = readRDS("london-dft-gam-preds-with-esti.Rds")
 
-verify = left_join(counter_la_results, gam_preds, by = c("year", "Borough" = "Name"))
+verify = left_join(counter_la_results, dft_gam_preds, by = c("year", "Borough" = "Name"))
 
 cor(verify$change_tfl_cycles, verify$borough_change_cycles)^2 #R squared = 0.00052
 plot(x = verify$change_tfl_cycles, y = verify$borough_change_cycles, xlab = "TfL change in cycle counts (adjusted daily flow)", ylab = "GAM predictions of change (AADF)")
@@ -376,26 +481,60 @@ plot(x = verify$count_relative_to_2015, y = verify$pred_relative_to_2015, xlab =
 # ggsave(plot = tosave, "figures/change-relative-to-2015.png")
 
 
-# Correlation between TfL and DfT counts (by borough) ---------------------
+# Correlation between TfL and DfT counts with estimated DfT counts (by borough) ---------------------
 
-piggyback::pb_download("dft-counts-by-borough.Rds")
-dft_counts_by_borough = readRDS("dft-counts-by-borough.Rds")
+piggyback::pb_download("dft-counts-by-borough-with-esti.Rds")
+dft_counts_by_borough = readRDS("dft-counts-by-borough-with-esti.Rds")
 
 verify_raw = left_join(counter_la_results, dft_counts_by_borough, by = c("year", "Borough" = "name"))
 dim(verify_raw)
 
 # Absolute counts
-cor(verify_raw$borough_mean, verify_raw$pedal_cycles)^2 #R squared = 0.799
-plot(verify_raw$borough_mean, verify_raw$pedal_cycles, xlab = "Mean TfL counts (flow per 15 minutes)", ylab = "Mean AADF from DfT counts")
+cor(verify_raw$borough_mean, verify_raw$pedal_cycles)^2 #R squared = 0.949
+# verify_raw = verify_raw %>% filter(Borough == "Westminster")
+plot(verify_raw$borough_mean, verify_raw$pedal_cycles, xlab = "Mean TfL counts (flow per 15 minutes)", ylab = "Mean AADF from DfT counts (with estimated counts)")
 text(verify_raw$borough_mean, verify_raw$pedal_cycles, verify_raw$year, pos = 1, cex = 0.7)
 text(verify_raw$borough_mean, verify_raw$pedal_cycles, verify_raw$Borough, pos = 1, cex = 0.7)
 
 # Raw change
-cor(verify_raw$change_tfl_cycles, verify_raw$change_cycles)^2 #R squared = 0.0008
+cor(verify_raw$change_tfl_cycles, verify_raw$change_cycles)^2 #R squared = 0.0002
 plot(verify_raw$change_tfl_cycles, verify_raw$change_cycles, xlab = "Mean change in TfL counts (adjusted daily flow)", ylab = "Mean change in DfT counts (AADF)")
 text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$year, pos = 1, cex = 0.7)
 text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$Borough, pos = 1, cex = 0.7)
 
+
+# Verify yearly trends ---------------------------------------------------
+
+# Using mean of all count points
+traffic_london = readRDS("dft-count-points-with-esti.Rds")
+
+verify_year = left_join(
+  (counter_year %>% group_by(year) %>% summarise(adjusted_total = mean(adjusted_total))),
+  (traffic_london %>% group_by(year) %>% summarise(pedal_cycles = mean(pedal_cycles))),
+  by = "year")
+cor(verify_year$adjusted_total, verify_year$pedal_cycles)^2 #R squared = 0.289 # R is negative
+plot(verify_year$adjusted_total, verify_year$pedal_cycles, xlab = "Mean change in TfL counts (adjusted daily flow)", ylab = "Mean change in DfT counts (AADF)")
+text(verify_year$adjusted_total, verify_year$pedal_cycles, verify_year$year, pos = 1, cex = 0.7)
+
+# Using mean of borough means for count points
+verify_year = left_join(
+  (counter_la_results %>% group_by(year) %>% summarise(borough_mean = mean(borough_mean))),
+  (dft_counts_by_borough %>% group_by(year) %>% summarise(pedal_cycles = mean(pedal_cycles))),
+   by = "year")
+cor(verify_year$borough_mean, verify_year$pedal_cycles)^2 #R squared = 0.094
+plot(verify_year$borough_mean, verify_year$pedal_cycles, xlab = "Mean change in TfL counts (adjusted daily flow)", ylab = "Mean change in DfT counts (AADF)")
+text(verify_year$borough_mean, verify_year$pedal_cycles, verify_year$year, pos = 1, cex = 0.7)
+
+# Using GAM predictions
+dft_gam_preds = readRDS("london-dft-gam-preds-with-esti.Rds")
+
+verify_year = left_join(
+  (tfl_gam_preds %>% st_drop_geometry() %>% group_by(year) %>% summarise(tfl_mean_cycles = mean(borough_mean_cycles))),
+  (dft_gam_preds %>% group_by(year) %>% summarise(borough_mean_cycles = mean(borough_mean_cycles))),
+  by = "year")
+cor(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles)^2 #R squared = 0.121 # R is negative
+plot(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles, xlab = "Mean cycles (GAM prediction using TfL counts)", ylab = "Mean cycels (GAM prediction using DfT counts)")
+text(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles, verify_year$year, pos = 1, cex = 0.7)
 
 # Two time periods 2015-16 and 2017-19 ----------------------------------
 
@@ -419,13 +558,16 @@ verify_two = left_join(tfl_early_v_late, dft_early_v_late, by = c("years", "Boro
 dim(verify_two)
 
 # Absolute counts
-cor(verify_two$borough_mean, verify_two$pedal_cycles)^2 #R squared = 0.826
-plot(verify_two$borough_mean, verify_two$pedal_cycles, xlab = "Mean TfL counts (flow per 15 minutes)", ylab = "Mean AADF from DfT counts")
+cor(verify_two$borough_mean, verify_two$pedal_cycles)^2 #R squared = 0.957
+plot(verify_two$borough_mean, verify_two$pedal_cycles, xlab = "Mean TfL counts (adjusted daily flow)", ylab = "Mean AADF from DfT counts",
+      # xlim = c(0, 500), ylim = c(0, 500)
+     )
+title ("Mean cycle counts per borough over two time periods (2015-16 and 2017-19)", cex.main = 0.8)
 text(verify_two$borough_mean, verify_two$pedal_cycles, verify_two$years, pos = 1, cex = 0.7)
 text(verify_two$borough_mean, verify_two$pedal_cycles, verify_two$Borough, pos = 1, cex = 0.7)
 
 # Raw change
-cor(verify_two$change_tfl_cycles, verify_two$change_cycles)^2 #R squared = 0.033
+cor(verify_two$change_tfl_cycles, verify_two$change_cycles)^2 #R squared = 0.020
 plot(verify_two$change_tfl_cycles, verify_two$change_cycles, xlab = "Mean change in TfL counts (adjusted daily flow)", ylab = "Mean change in DfT counts (AADF)")
 text(verify_two$change_tfl_cycles, verify_two$change_cycles, verify_two$years, pos = 1, cex = 0.7)
 text(verify_two$change_tfl_cycles, verify_two$change_cycles, verify_two$Borough, pos = 1, cex = 0.7)

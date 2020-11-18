@@ -5,7 +5,7 @@ library(tidyverse)
 library(mgcv)
 library(viridis)
 
-
+piggyback::pb_download("traffic_cyclable_clean.Rds")
 traffic_cyclable = readRDS("traffic_cyclable_clean.Rds")
 dim(traffic_cyclable)
 # [1] 183884     35 439688
@@ -18,6 +18,12 @@ traffic_points = traffic_cyclable %>%
 # nrow(traffic_points) / nrow(traffic_cyclable)
 # # [1] 0.3980621 # why are there multiple reading for each count point?
 # skimr::skim(traffic_cyclable)
+
+# check points are measured every year
+# traffic_points %>%
+#   # filter(estimation_method == "Counted") %>%
+#   group_by(year) %>%
+#   tally()
 
 #do this unless we are taking average counts for LAs
 traffic_points = traffic_points %>%
@@ -36,10 +42,11 @@ traffic_bam = traffic_bam %>%
 # dim(traffic_bam) #177313
 # length(unique(traffic_bam$grid_location))
 
-# Remove pre-2010 counts and count points with only 1 year of data --------
+# Remove pre-2010 counts and count points with only 1 year or less of counted data --------
 
 repeat_points = traffic_bam %>%
-  filter(year %in% 2010:2019) %>%
+  filter(year %in% 2010:2019,
+         estimation_method == "Counted") %>%
   group_by(count_point_id) %>%
   tally() %>%
   filter(n > 1)
@@ -47,7 +54,7 @@ repeat_points = traffic_bam %>%
 traffic_bam = traffic_bam %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_bam) #67614
+dim(traffic_bam) #67614 #124767
 
 ##surveyed in 2011
 repeat_points = traffic_bam %>%
@@ -57,7 +64,7 @@ repeat_points = traffic_bam %>%
 traffic_with_2011 = traffic_bam %>%
   filter(count_point_id %in% repeat_points$count_point_id) %>%
   filter(year %in% 2010:2019)
-dim(traffic_with_2011) #53275
+dim(traffic_with_2011) #53275 #123921
 
 
 # Get relative change in cycle counts  ------------------------------------
@@ -72,7 +79,7 @@ traffic_bam = traffic_bam %>%
   mutate(change_cycles = pedal_cycles/mean_cycles)
 # traffic_bam$change_cycles[is.na(traffic_bam$change_cycles)] = 0 #this creates erroneous data
 sum(is.na(traffic_bam$change_cycles))/nrow(traffic_bam) #0
-dim(traffic_bam) #66323
+dim(traffic_bam) #66323 #122456
 # nas = traffic_bam %>%
 #   filter(is.na(change_cycles))
 # View(nas)
@@ -85,7 +92,7 @@ traffic_0 = traffic_bam %>%
 traffic_nonzero = traffic_bam %>%
   filter(! count_point_id %in% traffic_0$count_point_id,
          mean_cycles >= 5.0)
-dim(traffic_nonzero) #51753
+dim(traffic_nonzero) #51753 #99130
 
 
 
@@ -126,7 +133,7 @@ lads = lads %>%
 
 traffic_london = traffic_bam %>%
   inner_join(lads, by = c("name" = "Name"))
-dim(traffic_london) #5215 6390 with zeroes
+dim(traffic_london) #5215 6390 with zeroes #13333 with estimated
 
 dft_counts_by_borough = traffic_london %>%
        group_by(name, year) %>%
@@ -136,7 +143,18 @@ dft_counts_by_borough = traffic_london %>%
                  n_counts = n())
 # View(dft_counts_by_borough)
 
-saveRDS(dft_counts_by_borough, "dft-counts-by-borough.Rds")
+saveRDS(dft_counts_by_borough, "dft-counts-by-borough-with-esti.Rds")
+
+dft_counts_by_borough_no_esti = traffic_london %>%
+  filter(estimation_method == "Counted") %>%
+  group_by(name, year) %>%
+  summarise(pedal_cycles = mean(pedal_cycles),
+            change_cycles = mean(change_cycles),
+            n_year = mean(n_year),
+            n_counts = n())
+
+saveRDS(dft_counts_by_borough, "dft-counts-by-borough-no-esti.Rds")
+
 
 # traffic_points_sequence = traffic_cyclable %>%
 #   select(year, name, count_point_id, road_category, easting, northing, pedal_cycles, estimation_method, estimation_method_detailed, link_length_km, sequence) %>%
@@ -760,7 +778,7 @@ pred_all_points_year = pred_all_points_year %>%
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
-  scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+  viridis::scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
                      na.value = 'transparent') +
   coord_fixed(ratio = 1) +
   # geom_line(lads, alpha(0.1)) +
@@ -785,6 +803,26 @@ pb_preds_year = point_to_borough %>%
   summarise(borough_mean_cycles = mean(Fitted))
 View(pb_preds_year)
 
+saveRDS(pb_preds_year, "london-dft-gam-preds-with-esti.Rds")
+
+## Compare GAM predictions with raw counts, by borough and year
+
+verify_dft_gam = inner_join(pb_preds_year, dft_counts_by_borough, by = c("Name" = "name", "year"))
+
+cor(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles)^2 #R squared = 0.946
+plot(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, xlab = "Mean DfT cycle count AADF (including estimated counts)", ylab = "GAM predictions based on DfT counts"
+     # , xlim = c(0,2000), ylim = c(0,2000)
+     )
+text(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, verify_dft_gam$year, pos = 1, cex = 0.7)
+text(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, verify_dft_gam$Name, pos = 1, cex = 0.7)
+
+# compare with actual counts only, not estimated counts
+verify_dft_gam = inner_join(pb_preds_year, dft_counts_by_borough_no_esti, by = c("Name" = "name", "year"))
+
+cor(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles)^2 #R squared = 0.872
+plot(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, xlab = "Mean DfT cycle count AADF (including estimated counts)", ylab = "GAM predictions based on DfT counts")
+text(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, verify_dft_gam$year, pos = 1, cex = 0.7)
+text(verify_dft_gam$pedal_cycles, verify_dft_gam$borough_mean_cycles, verify_dft_gam$Name, pos = 1, cex = 0.7)
 
 ############
 
