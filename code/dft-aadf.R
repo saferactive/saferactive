@@ -135,6 +135,8 @@ traffic_london = traffic_bam %>%
   inner_join(lads, by = c("name" = "Name"))
 dim(traffic_london) #5215 6390 with zeroes #13333 with estimated
 
+saveRDS(traffic_london, "dft-count-points-with-esti.Rds")
+
 dft_counts_by_borough = traffic_london %>%
        group_by(name, year) %>%
        summarise(pedal_cycles = mean(pedal_cycles),
@@ -648,28 +650,27 @@ pred_all_points_year = pred_all_points_year %>%
 
 #################
 
-system.time({m2 = bam(change_cycles ~
+system.time({m6 = bam(change_cycles ~
                         s(year, bs = "cr", k = 5)
                       + s(mean_year, bs = "cr", k = 3)
                       + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
                       + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
                       ,
-                      weights = (mean_cycles*n_year),
-                      # weights = (mean_cycles),
+                      weights = mean_cycles,
                       family = scat,
                       data = traffic_london, method = 'fREML',
                       nthreads = 4, discrete = TRUE)}) #15 seconds
-summary(m2)
-plot(m2, pages = 4, scheme = 2, shade = TRUE)
+summary(m6)
+plot(m6, pages = 4, scheme = 2, shade = TRUE)
 
-gam.check(m2)
-plot(fitted(m2), residuals(m2))
-plot(traffic_london$year, residuals(m2))
-plot(traffic_london$easting, residuals(m2))
-plot(traffic_london$northing, residuals(m2))
-plot(traffic_london$mean_year, residuals(m2))
-qqnorm(residuals(m2))
-qqline(residuals(m2))
+gam.check(m6)
+plot(fitted(m6), residuals(m6))
+plot(traffic_london$year, residuals(m6))
+plot(traffic_london$easting, residuals(m6))
+plot(traffic_london$northing, residuals(m6))
+plot(traffic_london$mean_year, residuals(m6))
+qqnorm(residuals(m6))
+qqline(residuals(m6))
 
 
 # assign the framework that will be used as a basis for predictions
@@ -679,7 +680,7 @@ pdata = with(traffic_london,
                          easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
                          northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
 # make predictions according to the GAM model
-fitted2 = predict(m2, newdata = pdata, type = "response",
+fitted2 = predict(m6, newdata = pdata, type = "response",
                   exclude = "mean_year",
                   newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
@@ -695,7 +696,7 @@ pred_all_points_year = pred_all_points_year %>%
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
-  scale_fill_viridis(name = "Change in pedal cycles", option = 'plasma',
+  viridis::scale_fill_viridis(name = "Change in pedal cycles", option = 'plasma',
                      na.value = 'transparent') +
   # geom_rect(xmin = 504000, xmax = 557500, ymin = 157500, ymax = 200000) + #doesn't work, maybe geom_tile would? but geom_raster is probably fine
   coord_fixed(ratio = 1) +
@@ -708,7 +709,7 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
 saveRDS(pred_all_points_year, "pred-london-change-cycles.Rds")
 
 borough_geom = lads %>%
-  dplyr::select(Name) %>%
+  dplyr::select(Borough) %>%
   st_transform(27700)
 
 ## Assign to borough for predictions by year
@@ -718,7 +719,7 @@ point_to_borough = st_join(x = pred_sf, y = borough_geom)
 ## Calculate mean annual predictions for each borough
 pb_preds_year = point_to_borough %>%
   drop_na() %>%
-  group_by(Name, year) %>%
+  group_by(Borough, year) %>%
   summarise(borough_change_cycles = mean(Fitted))
 View(pb_preds_year)
 
@@ -726,7 +727,7 @@ View(pb_preds_year)
 pb_preds_year = pb_preds_year %>%
   mutate(baseline_2015 = case_when(
     year == 2015 ~ borough_change_cycles)) %>%
-  group_by(Name) %>%
+  group_by(Borough) %>%
   mutate(pred_relative_to_2015 = borough_change_cycles/mean(baseline_2015, na.rm = TRUE)) %>%
   ungroup()
 

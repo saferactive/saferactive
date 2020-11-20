@@ -343,7 +343,7 @@ m = bam(change_cycles ~
         + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
         + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
         ,
-        weights = (mean_site),
+        weights = mean_site,
         family = scat,
         data = counter_bam, method = 'fREML',
         nthreads = 4, discrete = TRUE)
@@ -382,7 +382,7 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
         axis.ticks = element_blank())
 
 borough_geom = lads %>%
-  dplyr::select(Name) %>%
+  dplyr::select(Borough) %>%
   st_transform(27700)
 
 ## Assign to borough for predictions by year
@@ -390,15 +390,13 @@ pred_sf = pred_all_points_year %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 point_to_borough = st_join(x = pred_sf, y = borough_geom)
 ## Calculate mean annual predictions for each borough
-pb_preds_year = point_to_borough %>%
+tfl_gam_change = point_to_borough %>%
   drop_na() %>%
-  group_by(Name, year) %>%
-  summarise(borough_mean_cycles = mean(Fitted))
-View(pb_preds_year)
+  group_by(Borough, year) %>%
+  summarise(gam_change_cycles = mean(Fitted))
+View(tfl_gam_change)
 
-check = counter_bam %>% group_by(`Site ID`, year) %>% tally()
-check[check$n == 4,]
-View(counter_bam[counter_bam$`Site ID` == "CENCY005",])
+saveRDS(tfl_gam_change, "tfl-gam-change.Rds")
 #####################################
 
 m2 = bam(adjusted_total ~
@@ -444,7 +442,7 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
         axis.ticks = element_blank())
 
 borough_geom = lads %>%
-  dplyr::select(Name) %>%
+  dplyr::select(Borough) %>%
   st_transform(27700)
 
 ## Assign to borough for predictions by year
@@ -454,7 +452,7 @@ point_to_borough = st_join(x = pred_sf, y = borough_geom)
 ## Calculate mean annual predictions for each borough
 tfl_gam_preds = point_to_borough %>%
   drop_na() %>%
-  group_by(Name, year) %>%
+  group_by(Borough, year) %>%
   summarise(borough_mean_cycles = mean(Fitted))
 View(tfl_gam_preds)
 
@@ -502,6 +500,27 @@ plot(verify_raw$change_tfl_cycles, verify_raw$change_cycles, xlab = "Mean change
 text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$year, pos = 1, cex = 0.7)
 text(verify_raw$change_tfl_cycles, verify_raw$change_cycles, verify_raw$Borough, pos = 1, cex = 0.7)
 
+# Absolute GAM predictions
+dft_gam_preds = readRDS("london-dft-gam-preds-with-esti.Rds")
+
+verify_gam = left_join(
+  (tfl_gam_preds %>% st_drop_geometry() %>% rename(tfl_mean_cycles = borough_mean_cycles)),
+  dft_gam_preds,  by = c("year", "Borough" = "Name"))
+cor(verify_gam$tfl_mean_cycles, verify_gam$borough_mean_cycles)^2 #R squared = 0.945
+plot(verify_gam$tfl_mean_cycles, verify_gam$borough_mean_cycles, xlab = "Mean cycles (GAM prediction using TfL counts)", ylab = "Mean cycels (GAM prediction using DfT counts)")
+text(verify_gam$tfl_mean_cycles, verify_gam$borough_mean_cycles, verify_gam$year, pos = 1, cex = 0.7)
+
+# GAM change predictions (borough level)
+dft_gam_change = readRDS("pred-borough-change-cycles.Rds")
+
+
+verify_gam = left_join(
+  (tfl_gam_change %>% st_drop_geometry()),
+  dft_gam_change,  by = c("year", "Borough"))
+cor(verify_gam$gam_change_cycles, verify_gam$borough_change_cycles)^2 #R squared = 0.042
+plot(verify_gam$gam_change_cycles, verify_gam$borough_change_cycles, xlab = "Mean change in cycles (GAM prediction using TfL counts)", ylab = "Mean change in cycles (GAM prediction using DfT counts)")
+text(verify_gam$gam_change_cycles, verify_gam$borough_change_cycles, verify_gam$year, pos = 1, cex = 0.7)
+text(verify_gam$gam_change_cycles, verify_gam$borough_change_cycles, verify_gam$Borough, pos = 1, cex = 0.7)
 
 # Verify yearly trends ---------------------------------------------------
 
@@ -525,7 +544,7 @@ cor(verify_year$borough_mean, verify_year$pedal_cycles)^2 #R squared = 0.094
 plot(verify_year$borough_mean, verify_year$pedal_cycles, xlab = "Mean change in TfL counts (adjusted daily flow)", ylab = "Mean change in DfT counts (AADF)")
 text(verify_year$borough_mean, verify_year$pedal_cycles, verify_year$year, pos = 1, cex = 0.7)
 
-# Using GAM predictions
+# Using GAM count predictions
 dft_gam_preds = readRDS("london-dft-gam-preds-with-esti.Rds")
 
 verify_year = left_join(
@@ -535,6 +554,17 @@ verify_year = left_join(
 cor(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles)^2 #R squared = 0.121 # R is negative
 plot(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles, xlab = "Mean cycles (GAM prediction using TfL counts)", ylab = "Mean cycels (GAM prediction using DfT counts)")
 text(verify_year$tfl_mean_cycles, verify_year$borough_mean_cycles, verify_year$year, pos = 1, cex = 0.7)
+
+# Using GAM change predictions
+dft_gam_change = readRDS("pred-borough-change-cycles.Rds")
+
+verify_year = left_join(
+  (tfl_gam_change %>% st_drop_geometry() %>% group_by(year) %>% summarise(tfl_change_cycles = mean(gam_change_cycles))),
+  (dft_gam_change %>% group_by(year) %>% summarise(dft_change_cycles = mean(borough_change_cycles))),
+  by = "year")
+cor(verify_year$tfl_change_cycles, verify_year$dft_change_cycles)^2 #R squared = 0.208
+plot(verify_year$tfl_change_cycles, verify_year$dft_change_cycles, xlab = "Mean cycles (GAM prediction using TfL counts)", ylab = "Mean cycels (GAM prediction using DfT counts)")
+text(verify_year$tfl_change_cycles, verify_year$dft_change_cycles, verify_year$year, pos = 1, cex = 0.7)
 
 # Two time periods 2015-16 and 2017-19 ----------------------------------
 
