@@ -1,0 +1,235 @@
+Area,mnemonic,2019
+combauth:Greater Manchester,E47000001,2835686
+combauth:Sheffield City Region,E47000002,1409020
+combauth:West Yorkshire,E47000003,2332469
+combauth:Liverpool City Region,E47000004,1559320
+combauth:Tees Valley,E47000006,675944
+combauth:West Midlands,E47000007,2928592
+combauth:Cambridgeshire and Peterborough,E47000008,855796
+combauth:West of England,E47000009,941752
+combauth:North East,E47000010,1160830
+combauth:North of Tyne,E47000011,833167
+lacu:Darlington,E06000005,106803
+lacu:County Durham,E06000047,530094
+lacu:Hartlepool,E06000001,93663
+lacu:Middlesbrough,E06000002,140980
+lacu:Northumberland,E06000057,322434
+lacu:Redcar and Cleveland,E06000003,137150
+lacu:Stockton-on-Tees,E06000004,197348
+lacu:Gateshead,E08000037,202055
+lacu:Newcastle upon Tyne,E08000021,302820
+lacu:North Tyneside,E08000022,207913
+lacu:South Tyneside,E08000023,150976
+lacu:Sunderland,E08000024,277705
+lacu:Blackburn with Darwen,E06000008,149696
+lacu:Blackpool,E06000009,139446
+lacu:Cheshire East,E06000049,384152
+lacu:Cheshire West and Chester,E06000050,343071
+lacu:Halton,E06000006,129410
+lacu:Warrington,E06000007,210014
+lacu:Cumbria,E10000006,500012
+lacu:Bolton,E08000001,287550
+lacu:Bury,E08000002,190990
+lacu:Manchester,E08000003,552858
+lacu:Oldham,E08000004,237110
+lacu:Rochdale,E08000005,222412
+lacu:Salford,E08000006,258834
+lacu:Stockport,E08000007,293423
+lacu:Tameside,E08000008,226493
+lacu:Trafford,E08000009,237354
+lacu:Wigan,E08000010,328662
+lacu:Lancashire,E10000017,1219799
+lacu:Knowsley,E08000011,150862
+lacu:Liverpool,E08000012,498042
+lacu:Sefton,E08000014,276410
+lacu:St. Helens,E08000013,180585
+lacu:Wirral,E08000015,324011
+lacu:East Riding of Yorkshire,E06000011,341173
+"lacu:Kingston upon Hull, City of",E06000010,259778
+lacu:North East Lincolnshire,E06000012,159563
+lacu:North Lincolnshire,E06000013,172292
+lacu:York,E06000014,210618
+lacu:North Yorkshire,E10000023,618054
+lacu:Barnsley,E08000016,246866
+lacu:Doncaster,E08000017,311890
+lacu:Rotherham,E08000018,265411
+lacu:Sheffield,E08000019,584853
+lacu:Bradford,E08000032,539776
+lacu:Calderdale,E08000033,211455
+lacu:Kirklees,E08000034,439787
+lacu:Leeds,E08000035,793139
+lacu:Wakefield,E08000036,348312
+lacu:Derby,E06000015,257302
+lacu:Leicester,E06000016,354224
+lacu:Nottingham,E06000018,332900
+lacu:Rutland,E06000017,39927
+lacu:Derbyshire,E10000007,802694
+lacu:Leicestershire,E10000018,706155
+lacu:Lincolnshire,E10000019,761224
+lacu:Northamptonshire,E10000021,753278
+lacu:Nottinghamshire,E10000024,828224
+"lacu:Herefordshire, County of",E06000019,192801
+lacu:Shropshire,E06000051,323136
+lacu:Stoke-on-Trent,E06000021,256375
+lacu:Telford and Wrekin,E06000020,179854
+lacu:Staffordshire,E10000028,879560
+lacu:Warwickshire,E10000031,577933
+lacu:Birmingham,E08000025,1141816
+lacu:Coventry,E08000026,371521
+lacu:Dudley,E08000027,321596
+lacu:Sandwell,E08000028,328450
+lacu:Solihull,E08000029,216374
+lacu:Walsall,E08000030,285478
+lacu:Wolverhampton,E08000031,263357
+lacu:Worcestershire,E10000034,595786
+lacu:Bedford,E06000055,173292
+lacu:Central Bedfordshire,E06000056,288648
+lacu:Luton,E06000032,213052
+lacu:Peterborough,E06000031,202259
+lacu:Southend-on-Sea,E06000033,183125
+lacu:Thurrock,E06000034,174341
+lacu:Cambridgeshire,E10000003,653537
+lacu:Essex,E10000012,1489189
+lacu:Hertfordshire,E10000015,1189519
+lacu:Norfolk,E10000020,907760
+lacu:Suffolk,E10000029,761350
+lacu:Camden,E09000007,270029
+lacu:City of London,E09000001,9721
+lacu:Hackney,E09000012,281120
+lacu:Hammersmith and Fulham,E09000013,185143
+lacu:Haringey,E09000014,268647
+lacu:Islington,E09000019,242467
+lacu:Kensington and Chelsea,E09000020,156129
+lacu:Lambeth,E09000022,326034
+lacu:Lewisham,E09000023,305842
+lacu:Newham,E09000025,353134
+lacu:Southwark,E09000028,318830
+lacu:Tower Hamlets,E09000030,324745
+lacu:Wandsworth,E09000032,329677
+lacu:Westminster,E09000033,261317
+lacu:Barking and Dagenham,E09000002,212906
+lacu:Barnet,E09000003,395869
+lacu:Bexley,E09000004,248287
+lacu:Brent,E09000005,329771
+lacu:Bromley,E09000006,332336
+lacu:Croydon,E09000008,386710
+lacu:Ealing,E09000009,341806
+lacu:Enfield,E09000010,333794
+lacu:Greenwich,E09000011,287942
+lacu:Harrow,E09000015,251160
+lacu:Havering,E09000016,259552
+lacu:Hillingdon,E09000017,306870
+lacu:Hounslow,E09000018,271523
+lacu:Kingston upon Thames,E09000021,177507
+lacu:Merton,E09000024,206548
+lacu:Redbridge,E09000026,305222
+lacu:Richmond upon Thames,E09000027,198019
+lacu:Sutton,E09000029,206349
+lacu:Waltham Forest,E09000031,276983
+lacu:Bracknell Forest,E06000036,122549
+lacu:Brighton and Hove,E06000043,290885
+lacu:Isle of Wight,E06000046,141771
+lacu:Medway,E06000035,278556
+lacu:Milton Keynes,E06000042,269457
+lacu:Portsmouth,E06000044,214905
+lacu:Reading,E06000038,161780
+lacu:Slough,E06000039,149539
+lacu:Southampton,E06000045,252520
+lacu:West Berkshire,E06000037,158450
+lacu:Windsor and Maidenhead,E06000040,151422
+lacu:Wokingham,E06000041,171119
+lacu:Buckinghamshire,E06000060,543973
+lacu:East Sussex,E10000011,557229
+lacu:Hampshire,E10000014,1382542
+lacu:Kent,E10000016,1581555
+lacu:Oxfordshire,E10000025,691667
+lacu:Surrey,E10000030,1196236
+lacu:West Sussex,E10000032,863980
+lacu:Bath and North East Somerset,E06000022,193282
+"lacu:Bristol, City of",E06000023,463377
+lacu:Cornwall,E06000052,569578
+lacu:Isles of Scilly,E06000053,2224
+lacu:North Somerset,E06000024,215052
+lacu:Plymouth,E06000026,262100
+"lacu:Bournemouth, Christchurch and Poole",E06000058,395331
+lacu:South Gloucestershire,E06000025,285093
+lacu:Swindon,E06000030,222193
+lacu:Torbay,E06000027,136264
+lacu:Wiltshire,E06000054,500024
+lacu:Devon,E10000008,802375
+lacu:Dorset,E06000059,378508
+lacu:Gloucestershire,E10000013,637070
+lacu:Somerset,E10000027,562225
+lacu:Isle of Anglesey,W06000001,70043
+lacu:Gwynedd,W06000002,124560
+lacu:Conwy,W06000003,117203
+lacu:Denbighshire,W06000004,95696
+lacu:Flintshire,W06000005,156100
+lacu:Wrexham,W06000006,135957
+lacu:Powys,W06000023,132435
+lacu:Ceredigion,W06000008,72695
+lacu:Pembrokeshire,W06000009,125818
+lacu:Carmarthenshire,W06000010,188771
+lacu:Swansea,W06000011,246993
+lacu:Neath Port Talbot,W06000012,143315
+lacu:Bridgend,W06000013,147049
+lacu:Vale of Glamorgan,W06000014,133587
+lacu:Cardiff,W06000015,366903
+lacu:Rhondda Cynon Taff,W06000016,241264
+lacu:Merthyr Tydfil,W06000024,60326
+lacu:Caerphilly,W06000018,181075
+lacu:Blaenau Gwent,W06000019,69862
+lacu:Torfaen,W06000020,93961
+lacu:Monmouthshire,W06000021,94590
+lacu:Newport,W06000022,154676
+lacu:Aberdeen City,S12000033,228670
+lacu:Aberdeenshire,S12000034,261210
+lacu:Angus,S12000041,116200
+lacu:Argyll and Bute,S12000035,85870
+lacu:Clackmannanshire,S12000005,51540
+lacu:Dumfries and Galloway,S12000006,148860
+lacu:Dundee City,S12000042,149320
+lacu:East Ayrshire,S12000008,122010
+lacu:East Dunbartonshire,S12000045,108640
+lacu:East Lothian,S12000010,107090
+lacu:East Renfrewshire,S12000011,95530
+lacu:City of Edinburgh,S12000036,524930
+lacu:Na h-Eileanan Siar,S12000013,26720
+lacu:Falkirk,S12000014,160890
+lacu:Fife,S12000047,373550
+lacu:Glasgow City,S12000049,633120
+lacu:Highland,S12000017,235830
+lacu:Inverclyde,S12000018,77800
+lacu:Midlothian,S12000019,92460
+lacu:Moray,S12000020,95820
+lacu:North Ayrshire,S12000021,134740
+lacu:North Lanarkshire,S12000050,341370
+lacu:Orkney Islands,S12000023,22270
+lacu:Perth and Kinross,S12000048,151950
+lacu:Renfrewshire,S12000038,179100
+lacu:Scottish Borders,S12000026,115510
+lacu:Shetland Islands,S12000027,22920
+lacu:South Ayrshire,S12000028,112610
+lacu:South Lanarkshire,S12000029,320530
+lacu:Stirling,S12000030,94210
+lacu:West Dunbartonshire,S12000039,88930
+lacu:West Lothian,S12000040,183100
+lacu:Antrim and Newtownabbey,N09000001,143504
+"lacu:Armagh City, Banbridge and Craigavon",N09000002,216205
+lacu:Belfast,N09000003,343542
+lacu:Causeway Coast and Glens,N09000004,144838
+lacu:Derry City and Strabane,N09000005,151284
+lacu:Fermanagh and Omagh,N09000006,117397
+lacu:Lisburn and Castlereagh,N09000007,146002
+lacu:Mid and East Antrim,N09000008,139274
+lacu:Mid Ulster,N09000009,148528
+"lacu:Newry, Mourne and Down",N09000010,181368
+lacu:Ards and North Down,N09000011,161725
+mcounty:Greater Manchester (Met County),E11000001,2835686
+mcounty:Inner London,E13000001,3632835
+mcounty:Merseyside (Met County),E11000002,1429910
+mcounty:Outer London,E13000002,5329154
+mcounty:South Yorkshire (Met County),E11000003,1409020
+mcounty:Tyne and Wear (Met County),E11000007,1141469
+mcounty:West Midlands (Met County),E11000005,2928592
+mcounty:West Yorkshire (Met County),E11000006,2332469
