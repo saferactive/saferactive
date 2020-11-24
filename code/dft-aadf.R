@@ -133,9 +133,11 @@ lads = lads %>%
 
 traffic_london = traffic_bam %>%
   inner_join(lads, by = c("name" = "Name"))
-dim(traffic_london) #5215 6390 with zeroes #13333 with estimated
+dim(traffic_london) #5215 without zeroes #6390 with zeroes #13333 with estimated and zeroes
 
 saveRDS(traffic_london, "dft-count-points-with-esti.Rds")
+
+saveRDS(traffic_nonzero, "dft-london-no-zeroes-no-esti.Rds")
 
 dft_counts_by_borough = traffic_london %>%
        group_by(name, year) %>%
