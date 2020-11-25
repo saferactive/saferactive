@@ -1,9 +1,18 @@
 library(stats19)
 library(tidyverse)
 
-# piggyback::pb_download("casualty-adjustment.csv")
 
+piggyback::pb_download("casualty-adjustment.csv")
 cas_adjust = read_csv("casualty-adjustment.csv")
+url_cas_adusted = piggyback::pb_download_url("casualties_adjusted.Rds", tag = "v0.1")
+url_cas_adusted
+casualties_adjusted = readRDS(url(url_cas_adusted))
+names(casualties_adjusted)
+
+summary(casualties_adjusted$accident_index %in% cas_adjusted_from_zip$accident_index)
+
+cas_2019 = stats19::get_stats19(year = 2019, type = "cas")
+names(cas_2019)
 
 # dim(cas_adjust) #3163331
 cas_adjust = rename(cas_adjust, vehicle_reference = Vehicle_Reference,
@@ -35,3 +44,41 @@ casualties_adjusted = rbind(adjust, casualties_fatal)
 
 write_rds(casualties_adjusted, "casualties_adjusted.Rds")
 # piggyback::pb_upload("casualties_adjusted.Rds")
+
+
+# get data from source - tests --------------------------------------------
+
+# piggyback::pb_download("casualty-adjustment.csv")
+
+adj_zip <- tempfile(fileext = ".zip")
+download.file(
+  url = "http://data.dft.gov.uk/road-accidents-safety-data/accident-and-casualty-adjustment-2004-to-2019.zip",
+  destfile = adj_zip
+)
+
+download.file(
+  url = "http://data.dft.gov.uk/road-accidents-safety-data/accident-and-casualty-adjustment-2004-to-2019.zip",
+  destfile = adj_zip
+)
+
+
+unzip(adj_zip, exdir = tempdir())
+list.files(tempdir(), full.names = TRUE)
+
+cas_adjusted_from_zip = readr::read_csv("/tmp/RtmpgcjWM0/cas_adjustment_lookup_2019.csv")
+nrow(cas_adjusted_from_zip)
+head(cas_adjusted_from_zip)
+
+
+# read-in adjustment figures
+adj_figures <-read.csv(
+  file = file.path(tempdir(), "accident_adjustment_lookup_2019.csv"),
+  stringsAsFactors = FALSE,
+  col.names = c("accident_index", "adjusted_serious", "adjusted_slight", "injury_based")
+)
+
+class(adj_figures$accident_index)
+summary(adj_figures$adjusted_serious)
+summary(adj_figures$adjusted_slight)
+head(adj_figures)
+nrow(adj_figures)
