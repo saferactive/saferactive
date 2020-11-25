@@ -1,18 +1,16 @@
+# This script gets DfT severity adjustment factors on a per-casualty basis and joins them with the stats19 casualty data
+# The resulting output "casualties-adjusted.Rds" is uploaded as a release (tag = "v0.1") and is then used in the script `crash-data.R`
+
 library(stats19)
 library(tidyverse)
 
+# Old method using manual download
+# piggyback::pb_download("casualty-adjustment.csv")
+# cas_adjust = read_csv("casualty-adjustment.csv")
 
-piggyback::pb_download("casualty-adjustment.csv")
-cas_adjust = read_csv("casualty-adjustment.csv")
-url_cas_adusted = piggyback::pb_download_url("casualties_adjusted.Rds", tag = "v0.1")
-url_cas_adusted
-casualties_adjusted = readRDS(url(url_cas_adusted))
-names(casualties_adjusted)
+# New method using stats19 function
+cas_adjust = get_stats19_adjustments(data_dir = "severity-adjust", filename = "cas_adjustment_lookup_2019.csv")
 
-summary(casualties_adjusted$accident_index %in% cas_adjusted_from_zip$accident_index)
-
-cas_2019 = stats19::get_stats19(year = 2019, type = "cas")
-names(cas_2019)
 
 # dim(cas_adjust) #3163331
 cas_adjust = rename(cas_adjust, vehicle_reference = Vehicle_Reference,
@@ -27,12 +25,13 @@ adjust = left_join(casualties_all, cas_adjust, by = c("accident_index", "vehicle
   filter(casualty_severity != "Fatal")
 # dim(adjust) #2040869
 
-# For serious and slight casualties not listed in the adjustment data
-adjust$Adjusted_Serious[adjust$casualty_severity == "Serious" & is.na(adjust$Adjusted_Serious)] = 1
-adjust$Adjusted_Serious[adjust$casualty_severity != "Serious" & is.na(adjust$Adjusted_Serious)] = 0
-adjust$Adjusted_Slight[adjust$casualty_severity == "Slight" & is.na(adjust$Adjusted_Slight)] = 1
-adjust$Adjusted_Slight[adjust$casualty_severity != "Slight" & is.na(adjust$Adjusted_Slight)] = 0
+# For serious and slight casualties not listed in the adjustment data (these lines are no longer required with new adjustment data post-Sept 2020)
+# adjust$Adjusted_Serious[adjust$casualty_severity == "Serious" & is.na(adjust$Adjusted_Serious)] = 1
+# adjust$Adjusted_Serious[adjust$casualty_severity != "Serious" & is.na(adjust$Adjusted_Serious)] = 0
+# adjust$Adjusted_Slight[adjust$casualty_severity == "Slight" & is.na(adjust$Adjusted_Slight)] = 1
+# adjust$Adjusted_Slight[adjust$casualty_severity != "Slight" & is.na(adjust$Adjusted_Slight)] = 0
 
+# Deal with the fatal casualties
 casualties_fatal = casualties_all %>%
   filter(casualty_severity == "Fatal") %>%
   mutate(Adjusted_Serious = NA,
