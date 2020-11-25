@@ -17,41 +17,124 @@ library(tidyr)
 library(tmap)
 ```
 
+## Getting Data
+
+First stage is to get the crash data, in this analysis we used the stats19 data from 2010 to 2019 (the most recent 10 years) which has been adjusted to account for the different causality reporting systems used over that time.
+
+We also use the 2019 Local authority boundaries and the 2019 population estimates, for the workplace population we must used the 2011 census.
 
 
-```{r get_data, echo = FALSE, include=FALSE}
-crash <- readRDS("crashes_active.Rds")
-crash <- st_as_sf(crash[!is.na(crash$latitude),], coords = c("longitude","latitude"), crs = 4326)
+```{r data_setup, include=FALSE}
+if(!dir.exists("data")){
+  dir.create("data")
+}
+
+if(!file.exists("data/casualties_adjusted.Rds")){
+  download.file(piggyback::pb_download_url("casualties_adjusted.Rds", tag = "v0.1"),
+                "data/casualties_adjusted.Rds", mode = "wb")
+}
+
+if(!file.exists("data/crashes_2010_2019.Rds")){
+  download.file(piggyback::pb_download_url("ac10.Rds", tag = "0.1"),
+                "data/crashes_2010_2019.Rds", mode = "wb")
+}
 
 if(!file.exists("data/counties_uas_gb_2019_ubc.Rds")){
-  download.file("https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_ubc.Rds",
+  download.file(piggyback::pb_download_url("counties_uas_gb_2019_ubc.Rds", tag = "0.1.1"),
               destfile = "data/counties_uas_gb_2019_ubc.Rds", mode = "wb")
 }
 
+if(!file.exists("data/upper_LA_population_2019.csv")){
+  download.file(piggyback::pb_download_url("upper_LA_population_2019.csv", tag = "0.1.1"),
+              destfile = "data/upper_LA_population_2019.csv", mode = "wb")
+}
+
+if(!file.exists("data/upper_LA_work_population.csv")){
+  download.file(piggyback::pb_download_url("upper_LA_work_population.csv", tag = "0.1.1"),
+              destfile = "data/upper_LA_work_population.csv", mode = "wb")
+}
+
+if(!file.exists("data/scot_work_population.csv")){
+  download.file(piggyback::pb_download_url("scot_work_population.csv", tag = "0.1.1"),
+              destfile = "data/scot_work_population.csv", mode = "wb")
+}
+
+if(!file.exists("data/bdline_gpkg_gb.zip")){
+  download.file("https://api.os.uk/downloads/v1/products/BoundaryLine/downloads?area=GB&format=GeoPackage&redirect",
+                destfile = "data/bdline_gpkg_gb.zip", mode = "wb")
+}
+
+
+
+acc <- readRDS("data/crashes_2010_2019.Rds")
+
+cas <- readRDS("data/casualties_adjusted.Rds")
+
 la <- readRDS("data/counties_uas_gb_2019_ubc.Rds")
 la$ctyua19cd[la$ctyua19cd == "E10000002"] <- "E06000060"
-
-
-pop <- read.csv("data/upper_LA_population_2019.csv")
-pop <- pop[pop$mnemonic %in% la$ctyua19cd,]
-pop <- pop[,2:3]
-names(pop) <- c("code","population_2019")
 la <- la[,c("ctyua19cd","ctyua19nm")]
 names(la) <- c("code","la_name","geometry")
 
+pop <- read.csv("data/upper_LA_population_2019.csv")
+pop <- pop[pop$mnemonic %in% la$code,]
+pop <- pop[,2:3]
+names(pop) <- c("code","population_2019")
+
+pop_work_ew <- read.csv("data/upper_LA_work_population.csv")
+pop_work_ew <- pop_work_ew[,c(3,4)]
+names(pop_work_ew) <- c("code","work_pop_2011")
+pop_work_sct <- read.csv("data/scot_work_population.csv")
+pop_work_sct <- pop_work_sct[6:358,]
+names(pop_work_sct) <- c("id","work_pop")
+pop_work_sct$code <- substr(pop_work_sct$id,1,9)
+
+# dir.create("tmp")
+# unzip("data/bdline_gpkg_gb.zip", exdir = "tmp")
+# bounds_scot <- read_sf("tmp/data/bdline_gb.gpkg")
+
+```
+
+
+```{r get_data, echo = FALSE, include=FALSE}
+# Join ACC and CAS and summarize
+acc <- acc[!is.na(acc$longitude),]
+acc <- st_as_sf(acc, coords = c("longitude","latitude"), crs = 4326)
+acc$location_easting_osgr <- NULL
+acc$location_northing_osgr <- NULL
+
+cas_summary <- cas %>%
+  group_by(accident_index) %>%
+  summarise(casualty_slight = sum(Adjusted_Slight, na.rm = TRUE),
+            casualty_serious = sum(Adjusted_Serious, na.rm = TRUE),
+            casualty_fatal = length(casualty_severity[casualty_severity == "Fatal"]),
+            casualty_slight_pedestrian = sum(Adjusted_Slight[casualty_type == "Pedestrian"], na.rm = TRUE),
+            casualty_serious_pedestrian = sum(Adjusted_Serious[casualty_type == "Pedestrian"], na.rm = TRUE),
+            casualty_fatal_pedestrian = length(casualty_severity[casualty_severity == "Fatal" & casualty_type == "Pedestrian"]),
+            casualty_slight_cyclist = sum(Adjusted_Slight[casualty_type == "Cyclist"], na.rm = TRUE),
+            casualty_serious_cyclist = sum(Adjusted_Serious[casualty_type == "Cyclist"], na.rm = TRUE),
+            casualty_fatal_cyclist = length(casualty_severity[casualty_severity == "Fatal" & casualty_type == "Cyclist"])
+            
+  )
+
+crash <- left_join(acc, cas_summary, by = "accident_index")
+saveRDS(crash,"data/crash_2010_2019_with_summary_adjusted_casulaitied.Rds")
+
+
+
 la <- left_join(la,pop, by = "code")
+la <- left_join(la,pop_work_ew, by = "code")
 
 crash <- st_transform(crash, 27700)
 la <- st_transform(la, 27700)
 ```
 ## Upper Tier Local Authorities and their population
 
-We are using upper tier local authorities for this analysis as they tend to be the local highway authority, thus have overall responsability for road safety in their areas.
+We are using upper tier local authorities for this analysis as they tend to be the local highway authority, thus have overall responsibility for road safety in their areas.
 
 This first plot highlights the significant population and area variation in LAs. 
 
 ```{r pressure, echo=FALSE}
-tm_shape(la) +
+m1 <- tm_shape(la) +
   tm_fill(col = "population_2019",
           title = "Population (2019)",
           style = "quantile",
@@ -59,6 +142,17 @@ tm_shape(la) +
           legend.hist = TRUE) +
   tm_borders() +
   tm_layout(legend.outside = TRUE)
+
+m2 <- tm_shape(la) +
+  tm_fill(col = "work_pop_2011",
+          title = "Workplace Population (2011)",
+          style = "quantile",
+          n = 10, 
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE)
+tmap_arrange(m1, m2)
+
 ```
 
 ## Crashes by LA
@@ -76,34 +170,55 @@ crash_yr <- crash %>%
             crash_fatal = sum(accident_severity == "Fatal"),
             crash_serious = sum(accident_severity == "Serious"),
             crash_slight = sum(accident_severity == "Slight"),
-            cas_fatal = sum(number_of_casualties[accident_severity == "Fatal"]),
-            cas_serious = sum(number_of_casualties[accident_severity == "Serious"]),
-            cas_slight = sum(number_of_casualties[accident_severity == "Slight"])
+            casualty_slight = sum(casualty_slight),
+            casualty_serious = sum(casualty_serious),
+            casualty_fatal = sum(casualty_fatal),
+            casualty_slight_pedestrian = sum(casualty_slight_pedestrian),
+            casualty_serious_pedestrian = sum(casualty_serious_pedestrian),
+            casualty_fatal_pedestrian = sum(casualty_fatal_pedestrian),
+            casualty_slight_cyclist = sum(casualty_slight_cyclist),
+            casualty_serious_cyclist = sum(casualty_serious_cyclist),
+            casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
             )
 
 la <- left_join(la, crash_yr[crash_yr$year == 2018,], by = c("la_name"))
-la$ksi_per100k <- la$cas_fatal + la$cas_serious / la$population_2019 * 100000
-la$slight_per100k <- la$cas_slight  / la$population_2019 * 100000
+la$active_ksi_per100k <- (la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )/ la$population_2019 * 100000
+la$active_slight_per100k <- (la$casualty_slight_cyclist +  la$casualty_slight_pedestrian)  / la$population_2019 * 100000
+
+la$active_ksi_per100k_work <- (la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )/ la$work_pop_2011 * 100000
+
 ```
 
 We can adjust the plots the KSI rate for population, England is clearly doing worse than Scotland and Wales, particularly in the home counties. No this is a count based on the most serious causality, so may slightly overestimate the KSI rate. The City of London is an extreme outlier due to it very low resident population.
 
 ```{r crash_la_plot, echo=FALSE}
 tm_shape(la) +
-  tm_fill(col = "ksi_per100k",
-          title = "KSI per 100,000 people (2018)",
+  tm_fill(col = "active_ksi_per100k",
+          title = "Active Travel KSI per 100,000 people (2018)",
           style = "quantile",
           n = 10,
           legend.hist = TRUE) +
   tm_borders() +
   tm_layout(legend.outside = TRUE)
 ```
-The pattern of slight casualties is different to the KSI
+The pattern of slight casualties is different to the KSI.
+
 
 ```{r crash_la_plot2, echo=FALSE}
 tm_shape(la) +
-  tm_fill(col = "slight_per100k",
-          title = "Slight Casualties per 100,000 people (2018)",
+  tm_fill(col = "active_slight_per100k",
+          title = "Slight Active Casualties per 100,000 people (2018)",
+          style = "quantile",
+          n = 10,
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE)
+```
+
+```{r crash_la_plot3, echo=FALSE}
+tm_shape(la) +
+  tm_fill(col = "active_ksi_per100k_work",
+          title = "Active Travel KSI per 100,000 workplace people (2018)",
           style = "quantile",
           n = 10,
           legend.hist = TRUE) +
@@ -114,15 +229,26 @@ tm_shape(la) +
 
 ```{r crash_top10, echo=FALSE}
 la_top10 <- st_drop_geometry(la)
-la_top10 <- la_top10[order(la_top10$ksi_per100k, decreasing = TRUE),]
+la_top10 <- la_top10[order(la_top10$active_ksi_per100k, decreasing = TRUE),]
 la_top10$rank <- seq(1,nrow(la_top10))
 la_top10 <- la_top10[c(1:10,196:205),]
-la_top10 <- la_top10[,c("la_name","rank","ksi_per100k","total_crash","crash_fatal")]
-la_top10$ksi_per100k <- round(la_top10$ksi_per100k)
+la_top10 <- la_top10[,c("la_name","rank","active_ksi_per100k","total_crash","crash_fatal")]
+la_top10$active_ksi_per100k <- round(la_top10$active_ksi_per100k)
 la_top10
 ```
 
-City of London and Westminster are probably distorted due to there high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population. 
+City of London and Westminster are probably distorted due to there high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population.  Ranking by workplace population gives slightly different results.
+
+```{r crash_top10_work, echo=FALSE}
+la_top10_work <- st_drop_geometry(la)
+la_top10_work <- la_top10_work[order(la_top10_work$active_ksi_per100k_work, decreasing = TRUE),]
+la_top10_work$rank <- seq(1,nrow(la_top10_work))
+la_top10_work <- la_top10_work[c(1:10,196:205),]
+la_top10_work <- la_top10_work[,c("la_name","rank","active_ksi_per100k_work","total_crash","crash_fatal")]
+la_top10_work$active_ksi_per100k_work <- round(la_top10_work$active_ksi_per100k_work)
+la_top10_work
+```
+
 
 # Historical Trends
 
@@ -163,7 +289,7 @@ crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","total_crash")],
                              values_from = "total_crash",
                              names_from = "year")
 
-crash_yr_wide$change <- (crash_yr_wide$`2018` - crash_yr_wide$`2009`) / crash_yr_wide$`2009` * 100
+crash_yr_wide$change <- (crash_yr_wide$`2019` - crash_yr_wide$`2010`) / crash_yr_wide$`2010` * 100
 
 crash_yr_wide <- crash_yr_wide[order(crash_yr_wide$change, decreasing = TRUE),]
 
@@ -187,6 +313,13 @@ ggplot(crash_yr[crash_yr$la_name %in% change_bottom_10,],
 
 
 ```
-There is a clear lesson that Scotland has done something significant in terms of reducing KSI of active travelers especially in Aberdeen. At this stage we cannot show if this is a true change in the crash rate or a change in recording practices. Due to the gradual an continuous decline it seems unlikely to be caused by a chang in data gatherin policy. It may have been caused by a reduction in active travel.
+There is a clear lesson that Scotland has done something significant in terms of reducing KSI of active travelers especially in Aberdeen. At this stage we cannot show if this is a true change in the crash rate or a change in recording practices. Due to the gradual an continuous decline it seems unlikely to be caused by a change in data gatherin policy. It may have been caused by a reduction in active travel.
 
+## Looking at commuting times
+
+We can filter out the non-commuting crashes and look at the LA workplace population.
+
+
+
+commutert 7 am - 10 am 4 - 7 pm
 
