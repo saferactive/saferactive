@@ -1,5 +1,7 @@
 
-# Reframing active travel interventions as safety interventions: an exploration of the relationship between different interventions, uptake and casualty rates in the UK
+# Reframing active travel interventions as safety interventions
+
+<!-- an exploration of the relationship between different interventions, uptake and casualty rates in the UK -->
 
 Fear of unsafe roads and motor traffic are reported to be the main
 barriers to cycling in cities in the UK and internationally, implying
@@ -33,6 +35,27 @@ will see substantial reductions in crash rates for both pedestrians and
 cyclists. Our findings provide a (still evolving) evidence base on which
 policy-relevant debates about the framing of active travel and road
 safety interventions can build.
+
+# Summary
+
+Fear of unsafe roads and motor traffic are reported to be a major
+barriers to cycling in many places, implying that reducing road danger
+could be an effective strategy enabling cycling uptake. Road safety
+interventions can be framed as active travel interventions. On the other
+hand, a co-benefit of active travel interventions is that they will make
+the road safer. At least some types of active travel interventions can
+be seen as road safety interventions. Based on these observations and
+analysis of data from UK cities, this presentation makes the case for
+reframing active travel interventions as public safety interventions.
+
+# Quote
+
+Road traffic injury is now the leading cause of death for children and
+young adults aged 5–29 years (WHO 2018).
+
+# Media
+
+<https://twitter.com/robinlovelace>
 
 # References
 
