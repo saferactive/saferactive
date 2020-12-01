@@ -1,4 +1,4 @@
-
+# GAM model for DfT count data from London only
 
 library(tidyverse)
 library(mgcv)
@@ -8,27 +8,177 @@ library(mapview)
 theme_set(theme_bw())
 library(ggpubr)
 
-piggyback::pb_download("traffic_london.Rds")
-traffic_london = readRDS("traffic_london.Rds")
 
-# using bidirectional flows to match PCT, but since these are 7am-7pm this doesn't really reduce the increased residuals (+ve and -ve) at high predicted values (ie extreme variance in central london cycle flows)
+# # Older dataset
+# piggyback::pb_download("traffic_london.Rds")
+# traffic_london = readRDS("traffic_london.Rds")
 
-# ## could use peak hours only but why does this give so few results???
-# traffic_peak_only = traffic_london %>%
-#   filter(hour == c(10,11,12,13,14,15))
-# dim(traffic_peak_only)
+##Latest DfT dataset including 2019 counts
+# remotes::install_github("itsleeds/dftTrafficCounts")
+# library(dftTrafficCounts)
+#
+# u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_raw_counts.zip"
+# d = dtc_import(u = u)
+#
+# saveRDS(d, "traffic-data-29092020.Rds")
 
+# traffic_latest = readRDS("traffic-data-29092020.Rds")
 
-traffic_london_points = traffic_london %>%
-  select(year, count_date, hour, local_authority_name, count_point_id, easting, northing, pedal_cycles) %>%
-  group_by(year, count_date, hour, local_authority_name, count_point_id, easting, northing) %>%
-  summarise(pedal_cycles = sum(pedal_cycles)) %>%
+traffic_latest = readRDS("traffic_cyclable_clean_raw.Rds")
+
+traffic_u = traffic_latest %>%
+  unique()
+dim(traffic_u) #4321788
+
+# Get local authority names
+traffic_latest = traffic_latest %>%
+  select(year, count_date, hour, name, count_point_id, easting, northing, pedal_cycles, road_category, direction_of_travel)
+
+# remove motorways
+traffic_latest = traffic_latest %>%
+  filter(road_category != "TM",
+         road_category != "PM")
+dim(traffic_latest) #4321788
+
+traffic_lu = traffic_latest %>%
+  unique()
+dim(traffic_lu) #4155984
+
+traffic_latest = traffic_lu
+
+# Fix points with location errors
+# traffic_latest %>% filter(count_point_id == 946853) %>%
+#   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>% mapview()
+# traffic_latest %>% filter(count_point_id == 952939) %>%
+#   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>% mapview()
+
+error1 = traffic_latest %>%
+  filter(count_point_id == 946853)
+error2 = traffic_latest %>%
+  filter(count_point_id == 952939)
+error3 = traffic_latest %>%
+  filter(count_point_id == 38565)
+error4 = traffic_latest %>%
+  filter(count_point_id == 942684)
+error5 = traffic_latest %>%
+  filter(count_point_id == 942350)
+error6 = traffic_latest %>%
+  filter(count_point_id == 81119)
+error7 = traffic_latest %>%
+  filter(count_point_id == 942920)
+
+error1[error1$easting == 135809,] = error1[error1$easting == 135809,] %>%
+  mutate(northing = 24870)
+error2 = error2 %>%
+  mutate(northing = 221460)
+error3 = error3 %>%
+  mutate(northing = 178027, easting = 530470) %>%
+  unique()
+error4 = error4 %>%
+  mutate(northing = 177575, easting = 509142) %>%
+  unique()
+error5 = error5 %>%
+  mutate(northing = 197938, easting = 533059) %>%
+  unique()
+error6 = error6 %>%
+  mutate(northing = 180950, easting = 530640) %>%
+  unique()
+error7 = error7 %>%
+  mutate(road_category = "MB") %>%
+  unique()
+
+traffic_corrected = traffic_latest %>%
+  filter(count_point_id != 952939,
+         count_point_id != 946853,
+         count_point_id != 38565,
+         count_point_id != 942684,
+         count_point_id != 942350,
+         count_point_id != 81119,
+         count_point_id != 942920
+         )
+traffic_corrected = rbind(traffic_corrected, error1, error2, error3,
+                          error4, error5,
+                          error6, error7)
+dim(traffic_corrected) #4315296 #4155876
+
+# Filter to use London data only
+boroughs = as.character(spData::lnd$NAME)
+
+t_london = traffic_corrected %>%
+  filter(name %in% boroughs)
+dim(t_london) #370500 #354864
+
+# using bidirectional flows to match PCT, but this doesn't really reduce the increased residuals (+ve and -ve) at high predicted values (ie extreme variance in central london cycle flows)
+
+# # Remove counts with hour errors
+# traffic_bam = traffic_bam %>%
+#   filter(hour %in% 7:18)
+
+# use peak hours only
+traffic_peak_only = t_london %>%
+  filter(hour %in% c(7, 8, 9, 16, 17, 18))
+dim(traffic_peak_only) #185250 #177432
+
+# check each count point is consistently either bi-directional or unidirectional
+ford = traffic_peak_only %>%
+  group_by(year, count_date, count_point_id) %>%
+  tally()
+unique(ford$n)
+# [1] 12  6
+
+# check2 = inner_join(traffic_peak_only, ford, by = c("year", "count_point_id", "count_date"))
+# ddd = check2 %>% group_by(count_point_id) %>%
+#   length(distinct(check2$n))
+# unique(ddd$n)
+
+# # # check 4-way points
+# ford[ford$n == 24,]
+# ford = ford %>% filter(n == 24)
+# fd = traffic_peak_only %>% filter(count_point_id == 942920)
+# fd %>% group_by(year) %>% tally()
+# View(fd %>% filter(year == 2018))
+
+# combine bidirectional counts
+traffic_london_points = traffic_peak_only %>%
+  group_by(year, count_date, hour, name, count_point_id, easting, northing) %>%
+  summarise(pedal_cycles = sum(pedal_cycles)) %>% #sums movements in both directions
   ungroup()
 
 traffic_london_bam = transform(traffic_london_points,
                        count_point_id = factor(count_point_id),
-                       local_authority_name = factor(local_authority_name),
+                       name = factor(name),
                        DoY = as.numeric(lubridate::yday(count_date)))
+
+# seasonally adjust pedal cycles
+q1 = c("01", "02", "03")
+q2 = c("04", "05", "06")
+q3 = c("07", "08", "09")
+q4 = c("10", "11", "12")
+
+traffic_london_bam = traffic_london_bam %>%
+  mutate(pedal_cycles_adj = case_when(
+    substr(count_date, 6, 7) %in% q1 ~ pedal_cycles*1.14,
+    substr(count_date, 6, 7) %in% q2 ~ pedal_cycles*0.93,
+    substr(count_date, 6, 7) %in% q3 ~ pedal_cycles*0.91,
+    substr(count_date, 6, 7) %in% q4 ~ pedal_cycles*1.06
+    )
+  )
+
+# check each count point has 6 hours of data
+ford = traffic_london_bam %>%
+  group_by(year, count_date, count_point_id) %>%
+  tally()
+unique(ford$n)
+# [1] 6
+
+# check and remove rogue points
+# ford[ford$n == 12,]
+# traffic_london_bam[traffic_london_bam$count_point_id == 942684,]
+# View(traffic_corrected[traffic_corrected$count_point_id == 942350,])
+
+# traffic_london_bam = traffic_london_bam %>%
+#   filter(count_point_id != 942684,
+#          count_point_id != 942350)
 
 summary(traffic_london_bam$pedal_cycles)
 
@@ -36,14 +186,26 @@ summary(traffic_london_bam$pedal_cycles)
 traffic_london_bam = traffic_london_bam %>%
   mutate(grid_location = paste(signif(traffic_london_bam$easting, digits = 3),signif(traffic_london_bam$northing, digits = 3)))
 
-dim(traffic_london_bam)
-length(unique(traffic_london_bam$grid_location))
+dim(traffic_london_bam) #91446 #91560
+length(unique(traffic_london_bam$grid_location)) #1197
+
+saveRDS(traffic_london_bam, "raw-dft-london-hourly.Rds")
 
 
 #  Investigate count point numbers and placements per/across the year ----------------
 traffic_london_days = traffic_london_bam %>%
-  group_by(year, count_date, DoY, local_authority_name, count_point_id, easting, northing, grid_location) %>%
-  summarise(pedal_cycles = sum(pedal_cycles))
+  group_by(year, count_date, DoY, name, count_point_id, easting, northing, grid_location) %>%
+  summarise(pedal_cycles_adj = sum(pedal_cycles_adj))
+dim(traffic_london_days) #15260
+
+# check one day per site per year
+ford = traffic_london_days %>%
+  group_by(year, count_point_id) %>%
+  tally()
+unique(ford$n)
+# [1] 1
+
+saveRDS(traffic_london_days, "raw-dft-london-daily.Rds")
 
 #Get London Borough boundaries for maps
 lads = readRDS("lads.Rds")
@@ -124,7 +286,7 @@ traffic_london_blue = traffic_london_bam[new_order, ]
 
 # take the first record from each grid square
 one_per_square = traffic_london_blue %>%
-  distinct(year, local_authority_name, grid_location, .keep_all = TRUE)
+  distinct(year, name, grid_location, .keep_all = TRUE)
 
 
 
@@ -213,8 +375,8 @@ plot(traffic_london_bam$northing, residuals(m))
 # m3 = gamm(pedal_cycles ~
 #           s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
 #           s(year, k = 5),
-#           random = list(local_authority_name=~1)
-#          # + ti(local_authority_name, year, d = c(1,1), bs = c('re','tp'))
+#           random = list(name=~1)
+#          # + ti(name, year, d = c(1,1), bs = c('re','tp'))
 #          ,
 #         family = negbin(theta = 0.9415, link = "log"),
 #         data = one_per_square, method = 'fREML')
@@ -225,8 +387,8 @@ plot(traffic_london_bam$northing, residuals(m))
 m4 = bam(pedal_cycles ~
             s(DoY, bs = "cr", k = 3) + #smooth term with a low number of knots to prevent the few november counts from skewing the results
             s(year, k = 5) +
-            s(local_authority_name, bs = "re") +
-            ti(local_authority_name, year, d = c(1,1), bs = c('re','tp'), k = c(NA, 5)),
+            s(name, bs = "re") +
+            ti(name, year, d = c(1,1), bs = c('re','tp'), k = c(NA, 5)),
           family = nb(link = "log"),
           data = one_per_square, method = 'fREML')
 summary(m4)
@@ -240,7 +402,7 @@ plot(m4, pages = 1, scheme = 2, shade = TRUE)
 gam.check(m4, pages = 1)
 plot(one_per_square$DoY, residuals(m4))
 plot(one_per_square$year, residuals(m4))
-plot(one_per_square$local_authority_name, residuals(m4))
+plot(one_per_square$name, residuals(m4))
 
 # rsd = residuals(m4,type="deviance")
 # gam(rsd~s(year, k = 10)-1, data = one_per_square, select = TRUE)
@@ -391,7 +553,7 @@ pdata = with(one_per_square,
                # DoY = 170,
                DoY = days_to_use,
                          year = seq(min(year), max(year), length = 19), # can change length to a higher number for smoother graphs
-                        local_authority_name = "Southwark"))
+                        name = "Southwark"))
 fit = data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
 fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
 pred = cbind(pdata, fit)
@@ -406,14 +568,14 @@ boroughs = as.character(spData::lnd$NAME)
 pdata = with(one_per_square,
              expand.grid(DoY = 170,
                          year = seq(min(year), max(year), length = 19), # can change length to a higher number for smoother graphs
-                         local_authority_name = boroughs))
+                         name = boroughs))
 fit = data.frame(predict(m4, type = "response", newdata = pdata, se.fit = TRUE))
 fit = transform(fit, upper = fit + (2 * se.fit), lower = fit - (2 * se.fit)) # find 95% confidence interval
 pred_all_boroughs = cbind(pdata, fit)
 # (y axis has log10 scale)
 ggplot(pred_all_boroughs, aes(x = year, y = fit)) +
   scale_y_log10() +
-  facet_wrap(~ local_authority_name, ncol = 5) +
+  facet_wrap(~ name, ncol = 5) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = 'grey', alpha = 0.5) +
   geom_line() +
   labs(x = NULL, y = "Pedal cycles")
@@ -448,8 +610,8 @@ borough_network_length = c_london %>%
 
 # join route network length with model predictions
 pred_with_lengths = pred_all_boroughs %>%
-  mutate(local_authority_name = as.character(local_authority_name)) %>%
-  inner_join(borough_network_length, by = c("local_authority_name" = "Name")) %>%
+  mutate(name = as.character(name)) %>%
+  inner_join(borough_network_length, by = c("name" = "Name")) %>%
   mutate(fit_km = fit * lengths)
 
 pred_2011 = pred_with_lengths %>%
@@ -460,11 +622,11 @@ pred_2011 = pred_with_lengths %>%
 rate_per_borough = read_rds("rate_per_borough.Rds") %>%
   st_drop_geometry()
 
-dft_and_pct = inner_join(pred_2011, rate_per_borough, by = c("local_authority_name" = "Name"))
+dft_and_pct = inner_join(pred_2011, rate_per_borough, by = c("name" = "Name"))
 
 
 plot(fit_km ~ km_cycled, data = dft_and_pct, log = "xy")
-text(fit_km ~ km_cycled, data = dft_and_pct, labels = local_authority_name, cex = 0.7, pos = 1)
+text(fit_km ~ km_cycled, data = dft_and_pct, labels = name, cex = 0.7, pos = 1)
 
 cor(dft_and_pct$fit_km, dft_and_pct$km_cycled) #0.964
 
@@ -498,13 +660,13 @@ cor(dft_and_pct_rast$fit_km, dft_and_pct_rast$km_cycled) #0.990
 
 dft_and_pct_adjustment = dft_and_pct %>%
   mutate(adj_factor = km_cycled/fit_km) %>%
-  select(local_authority_name, adj_factor)
+  select(name, adj_factor)
 
 # Make annual adjustments to the 2011 census data -------------------------
 
 
 adjust_join = pred_with_lengths %>%
-  left_join(dft_and_pct_adjustment, by = "local_authority_name") %>%
+  left_join(dft_and_pct_adjustment, by = "name") %>%
   mutate(km_cycled_estimate = adj_factor*fit_km)
 
 View(adjust_join)
@@ -518,10 +680,10 @@ tfl_counts = read_csv("tfl-counter-results-london-boroughs-2015-2019.csv")
 ggplot(tfl_counts, aes(x = year, y = relative_to_2015)) +
   geom_line(aes(color = Borough))
 
-dft_and_tfl = inner_join(pred_all_boroughs, tfl_counts, by = c("year", "local_authority_name" = "Borough"))
+dft_and_tfl = inner_join(pred_all_boroughs, tfl_counts, by = c("year", "name" = "Borough"))
 
 plot(fit ~ mean_counts, data = dft_and_tfl, xlab = "TfL mean counts", ylab = "GAM model prediction from DfT counts", log = "xy")
-text(fit ~ mean_counts, data = dft_and_tfl, labels = local_authority_name, cex = 0.8)
+text(fit ~ mean_counts, data = dft_and_tfl, labels = name, cex = 0.8)
 text(fit ~ mean_counts, data = dft_and_tfl, labels = year, cex = 0.8)
 
 cor(dft_and_tfl$fit, dft_and_tfl$mean_counts) #0.982
@@ -539,13 +701,13 @@ cor(dft_and_tfl_rast$borough_mean_cycles, dft_and_tfl_rast$mean_counts) #0.955
 # Compare DfT raw counts (all of them) with TfL counts --------------------------
 
 raw_borough_counts = traffic_london_bam %>%
-  group_by(local_authority_name, year) %>%
+  group_by(name, year) %>%
   summarise(pedal_cycles = mean(pedal_cycles))
 
-dft_raw_and_tfl = inner_join(raw_borough_counts, tfl_counts, by = c("year", "local_authority_name" = "Borough"))
+dft_raw_and_tfl = inner_join(raw_borough_counts, tfl_counts, by = c("year", "name" = "Borough"))
 
 plot(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, xlab = "TfL mean counts", ylab = "DfT mean raw counts")
-text(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, labels = local_authority_name, cex = 0.8)
+text(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, labels = name, cex = 0.8)
 text(pedal_cycles ~ mean_counts, data = dft_raw_and_tfl, labels = year, cex = 0.8)
 
 cor(dft_raw_and_tfl$pedal_cycles, dft_raw_and_tfl$mean_counts) #0.860
@@ -553,13 +715,13 @@ cor(dft_raw_and_tfl$pedal_cycles, dft_raw_and_tfl$mean_counts) #0.860
 # there are not many counts per borough per year (eg City of London 2018), and these can be skewed by date and choice of count location, so the model predictions seem better than the raw counts as a basis for comparisons with other data
 # traffic_london_bam %>%
 #   filter(year == 2018,
-#          local_authority_name == "City of London")
+#          name == "City of London")
 
 # Investigate Southwark counts --------------------------------------------
 
 # DfT counts are very heavily skewed towards the northern (central London) fringe of Southwark
 traffic_london_bam %>%
-  filter(local_authority_name == "Southwark") %>%
+  filter(name == "Southwark") %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700) %>%
   mapview::mapview() +
 lads %>%

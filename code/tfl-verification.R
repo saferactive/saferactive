@@ -13,48 +13,52 @@ counter_daytime = counter_df %>%
   filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)" | Period == "Inter-peak (10:00-16:00)")
 unique(counter_daytime$Period)
 
+counter_peak = counter_df %>%
+  filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)")
+unique(counter_peak$Period)
+
 
 #find year
-counter_daytime$year = case_when(is.na(counter_daytime$Survey_wave) ~ lubridate::year(counter_daytime$`Survey date`), TRUE ~ as.numeric(substr(counter_daytime$Survey_wave, 1, 4)))
-counter_daytime = counter_daytime %>%
+counter_peak$year = case_when(is.na(counter_peak$Survey_wave) ~ lubridate::year(counter_peak$`Survey date`), TRUE ~ as.numeric(substr(counter_peak$Survey_wave, 1, 4)))
+counter_peak = counter_peak %>%
   filter(! is.na(year))
-dim(counter_daytime) #945728
+dim(counter_peak) #945728 #472856 peak
 
 
 # Select the correct survey wave only
 
 #create ID variable
-counter_daytime$id = rownames(counter_daytime)
+counter_peak$id = rownames(counter_peak)
 
 # remove rows where survey wave doesn't match survey date
-remove1 = counter_daytime %>%
-      filter(substr(counter_daytime$Survey_wave,6,7) == "Q1" & !((substr(counter_daytime$`Survey date`,6,7) == "01") | (substr(counter_daytime$`Survey date`,6,7) == "02") | (substr(counter_daytime$`Survey date`,6,7) == "03")))
+remove1 = counter_peak %>%
+      filter(substr(counter_peak$Survey_wave,6,7) == "Q1" & !((substr(counter_peak$`Survey date`,6,7) == "01") | (substr(counter_peak$`Survey date`,6,7) == "02") | (substr(counter_peak$`Survey date`,6,7) == "03")))
 
-counter_daytime = counter_daytime %>%
+counter_peak = counter_peak %>%
   filter(! id %in% remove1$id)
 
-remove2 = counter_daytime %>%
-      filter(substr(counter_daytime$Survey_wave,6,7) == "Q2" & !((substr(counter_daytime$`Survey date`,6,7) == "04") | (substr(counter_daytime$`Survey date`,6,7) == "05") | (substr(counter_daytime$`Survey date`,6,7) == "06")))
+remove2 = counter_peak %>%
+      filter(substr(counter_peak$Survey_wave,6,7) == "Q2" & !((substr(counter_peak$`Survey date`,6,7) == "04") | (substr(counter_peak$`Survey date`,6,7) == "05") | (substr(counter_peak$`Survey date`,6,7) == "06")))
 
-counter_daytime = counter_daytime %>%
+counter_peak = counter_peak %>%
   filter(! id %in% remove2$id)
 
-remove3 = counter_daytime %>%
-      filter(substr(counter_daytime$Survey_wave,6,7) == "Q3" & !((substr(counter_daytime$`Survey date`,6,7) == "07") | (substr(counter_daytime$`Survey date`,6,7) == "08") | (substr(counter_daytime$`Survey date`,6,7) == "09")))
+remove3 = counter_peak %>%
+      filter(substr(counter_peak$Survey_wave,6,7) == "Q3" & !((substr(counter_peak$`Survey date`,6,7) == "07") | (substr(counter_peak$`Survey date`,6,7) == "08") | (substr(counter_peak$`Survey date`,6,7) == "09")))
 
-counter_daytime = counter_daytime %>%
+counter_peak = counter_peak %>%
   filter(! id %in% remove3$id)
 
-remove4 = counter_daytime %>%
-      filter(substr(counter_daytime$Survey_wave,6,7) == "Q4" & !((substr(counter_daytime$`Survey date`,6,7) == "10") | (substr(counter_daytime$`Survey date`,6,7) == "11") | (substr(counter_daytime$`Survey date`,6,7) == "12")))
+remove4 = counter_peak %>%
+      filter(substr(counter_peak$Survey_wave,6,7) == "Q4" & !((substr(counter_peak$`Survey date`,6,7) == "10") | (substr(counter_peak$`Survey date`,6,7) == "11") | (substr(counter_peak$`Survey date`,6,7) == "12")))
 
-counter_daytime = counter_daytime %>%
+counter_peak = counter_peak %>%
   filter(! id %in% remove4$id)
 
-dim(counter_daytime) #929008
+dim(counter_peak) #929008 #464694 peak
 
 ############# Weather
-doubles = counter_daytime %>%
+doubles = counter_peak %>%
   group_by(`Site ID`, Direction, year, Time, Location, Survey_wave) %>%
   summarise(n_repeats = n()) %>%
   ungroup()
@@ -63,18 +67,18 @@ weather_repeats = doubles %>%
   filter(n_repeats == 2)
 
 remove5 = weather_repeats %>%
-  inner_join(counter_daytime, by = c("Site ID" = "Site ID", "Direction" = "Direction", "year" = "year", "Time" = "Time", "Location" = "Location", "Survey_wave" = "Survey_wave")) %>%
+  inner_join(counter_peak, by = c("Site ID" = "Site ID", "Direction" = "Direction", "year" = "year", "Time" = "Time", "Location" = "Location", "Survey_wave" = "Survey_wave")) %>%
     filter(Weather == "Dry")
 
-counter_daytime = counter_daytime %>%
+counter_peak = counter_peak %>%
   filter(! id %in% remove5$id)
-dim(counter_daytime) #928816
+dim(counter_peak) #928816 #464598 peak
 
 ###################
 
 # group by survey wave, site and direction
 # select only sites which have a full 12 hours (48 periods) of survey data (this can be across several survey dates but must be within the same survey wave/quarter)
-counter_daily = counter_daytime %>%
+counter_daily = counter_peak %>%
   group_by(`Site ID`, Direction, year, Survey_wave) %>%
   summarise(
     n_periods = n(),
@@ -82,9 +86,10 @@ counter_daily = counter_daytime %>%
     mean_daily = mean(`Total cycles`, na.rm = TRUE)) %>%
   ungroup()
 
-counter_clean = left_join(counter_daytime, counter_daily, by = c("Site ID", "Direction", "year", "Survey_wave")) %>%
-  filter(n_periods == 48)
-dim(counter_clean) #919440
+counter_clean = left_join(counter_peak, counter_daily, by = c("Site ID", "Direction", "year", "Survey_wave")) %>%
+  # filter(n_periods == 48) #for whole day
+  filter(n_periods == 24) #for peak hours
+dim(counter_clean) #919440 #460824
 
 # CENCY201 Tooley Street Survey wave changes while Survey date stays the same
 # not enough hours only covers 7am - 2pm
@@ -97,8 +102,8 @@ dim(counter_clean) #919440
 # unique(substr(counter_clean$Survey_wave,6,7))
 # unique(substr(counter_clean$`Survey date`,6,7))
 
-# counter_daytime %>%
-#   filter(substr(counter_daytime$Survey_wave, 6, 7) == "Q1")
+# counter_peak %>%
+#   filter(substr(counter_peak$Survey_wave, 6, 7) == "Q1")
 
 # Clean the Time strings
 counter_clean$Time = gsub("0-0", "0 - 0", counter_clean$Time)
@@ -124,9 +129,10 @@ View(counter_clean %>%
 # Full 2014 data is available for Central London (all 4 survey waves) but no 2014 data is available for the Inner or Outer London locations
 counter_clean = counter_clean %>%
   filter(year != 2014)
-dim(counter_clean) #846528
+dim(counter_clean) #846528 #424320 peak
 
 # saveRDS(counter_clean, "counter_clean.Rds")
+saveRDS(counter_clean, "counter_clean_peak.Rds")
 
 # Get location data and create sf object ----------------------------------
 
@@ -152,7 +158,7 @@ counter_bng = counter_sf %>%
 counter_days = counter_nogeo %>%
   select(year, Survey_wave, Borough, `Site ID`, Direction, ProgID, Location, total_daily, mean_daily) %>%
   unique()
-dim(counter_days) #17636
+dim(counter_days) #17636 #17680 peak
 
 # Use annual equivalent adjustment factors taken from TfL Central London grid survey data to account for seasonal variation
 # Also helps to correct central london counts for varying numbers in each survey wave (Corrects for missing survey wave 4 in 2019)
@@ -172,7 +178,7 @@ season_adjust = season_adjust %>%
   group_by(year, Survey_wave, Borough, `Site ID`, ProgID, Location, wave_number) %>%
   summarise(total_daily = sum(total_daily),
             adjusted_total = sum(adjusted_total))
-dim(season_adjust) #8818
+dim(season_adjust) #8818 #8840 peak
 
 # Calculate change in TfL counts ------------------------------------------
 
@@ -222,7 +228,7 @@ dim(counter_year %>% filter(ProgID == "OUTCY")) #2247
 
 
 saveRDS(counter_year, "tfl-counts-by-site.Rds")
-
+saveRDS(counter_year, "tfl-counts-by-site-peak.Rds")
 
 
 # Group by borough --------------------------------------------------------
@@ -254,6 +260,8 @@ ggplot(counter_la_results) +
 
 readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019.csv")
 piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019.csv", repo = "itsleeds/saferroadsmap")
+readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019-peak.csv")
+piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019-peak.csv", repo = "itsleeds/saferroadsmap")
 
 lads = spData::lnd %>% rename(Borough = NAME) %>%
   mutate(Borough = as.character(Borough)) %>%
@@ -311,21 +319,26 @@ tfl_early_v_late = rbind(counter_earlyyear, counter_lateyear)
 
 # loosely based on London Assembly constituencies
 
-# City of London, Tower Hamlets, Newham
-# Camden, Islington
-# Westminster, Kensington and Chelsea, Hammersmith and Fulham
-# Southwark, Lambeth
-# Lewisham, Greenwich
-# Hackney, Waltham Forest
-# Wandsworth, Merton
-# Haringey, Enfield, Barnet
-# Harrow, Brent
-# Ealing, Hillingdon
-# Hounslow, Richmond upon Thames, Kingston upon Thames
-# Croydon, Sutton
-# Bromley, Bexley
-# Havering, Barking and Dagenham, Redbridge
+ctn = c("City of London", "Tower Hamlets", "Newham")
+ci = c("Camden", "Islington")
+wkh = c("Westminster", "Kensington and Chelsea", "Hammersmith and Fulham")
+sl = c("Southwark", "Lambeth")
+lg = c("Lewisham", "Greenwich")
+hw = c("Hackney", "Waltham Forest")
+wm = c("Wandsworth", "Merton")
+heb = c("Haringey", "Enfield", "Barnet")
+hb = c("Harrow", "Brent")
+eh = c("Ealing", "Hillingdon")
+hrk = c("Hounslow", "Richmond upon Thames", "Kingston upon Thames")
+cs = c("Croydon", "Sutton")
+bb = c("Bromley", "Bexley")
+hbr = c("Havering", "Barking and Dagenham", "Redbridge")
+areas = list(ctn, ci, wkh, sl, lg, hw, wm, heb, hb, eh, hrk, cs, bb, hbr)
+a2 = c("ctn", "ci", "wkh", "sl", "lg", "hw", "wm", "heb", "hb", "eh", "hrk", "cs", "bb", "hbr")
 
+counter_la_results$area = for(i in 1:length(areas)){
+  if(counter_la_results$Borough %in% areas[[i]]) {counter_la_results$area = a2[i]}
+}
 
 # GAM model for TfL counts ------------------------------------------------
 

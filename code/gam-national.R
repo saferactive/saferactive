@@ -1,4 +1,4 @@
-
+# National GAM model using DfT count data
 
 library(tidyverse)
 library(mgcv)
@@ -62,6 +62,17 @@ traffic_bam = transform(traffic_points,
                         local_authority_name = factor(local_authority_name),
                         road_category = factor(road_category),
                         DoY = as.numeric(lubridate::yday(count_date)))
+
+# use peak hours only
+traffic_peak_only = traffic_bam %>%
+  filter(hour %in% c(7, 8, 9, 16, 17, 18))
+dim(traffic_peak_only) #165180
+
+# check all points are bi-directional
+ford = traffic_peak_only %>%
+  group_by(year, count_date, hour, local_authority_name, count_point_id) %>%
+  tally()
+unique(ford$n)
 
 
 # Fix points with location errors

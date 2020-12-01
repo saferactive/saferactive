@@ -1,8 +1,10 @@
+library(tidyverse)
+library(sf)
 
 # Organise TfL dataset ----------------------------------------------------
 
 # TfL counts
-tfl_zero = readRDS("tfl-counts-by-site.Rds")
+tfl_zero = readRDS("tfl-counts-by-site-peak.Rds")
 dim(tfl_zero) #6221
 
 # add geometry
@@ -21,7 +23,7 @@ tfl_0 = counter_bng %>%
 tfl_nonzero = counter_bng %>%
   filter(! `Site ID` %in% tfl_0$`Site ID`,
          mean_site >= 5.0)
-dim(tfl_nonzero) #6181
+dim(tfl_nonzero) #6181 #5613
 
 tfl_nonzero$easting = st_coordinates(tfl_nonzero)[,1]
 tfl_nonzero$northing = st_coordinates(tfl_nonzero)[,2]
@@ -34,7 +36,7 @@ tfl_repeats = tfl_nonzero %>%
 
 tfl_nonzero = tfl_nonzero %>%
   filter(`Site ID` %in% tfl_repeats$`Site ID`)
-dim(tfl_nonzero) #6173
+dim(tfl_nonzero) #6173 #5605
 
 # calculate sum of counts at each point (helps to avoid giving too much weight to counts missing some years)
 
@@ -46,20 +48,43 @@ tfl_nonzero = tfl_nonzero %>%
 # DfT dataset for the years 2010-2015 -------------------------------------
 
 # DfT counts
-dft_nonzero = readRDS("dft-london-no-zeroes-no-esti.Rds")
-dim(dft_nonzero) #5215
+# dft_nonzero = readRDS("dft-london-no-zeroes-no-esti.Rds")
+# dim(dft_nonzero) #5215
+
+dft_all = readRDS("raw-dft-london-daily.Rds")
+
+dft_all = dft_all %>%
+  filter(year %in% 2010:2019)
+dim(dft_all) #7121
+
+# get mean count per site
+dft_all = dft_all %>%
+  group_by(count_point_id) %>%
+  mutate(mean_cycles = mean(pedal_cycles_adj),
+         sum_cycles = sum(pedal_cycles_adj)) %>%
+  ungroup() %>%
+  mutate(change_cycles = pedal_cycles_adj/mean_cycles)
+
+# remove very low counts
+dft_0 = dft_all %>%
+  group_by(count_point_id) %>%
+  filter(pedal_cycles_adj == 0)
+dft_nonzero = dft_all %>%
+  filter(! count_point_id %in% dft_0$count_point_id,
+         mean_cycles >= 5.0)
+dim(dft_nonzero) #5775
 
 counts_early_years = dft_nonzero %>%
   filter(year %in% 2010:2015)
-dim(counts_early_years) #2981
+dim(counts_early_years) #3156
 
 # recalculate change in cycles
 counts_early_years = counts_early_years %>%
   group_by(count_point_id) %>%
-  mutate(mean_cycles_early = mean(pedal_cycles),
-         sum_cycles_early = sum(pedal_cycles)) %>%
+  mutate(mean_cycles_early = mean(pedal_cycles_adj),
+         sum_cycles_early = sum(pedal_cycles_adj)) %>%
   ungroup() %>%
-  mutate(change_cycles_early = pedal_cycles/mean_cycles_early)
+  mutate(change_cycles_early = pedal_cycles_adj/mean_cycles_early)
 
 # remove count points not repeated in the years 2010-2015
 dft_early_years_repeats = counts_early_years %>%
@@ -69,22 +94,22 @@ dft_early_years_repeats = counts_early_years %>%
 
 counts_early_years = counts_early_years %>%
   filter(count_point_id %in% dft_early_years_repeats$count_point_id)
-dim(counts_early_years) #2432
+dim(counts_early_years) #2326
 
 
 # DfT dataset for the years 2015-2019 -------------------------------------
 
 dft_late_years = dft_nonzero %>%
   filter(year %in% 2015:2019)
-dim(dft_late_years) #2674
+dim(dft_late_years) #3077
 
 # recalculate change in cycles
 dft_late_years = dft_late_years %>%
   group_by(count_point_id) %>%
-  mutate(mean_cycles_late = mean(pedal_cycles),
-         sum_cycles_late = sum(pedal_cycles)) %>%
+  mutate(mean_cycles_late = mean(pedal_cycles_adj),
+         sum_cycles_late = sum(pedal_cycles_adj)) %>%
   ungroup() %>%
-  mutate(change_cycles_late = pedal_cycles/mean_cycles_late)
+  mutate(change_cycles_late = pedal_cycles_adj/mean_cycles_late)
 
 # remove count points not repeated in the years 2015-2019
 dft_late_years_repeats = dft_late_years %>%
@@ -94,7 +119,7 @@ dft_late_years_repeats = dft_late_years %>%
 
 dft_late_years = dft_late_years %>%
   filter(count_point_id %in% dft_late_years_repeats$count_point_id)
-dim(dft_late_years) #2021
+dim(dft_late_years) #1498
 
 
 # Annual change comparisons
@@ -113,9 +138,9 @@ dim(dft_late_years) #2021
 
 # # Combine the two datasets
 # dft_nonzero = dft_nonzero %>%
-#   select(year, name, count_point_id, easting, northing, pedal_cycles, change_cycles, mean_cycles)
+#   select(year, name, count_point_id, easting, northing, pedal_cycles_adj, change_cycles, mean_cycles)
 # tfl_nonzero = tfl_nonzero %>%
-#   select(year, name = Borough, count_point_id = `Site ID`, easting, northing, pedal_cycles = adjusted_total, change_cycles = change_corrected, mean_cycles = mean_site) %>%
+#   select(year, name = Borough, count_point_id = `Site ID`, easting, northing, pedal_cycles_adj = adjusted_total, change_cycles = change_corrected, mean_cycles = mean_site) %>%
 #   st_drop_geometry()
 #
 # dft_nonzero$data_source = "DfT"
@@ -126,7 +151,7 @@ dim(dft_late_years) #2021
 # Combine DfT and TfL counts for late years -------------------------------
 
 dft_late_years = dft_late_years %>%
-  select(year, name, count_point_id, easting, northing, pedal_cycles, change_cycles_late, mean_cycles_late, sum_cycles_late)
+  select(year, name, count_point_id, easting, northing, pedal_cycles = pedal_cycles_adj, change_cycles_late, mean_cycles_late, sum_cycles_late)
 
 tfl_nonzero = tfl_nonzero %>%
     select(year, name = Borough, count_point_id = `Site ID`, easting, northing, pedal_cycles = adjusted_total, change_cycles_late = change_cycles, mean_cycles_late = mean_site, sum_cycles_late = sum_cycles) %>%
@@ -159,6 +184,9 @@ forplot = counts_combined %>%
   summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late))
 plot(change_cycles_late ~ year, data = forplot)
 
+# ggplot(counts_combined) +
+#   geom_line(aes(year, change_cycles_late, colour = data_source))
+
 plot(counts_combined$year, counts_combined$change_cycles_late)
 
 # dd = tfl_nonzero %>%
@@ -177,7 +205,7 @@ M = list(c(1, 0.5), NA)
 m = bam(change_cycles_early ~
           s(year, bs = "cr", k = 4)
         + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
-        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
+        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
         ,
         weights = sum_cycles_early,
         family = scat,
@@ -217,6 +245,10 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
         axis.text = element_blank(),
         axis.ticks = element_blank())
 
+lads = spData::lnd %>% rename(Borough = NAME) %>%
+  mutate(Borough = as.character(Borough)) %>%
+  mutate(Name = abbreviate(Borough, minlength = 2))
+
 borough_geom = lads %>%
   dplyr::select(Borough) %>%
   st_transform(27700)
@@ -232,8 +264,8 @@ gam_early_year = point_to_borough %>%
   summarise(gam_change_cycles = mean(Fitted))
 View(gam_early_year)
 
-saveRDS(gam_early_year, "gam-early-year")
-
+# saveRDS(gam_early_year, "gam-early-year.Rds")
+saveRDS(gam_early_year, "gam-early-year-peak.Rds")
 
 
 
@@ -251,8 +283,8 @@ m2 = bam(change_cycles_late ~
         data = counts_combined, method = 'fREML',
         nthreads = 4, discrete = TRUE)
 
-summary(m)
-plot(m, pages = 4, scheme = 2, shade = TRUE)
+summary(m2)
+plot(m2, pages = 4, scheme = 2, shade = TRUE)
 
 
 
@@ -299,9 +331,83 @@ gam_late_year = point_to_borough %>%
   summarise(gam_change_cycles_late = mean(Fitted))
 View(gam_late_year)
 
-saveRDS(gam_late_year, "gam_late_year.Rds")
+# saveRDS(gam_late_year, "gam_late_year.Rds")
+saveRDS(gam_late_year, "gam_late_year_peak.Rds")
 
 
+# Compare TfL counts with joint GAM predictions -----------------------------------------
+
+# counter_la_results = read.csv("tfl-counter-results-london-boroughs-2015-2019.csv")
+counter_la_results = read.csv("tfl-counter-results-london-boroughs-2015-2019-peak.csv")
+gam_late_year = readRDS("gam_late_year_peak.Rds")
+
+verify = left_join(counter_la_results, gam_late_year, by = c("year", "Borough"))
+
+cor(verify$change_tfl_cycles, verify$gam_change_cycles_late)^2 #R squared = 0.15 #peak 0.194
+plot(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late, xlab = "TfL change in cycle counts (adjusted daily flow)", ylab = "GAM predictions of change (AADF)")
+# line(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late)
+# ggsave(plot = tosave, "figures/gam-change-late.png")
 
 
+# Adjustment factors from 2011 --------------------------------------------
 
+# gam_early_year = readRDS("gam-early-year.Rds")
+gam_early_year = readRDS("gam-early-year-peak.Rds")
+
+# get change relative to 2011 for the early years
+gam_2011 = gam_early_year %>%
+  st_drop_geometry() %>%
+  filter(year == 2011) %>%
+  ungroup() %>%
+  mutate(change_2011 = gam_change_cycles) %>%
+  select(Borough, change_2011)
+
+gam_early_results = inner_join(gam_early_year, gam_2011) %>%
+  mutate(change_relative_to_2011 = gam_change_cycles / change_2011)
+
+# bridge to the late years
+gam_up_to_2015 = gam_early_results %>%
+  filter(year == 2015) %>%
+  st_drop_geometry() %>%
+  select(Borough, change_relative_to_2011)
+
+gam_2015 = gam_late_year %>%
+  st_drop_geometry() %>%
+  filter(year == 2015) %>%
+  ungroup() %>%
+  mutate(change_2015 = gam_change_cycles_late) %>%
+  select(Borough, change_2015)
+
+gam_2015_onwards = inner_join(gam_late_year, gam_2015) %>%
+  mutate(change_relative_to_2015 = gam_change_cycles_late / change_2015)
+
+gam_bridged = inner_join(gam_2015_onwards, gam_up_to_2015, by = "Borough")
+
+gam_bridged = gam_bridged %>%
+  mutate(complete_change = change_relative_to_2011*change_relative_to_2015)
+
+# collate full results
+gam_bridged %>% select(Borough, year, change_cycles = complete_change)
+gam_early_results %>% select(Borough, year, change_cycles = change_relative_to_2011)
+
+gam_full_results = rbind(
+  (gam_early_results %>% select(Borough, year, change_cycles = change_relative_to_2011)),
+  (gam_bridged %>% select(Borough, year, change_cycles = complete_change) %>%
+     filter(year != 2015))
+  ) %>%
+  st_drop_geometry()
+dim(gam_full_results)
+View(gam_full_results)
+
+ggplot(gam_full_results) +
+  geom_line(aes(year, change_cycles, colour = Borough))
+
+saveRDS(gam_full_results, "gam-full-results-peak.Rds")
+
+lads_data = inner_join(lads, gam_full_results)
+
+library(tmap)
+tm_shape(lads_data) +
+  tm_polygons("change_cycles", palette = "BrBG", n = 6) +
+  tm_text(text = "Name", size = 0.7) +
+  tm_facets("year")

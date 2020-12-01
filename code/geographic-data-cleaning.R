@@ -6,6 +6,7 @@ library(tidyverse)
 remotes::install_github("itsleeds/dftTrafficCounts")
 library(dftTrafficCounts)
 
+# For annual average daily flows
 u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_aadf.zip"
 d = dtc_import(u = u)
 
@@ -13,20 +14,47 @@ saveRDS(d, "traffic-aadf-29092020.Rds")
 piggyback::pb_upload("traffic-aadf-29092020.Rds", tag = "0.1")
 traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
-dim(traffic_aadf)
+# For raw hourly data (eg for peak hours only)
+u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_raw_counts.zip"
+d = dtc_import(u = u)
+
+saveRDS(d, "traffic-data-29092020.Rds")
+piggyback::pb_upload("traffic-data-29092020.Rds", tag = "0.1")
+traffic_raw = readRDS("traffic-data-29092020.Rds")
+
+dim(traffic_raw)
 # [1] 461948     33
+# [1] 4511532      33
 
-names(traffic_aadf)
-table(traffic_aadf$sequence)
+names(traffic_raw)
+table(traffic_raw$sequence)
+
+# For raw counts, change column names, to make them equivalent to AADF column names
+traffic_raw = traffic_raw %>%
+  rename(year = Year,
+         count_point_id = CP,
+         direction_of_travel = iDir,
+         pedal_cycles = PedalCycles,
+         easting = Easting,
+         northing = Northing,
+         local_authority_id = LocalAuthority,
+         road_category = RoadCategory,
+         road_type = RoadType,
+         all_motor_vehicles = AllMotorVehicles)
+
+# For raw counts, join with local authority names
+la_lookup = readRDS("la-lookup.Rds")
+traffic_raw = traffic_raw %>%
+  left_join(la_lookup, by = "local_authority_id")
+dim(traffic_raw)
 
 
-traffic_aadf = readRDS("traffic-aadf-29092020.Rds")
 
 # including estimated counts in year that were missed
-traffic_cyclable = traffic_aadf %>%
+traffic_cyclable = traffic_raw %>%
   filter(road_category != "TM",
          road_category != "PM") # %>%
-  # filter(estimation_method == "Counted")
+  # filter(estimation_method == "Counted") # not needed for raw data
 # there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
 
 # Fix points with location errors
@@ -85,79 +113,82 @@ mapview::mapview(counties_uas_gb) # very detailed
 
 
 
-traffic_aadf_sf = traffic_cyclable %>%
+traffic_raw_sf = traffic_cyclable %>%
   group_by(count_point_id, local_authority_name) %>%
   mutate(easting = mean(easting), northing = mean(northing)) %>%
   group_by(count_point_id, local_authority_name, easting, northing) %>%
   summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
-nrow(traffic_aadf_sf)
+nrow(traffic_raw_sf)
 # [1] 42543 ([1] 41980 when local_authority_name is omitted) 44359 with estimated counts
-summary(sf::st_geometry_type(traffic_aadf_sf))
-mapview::mapview(traffic_aadf_sf)
+# [1] 41096 for raw counts #41366
+summary(sf::st_geometry_type(traffic_raw_sf))
+mapview::mapview(traffic_raw_sf)
 
 # county aggregation
-traffic_aadf_sf_las = traffic_cyclable %>%
+traffic_raw_sf_las = traffic_cyclable %>%
   group_by(local_authority_name) %>%
   mutate(easting = mean(easting), northing = mean(northing)) %>%
   group_by(local_authority_name, easting, northing) %>%
   summarise_at(vars(pedal_cycles:all_motor_vehicles), .funs = mean) %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
-nrow(traffic_aadf_sf_las)
+nrow(traffic_raw_sf_las)
 # [1] 208
-mapview::mapview(traffic_aadf_sf_las)
-traffic_aadf_sf_las_joined = sf::st_join(
-  traffic_aadf_sf_las,
+mapview::mapview(traffic_raw_sf_las)
+traffic_raw_sf_las_joined = sf::st_join(
+  traffic_raw_sf_las,
   counties_uas_gb %>% select(name = ctyua19nm)
 )
-aadf_la_county_lookup = traffic_aadf_sf_las_joined %>%
+raw_la_county_lookup = traffic_raw_sf_las_joined %>%
   select(name, local_authority_name) %>%
   filter(name != local_authority_name) %>%
   sf::st_drop_geometry()
-readr::write_csv(aadf_la_county_lookup, "small-output-datasets/aadf_la_county_lookup.csv")
+readr::write_csv(raw_la_county_lookup, "small-output-datasets/raw_la_county_lookup.csv")
+# readr::write_csv(aadf_la_county_lookup, "small-output-datasets/aadf_la_county_lookup.csv")
 
 # join and create lookup at counter id level
-traffic_aadf_sf_las_joined = sf::st_join(
-  traffic_aadf_sf,
+traffic_raw_sf_las_joined = sf::st_join(
+  traffic_raw_sf,
   counties_uas_gb %>% select(name = ctyua19nm)
 )
 
-aadf_la_county_lookup_point = traffic_aadf_sf_las_joined %>%
+raw_la_county_lookup_point = traffic_raw_sf_las_joined %>%
   select(count_point_id, name, local_authority_name) %>%
   filter(name != local_authority_name)
 
-aadf_la_county_lookup_point
+raw_la_county_lookup_point
 # identify edge case points in aggregated data:
-# aadf_la_county_lookup_point %>%
+# raw_la_county_lookup_point %>%
 #   filter(name == "Swansea" & local_authority_name == "Carmarthenshire") %>%
 #   mapview::mapview() +
 #   mapview::mapview(counties_uas_gb)
 
-aadf_la_county_lookup_point_n = aadf_la_county_lookup_point %>%
+raw_la_county_lookup_point_n = raw_la_county_lookup_point %>%
   sf::st_drop_geometry() %>%
   group_by(name, local_authority_name) %>%
   summarise(n = n()) %>%
   arrange(n)
-table(aadf_la_county_lookup_point_n$n)
+table(raw_la_county_lookup_point_n$n)
 # 1   2   3   4   5  14  59  63  78  79 106 112 125 145 155 181 204 240 264 304 344 409
 # 95  18   2   4   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
-View(aadf_la_county_lookup_point_n)
-aadf_la_county_lookup_point_n_filtered = aadf_la_county_lookup_point_n %>%
+View(raw_la_county_lookup_point_n)
+raw_la_county_lookup_point_n_filtered = raw_la_county_lookup_point_n %>%
   filter(n >= 13)
-aadf_la_county_lookup_point_n_filtered
+raw_la_county_lookup_point_n_filtered
 
 traffic_aadf_yrs_la_summary = read_csv("small-output-datasets/traffic_aadf_yrs_la_summary.csv")
 
 summary(sel <- counties_uas_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
 counties_gb$ctyua19nm[!sel]
 
-aadf_la_county_lookup_point2 = aadf_la_county_lookup_point %>%
+raw_la_county_lookup_point2 = raw_la_county_lookup_point %>%
   sf::st_drop_geometry() %>%
-  inner_join(., aadf_la_county_lookup_point_n_filtered) %>%
+  inner_join(., raw_la_county_lookup_point_n_filtered) %>%
   select(-n)
-readr::write_csv(aadf_la_county_lookup_point2, "small-output-datasets/aadf_la_county_lookup.csv")
+# readr::write_csv(aadf_la_county_lookup_point2, "small-output-datasets/aadf_la_county_lookup.csv")
+readr::write_csv(raw_la_county_lookup_point2, "small-output-datasets/raw_la_county_lookup.csv")
 
-corrections = aadf_la_county_lookup_point2 %>% select(count_point_id, name)
+corrections = raw_la_county_lookup_point2 %>% select(count_point_id, name)
 remove = duplicated(corrections)
 corrections2 = corrections[remove == FALSE,]
 
@@ -174,7 +205,7 @@ corrections2 = corrections[remove == FALSE,]
 
 traffic_cyclable_clean = traffic_cyclable %>%
   left_join(., corrections2)
-dim(traffic_cyclable_clean) #183884 #439688
+dim(traffic_cyclable_clean) #183884 #439688 #4315332 for raw
 summary(as.factor(traffic_cyclable_clean$name))
 summary(as.factor(traffic_cyclable_clean$local_authority_name))
 traffic_cyclable_clean$name[is.na(traffic_cyclable_clean$name)] =
@@ -208,15 +239,15 @@ traffic_cyclable_clean %>%
   count(count_point_id)
 
 # where is it?
-missing_count_point = traffic_aadf_sf %>%
+missing_count_point = traffic_raw_sf %>%
   filter(count_point_id == 50974)
-missing_count_point2 = traffic_aadf_sf %>%
+missing_count_point2 = traffic_raw_sf %>%
   filter(count_point_id == 10820)
-missing_count_point3 = traffic_aadf_sf %>%
+missing_count_point3 = traffic_raw_sf %>%
   filter(count_point_id == 50728)
-missing_count_point4 = traffic_aadf_sf %>%
+missing_count_point4 = traffic_raw_sf %>%
   filter(count_point_id == 82090)
-missing_count_point5 = traffic_aadf_sf %>%
+missing_count_point5 = traffic_raw_sf %>%
   filter(count_point_id == 940855)
 
 mapview::mapview(missing_count_point)
@@ -237,13 +268,19 @@ traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 82090] =
 traffic_cyclable_clean$name[traffic_cyclable_clean$count_point_id == 940855] =
   "Cambridgeshire"
 
+# #remove old local authority name fields
+# traffic_cyclable_clean$local_authority_name = NULL
+# traffic_cyclable_clean$name_updated = NULL
+
+
 #remove duplicate rows to prevent error in Glasgow/Lanarkshire NAs
 remove = duplicated(traffic_cyclable_clean)
 sum(remove) #10618 #68656
 traffic_cyclable_clean = traffic_cyclable_clean[remove == FALSE,]
-dim(traffic_cyclable_clean) #183884 #439688
+dim(traffic_cyclable_clean) #183884 #439688 #4321788 raw
 
-saveRDS(traffic_cyclable_clean, "traffic_cyclable_clean.Rds")
+# saveRDS(traffic_cyclable_clean, "traffic_cyclable_clean.Rds")
+saveRDS(traffic_cyclable_clean, "traffic_cyclable_clean_raw.Rds")
 piggyback::pb_upload("traffic_cyclable_clean.Rds")
 
 # test code ---------------------------------------------------------------
@@ -258,10 +295,10 @@ piggyback::pb_upload("traffic_cyclable_clean.Rds")
 # # [1] 174
 # setwd("..")
 # getwd() # in the right directory again 🎉
-# summary(sel <- counties_gb$ctyua19nm %in% traffic_aadf_yrs_la_summary$local_authority_name)
-# summary(traffic_aadf_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
-# lads_not_in_aadf1 = counties_gb[!sel, ]
-# mapview::mapview(lads_not_in_aadf1)
+# summary(sel <- counties_gb$ctyua19nm %in% traffic_raw_yrs_la_summary$local_authority_name)
+# summary(traffic_raw_yrs_la_summary$local_authority_name %in% counties_gb$ctyua19nm)
+# lads_not_in_raw1 = counties_gb[!sel, ]
+# mapview::mapview(lads_not_in_raw1)
 
 
 # dir.create("counties-2019")
@@ -309,15 +346,15 @@ piggyback::pb_upload("traffic_cyclable_clean.Rds")
 
 # lads = readRDS("lads.Rds")
 # nrow(lads)
-# length(unique(traffic_aadf$local_authority_name))
-# summary(sel <- lads$Name %in% traffic_aadf_yrs_la_summary$local_authority_name)
+# length(unique(traffic_raw$local_authority_name))
+# summary(sel <- lads$Name %in% traffic_raw_yrs_la_summary$local_authority_name)
 # # Mode   FALSE    TRUE
 # # logical     219     163
-# summary(traffic_aadf_yrs_la_summary$local_authority_name %in% lads$Name)
+# summary(traffic_raw_yrs_la_summary$local_authority_name %in% lads$Name)
 # # Mode   FALSE    TRUE
 # # logical     380    1625
-# lads_in_aadf1 = lads[sel, ]
-# mapview::mapview(lads_in_aadf1)
+# lads_in_raw1 = lads[sel, ]
+# mapview::mapview(lads_in_raw1)
 
 # # try 2018 definition of uas/counties
 # u = "https://opendata.arcgis.com/datasets/d13feea979be44eb83bceeed94a1510d_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
