@@ -20,3 +20,5 @@ counties-*
 *.tif
 *.ods
 rnet_split.gpkg
+*.asc
+*.xml

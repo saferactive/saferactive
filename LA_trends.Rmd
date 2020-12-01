@@ -87,6 +87,15 @@ pop_work_sct <- read.csv("data/scot_work_population.csv")
 pop_work_sct <- pop_work_sct[6:358,]
 names(pop_work_sct) <- c("id","work_pop")
 pop_work_sct$code <- substr(pop_work_sct$id,1,9)
+# Fix old codes
+pop_work_ew$code[pop_work_ew$code == "E10000002"] <- "E06000060"
+pop_work_ew$code[pop_work_ew$code == "E06000028"] <- "E06000058"
+pop_work_ew$code[pop_work_ew$code == "E06000029"] <- "E06000058"
+pop_work_ew$code[pop_work_ew$code == "E10000009"] <- "E06000059"
+
+pop_work_ew <- pop_work_ew %>% 
+  group_by(code) %>%
+  summarise(work_pop_2011 = sum(work_pop_2011))
 
 # dir.create("tmp")
 # unzip("data/bdline_gpkg_gb.zip", exdir = "tmp")
@@ -141,7 +150,8 @@ m1 <- tm_shape(la) +
           n = 10, 
           legend.hist = TRUE) +
   tm_borders() +
-  tm_layout(legend.outside = TRUE)
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
 
 m2 <- tm_shape(la) +
   tm_fill(col = "work_pop_2011",
@@ -150,7 +160,8 @@ m2 <- tm_shape(la) +
           n = 10, 
           legend.hist = TRUE) +
   tm_borders() +
-  tm_layout(legend.outside = TRUE)
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
 tmap_arrange(m1, m2)
 
 ```
@@ -158,14 +169,14 @@ tmap_arrange(m1, m2)
 ## Crashes by LA
 
 ```{r crash_la, echo=FALSE, message=FALSE}
-crash <- st_join(crash, la[,"la_name"])
+crash <- st_join(crash, la[,c("la_name", "code")])
 
 # Get Year and Month
 crash$year <- year(crash$date)
 
 crash_yr <- crash %>%
   st_drop_geometry() %>%
-  group_by(la_name, year) %>%
+  group_by(la_name, code, year, ) %>%
   summarise(total_crash = n(),
             crash_fatal = sum(accident_severity == "Fatal"),
             crash_serious = sum(accident_severity == "Serious"),
@@ -187,40 +198,49 @@ la$active_slight_per100k <- (la$casualty_slight_cyclist +  la$casualty_slight_pe
 
 la$active_ksi_per100k_work <- (la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )/ la$work_pop_2011 * 100000
 
+la$active_slight_per_ksi <- (la$casualty_slight_pedestrian + la$casualty_slight_cyclist) /(la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )
+
+la$active_slight_per_ksi[la$active_slight_per_ksi == Inf] <- NA
+
 ```
 
 We can adjust the plots the KSI rate for population, England is clearly doing worse than Scotland and Wales, particularly in the home counties. No this is a count based on the most serious causality, so may slightly overestimate the KSI rate. The City of London is an extreme outlier due to it very low resident population.
 
 ```{r crash_la_plot, echo=FALSE}
-tm_shape(la) +
+m1 <- tm_shape(la) +
   tm_fill(col = "active_ksi_per100k",
           title = "Active Travel KSI per 100,000 people (2018)",
           style = "quantile",
-          n = 10,
+          n = 10, 
           legend.hist = TRUE) +
   tm_borders() +
-  tm_layout(legend.outside = TRUE)
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
+
+m2 <- tm_shape(la) +
+  tm_fill(col = "active_ksi_per100k_work",
+          title = "Active Travel KSI per 100,000 workplace population (2011)",
+          style = "quantile",
+          n = 10, 
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
+tmap_arrange(m1, m2)
 ```
-The pattern of slight casualties is different to the KSI.
+The pattern of slight casualties is different to the KSI. This pa account for the adjusted proportion of serious causalities caused by the historic use of different reporting systems. However this difference may still be due to different reporting practices across the country. 
+
+If this represent a genuine difference in safety, then LAs with a high ratio (dark green) are having proportionally more slight casualties than serious and fatal ones. This could be use to more segregation of active travelers from motor traffic, lower traffic speed or greater driver awareness of active travellers. 
 
 
 ```{r crash_la_plot2, echo=FALSE}
 tm_shape(la) +
-  tm_fill(col = "active_slight_per100k",
-          title = "Slight Active Casualties per 100,000 people (2018)",
-          style = "quantile",
-          n = 10,
-          legend.hist = TRUE) +
-  tm_borders() +
-  tm_layout(legend.outside = TRUE)
-```
-
-```{r crash_la_plot3, echo=FALSE}
-tm_shape(la) +
-  tm_fill(col = "active_ksi_per100k_work",
-          title = "Active Travel KSI per 100,000 workplace people (2018)",
-          style = "quantile",
-          n = 10,
+  tm_fill(col = "active_slight_per_ksi",
+          title = "Slight Active casualties per KSI",
+          style = "fixed",
+          breaks = c(0, 0.5, 1, 1.5,2,2.5,3,3.5,4,10),
+          palette = "PRGn",
+          midpoint = 2,
           legend.hist = TRUE) +
   tm_borders() +
   tm_layout(legend.outside = TRUE)
@@ -249,35 +269,53 @@ la_top10_work$active_ksi_per100k_work <- round(la_top10_work$active_ksi_per100k_
 la_top10_work
 ```
 
+# Focus on Cycling Communitng Times
+
+As we have the best data for cycling activity during communing times (via the PCT), we have filtered the data in this section to only conisder crashes between 7am - 10am and 4pm - 7pm. 
+
+```{r trends_commute, echo=FALSE}
+ 
+
+
+```
+
 
 # Historical Trends
 
 Looking at absolute number of KSI, the top 10 and bottom 10 are the same in 2009 and 2018 suggesting no overall change.
 
 ```{r trends, echo=FALSE}
-rank_2018 <- crash_yr[crash_yr$year == 2018,]
-rank_2018 <- rank_2018[order(rank_2018$total_crash, decreasing = TRUE),]
-top_10_2018 <- rank_2018$la_name[1:10]
-bottom_10_2018 <- rank_2018$la_name[seq(nrow(rank_2018) - 9,nrow(rank_2018))]
+la <- la[order(la$active_ksi_per100k_work, decreasing = TRUE),]
+top_5 <- la$la_name[1:5]
+bottom_5 <- la$la_name[seq(169,173)]
 
-rank_2009 <- crash_yr[crash_yr$year == 2018,]
-rank_2009 <- rank_2009[order(rank_2009$total_crash, decreasing = TRUE),]
-top_10_2009 <- rank_2009$la_name[1:10]
-bottom_10_2009 <- rank_2009$la_name[seq(nrow(rank_2009) - 9,nrow(rank_2009))]
+crash_yr <- left_join(crash_yr, pop, by = "code")
+crash_yr <- left_join(crash_yr, pop_work_ew, by = "code")
 
-ggplot(crash_yr[crash_yr$la_name %in% top_10_2018,],
-       aes(year, total_crash, colour = la_name)) +
-  geom_line() +
-  ylab("Crashes with active travel casualties") +
-  labs(color = "Local Authority") +
-  ggtitle("Top 10 LAs in 2018")
 
-ggplot(crash_yr[crash_yr$la_name %in% bottom_10_2018,],
-       aes(year, total_crash, colour = la_name)) +
-  geom_line() +
-  ylab("Crashes with active travel casualties") +
-  labs(color = "Local Authority") +
-  ggtitle("Bottom 10 LAs in 2018") 
+crash_yr$active_ksi_per100k <- (crash_yr$casualty_fatal_pedestrian + crash_yr$casualty_fatal_cyclist + crash_yr$casualty_serious_pedestrian + crash_yr$casualty_serious_cyclist )/ crash_yr$population_2019 * 100000
+
+crash_yr$active_ksi_per100k_work <- (crash_yr$casualty_fatal_pedestrian + crash_yr$casualty_fatal_cyclist + crash_yr$casualty_serious_pedestrian + crash_yr$casualty_serious_cyclist )/ crash_yr$work_pop_2011 * 100000
+
+crash_yr$la_name_plot <- ifelse(crash_yr$la_name %in% c(top_5, bottom_5), crash_yr$la_name, "Other" )
+crash_yr$lwd <- ifelse(crash_yr$la_name_plot == "Other", FALSE, TRUE )
+
+
+ggplot(crash_yr,
+       aes(year, active_ksi_per100k_work, colour = la_name_plot, group = la_name)) +
+  geom_line(data = subset(crash_yr, lwd == FALSE), aes(size = lwd)) +
+  geom_line(data = subset(crash_yr, lwd == TRUE), aes(size = lwd)) +
+  ylab("Active Travel KSI per 100k workplace population") +
+  labs(color = "Local Authority") + 
+  guides(size = FALSE) +
+  guides(colour = guide_legend(override.aes = list(size=3))) +
+  scale_size_manual(values = c("TRUE" = 1.5, "FALSE" = 0.1)) +
+  scale_color_manual(values=c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
+                              "#FDBF6F","#d3d3d3",
+                              "#FF7F00", "#CAB2D6", "#6A3D9A")) +
+  ggtitle("Top and Bottom LAs")
+
+
 
 
 ```
@@ -293,23 +331,40 @@ crash_yr_wide$change <- (crash_yr_wide$`2019` - crash_yr_wide$`2010`) / crash_yr
 
 crash_yr_wide <- crash_yr_wide[order(crash_yr_wide$change, decreasing = TRUE),]
 
-change_top_10 <- crash_yr_wide$la_name[1:10]
-change_bottom_10 <- crash_yr_wide$la_name[seq(nrow(crash_yr_wide) - 9,nrow(crash_yr_wide))]
+change_top_5 <- crash_yr_wide$la_name[1:5]
+change_bottom_5 <- crash_yr_wide$la_name[seq(nrow(crash_yr_wide) - 4,nrow(crash_yr_wide))]
 
+crash_yr$la_name_plot <- ifelse(crash_yr$la_name %in% c(change_top_5, change_bottom_5), crash_yr$la_name, "Other" )
+crash_yr$lwd <- ifelse(crash_yr$la_name_plot == "Other", FALSE, TRUE )
 
-ggplot(crash_yr[crash_yr$la_name %in% change_top_10,],
-       aes(year, total_crash, colour = la_name)) +
-  geom_line() +
-  ylab("Crashes with active travel casualties") +
-  labs(color = "Local Authority") +
-  ggtitle("10 LAs with greatest % increase in crashes")
+# ggplot(crash_yr[crash_yr$la_name %in% change_top_10,],
+#        aes(year, total_crash, colour = la_name)) +
+#   geom_line() +
+#   ylab("Crashes with active travel casualties") +
+#   labs(color = "Local Authority") +
+#   ggtitle("10 LAs with greatest % increase in crashes")
+# 
+# ggplot(crash_yr[crash_yr$la_name %in% change_bottom_10,],
+#        aes(year, total_crash, colour = la_name)) +
+#   geom_line() +
+#   ylab("Crashes with active travel casualties") +
+#   labs(color = "Local Authority") +
+#   ggtitle("10 LAs with greatest % decrease in crashes")
 
-ggplot(crash_yr[crash_yr$la_name %in% change_bottom_10,],
-       aes(year, total_crash, colour = la_name)) +
-  geom_line() +
-  ylab("Crashes with active travel casualties") +
-  labs(color = "Local Authority") +
-  ggtitle("10 LAs with greatest % decrease in crashes")
+ggplot(crash_yr,
+       aes(year, total_crash, colour = la_name_plot, group = la_name)) +
+  geom_line(data = subset(crash_yr, lwd == FALSE), aes(size = lwd)) +
+  geom_line(data = subset(crash_yr, lwd == TRUE), aes(size = lwd)) +
+  ylab("Total Crahes") +
+  labs(color = "Local Authority") + 
+  guides(size = FALSE) +
+  ylim(0,2600)+
+  guides(colour = guide_legend(override.aes = list(size=3))) +
+  scale_size_manual(values = c("TRUE" = 1.5, "FALSE" = 0.1)) +
+  scale_color_manual(values=c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
+                              "#FDBF6F","#d3d3d3",
+                              "#FF7F00", "#CAB2D6", "#6A3D9A")) +
+  ggtitle("Top and Bottom LAs")
 
 
 ```

@@ -40,11 +40,18 @@ overestimate the KSI rate. The City of London is an extreme outlier due
 to it very low resident population.
 
 ![](LA_trends_files/figure-gfm/crash_la_plot-1.png)<!-- --> The pattern
-of slight casualties is different to the KSI.
+of slight casualties is different to the KSI. This pa account for the
+adjusted proportion of serious causalities caused by the historic use of
+different reporting systems. However this difference may still be due to
+different reporting practices across the country.
+
+If this represent a genuine difference in safety, then LAs with a high
+ratio (dark green) are having proportionally more slight casualties than
+serious and fatal ones. This could be use to more segregation of active
+travelers from motor traffic, lower traffic speed or greater driver
+awareness of active travellers.
 
 ![](LA_trends_files/figure-gfm/crash_la_plot2-1.png)<!-- -->
-
-![](LA_trends_files/figure-gfm/crash_la_plot3-1.png)<!-- -->
 
     ##                         la_name rank active_ksi_per100k total_crash crash_fatal
     ## 93               City of London    1                525         229           1
@@ -116,22 +123,32 @@ population gives slightly different results.
     ## 182           9
     ## 183           5
 
+# Focus on Cycling Communitng Times
+
+As we have the best data for cycling activity during communing times
+(via the PCT), we have filtered the data in this section to only
+conisder crashes between 7am - 10am and 4pm - 7pm.
+
 # Historical Trends
 
 Looking at absolute number of KSI, the top 10 and bottom 10 are the same
 in 2009 and 2018 suggesting no overall change.
 
-![](LA_trends_files/figure-gfm/trends-1.png)<!-- -->![](LA_trends_files/figure-gfm/trends-2.png)<!-- -->
+    ## Warning: Removed 330 row(s) containing missing values (geom_path).
+
+![](LA_trends_files/figure-gfm/trends-1.png)<!-- -->
 
 If we look for areas with the biggest change
 
-![](LA_trends_files/figure-gfm/trends2-1.png)<!-- -->![](LA_trends_files/figure-gfm/trends2-2.png)<!-- -->
-There is a clear lesson that Scotland has done something significant in
-terms of reducing KSI of active travelers especially in Aberdeen. At
-this stage we cannot show if this is a true change in the crash rate or
-a change in recording practices. Due to the gradual an continuous
-decline it seems unlikely to be caused by a change in data gatherin
-policy. It may have been caused by a reduction in active travel.
+    ## Warning: Removed 55 row(s) containing missing values (geom_path).
+
+![](LA_trends_files/figure-gfm/trends2-1.png)<!-- --> There is a clear
+lesson that Scotland has done something significant in terms of reducing
+KSI of active travelers especially in Aberdeen. At this stage we cannot
+show if this is a true change in the crash rate or a change in recording
+practices. Due to the gradual an continuous decline it seems unlikely to
+be caused by a change in data gatherin policy. It may have been caused
+by a reduction in active travel.
 
 ## Looking at commuting times
 
