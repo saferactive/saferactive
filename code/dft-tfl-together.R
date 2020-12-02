@@ -242,12 +242,14 @@ fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRU
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                       counts_early_years$easting, counts_early_years$northing, dist = 0.1)
+# dist = 0.02) # for calculation of borough means
 fitted[ind] = NA
 # join the predictions with the framework data
 pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
+saveRDS(pred_all_points_year, "gam-early-year-peak-grid.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -312,13 +314,16 @@ pdata = with(counts_combined,
 fitted = predict(m2, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
-                      counts_combined$easting, counts_combined$northing, dist = 0.1)
+                      counts_combined$easting, counts_combined$northing,
+                      dist = 0.1)
+# dist = 0.02) # for calculation of borough means
 fitted[ind] = NA
 # join the predictions with the framework data
 pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
+saveRDS(pred_all_points_year, "gam_late_year_peak_grid.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -364,7 +369,7 @@ plot(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late, xlab = "Tf
 # ggsave(plot = tosave, "figures/gam-change-late.png")
 
 
-# Adjustment factors from 2011 --------------------------------------------
+# Adjustment factors from 2011, for boroughs--------------------------------
 
 # gam_early_year = readRDS("gam-early-year.Rds")
 gam_early_year = readRDS("gam-early-year-peak.Rds")
@@ -426,3 +431,68 @@ tm_shape(lads_data) +
   tm_polygons("change_cycles", palette = "BrBG", n = 6) +
   tm_text(text = "Name", size = 0.7) +
   tm_facets("year")
+
+
+# Adjustment factors from 2011, for spatial grid --------------------------
+
+gam_early_year = readRDS("gam-early-year-peak-grid.Rds")
+gam_late_year = readRDS("gam_late_year_peak_grid.Rds")
+
+# get change relative to 2011 for the early years
+gam_2011 = gam_early_year %>%
+  filter(year == 2011) %>%
+  ungroup() %>%
+  mutate(change_2011 = Fitted) %>%
+  select(easting, northing, change_2011)
+
+gam_early_results = inner_join(gam_early_year, gam_2011) %>%
+  mutate(change_relative_to_2011 = Fitted / change_2011)
+
+# bridge to the late years
+gam_up_to_2015 = gam_early_results %>%
+  filter(year == 2015) %>%
+  select(easting, northing, change_relative_to_2011)
+
+gam_2015 = gam_late_year %>%
+  filter(year == 2015) %>%
+  ungroup() %>%
+  mutate(change_2015 = Fitted) %>%
+  select(easting, northing, change_2015)
+
+gam_2015_onwards = inner_join(gam_late_year, gam_2015) %>%
+  mutate(change_relative_to_2015 = Fitted / change_2015)
+
+gam_bridged = inner_join(gam_2015_onwards, gam_up_to_2015, by = c("easting", "northing"))
+
+gam_bridged = gam_bridged %>%
+  mutate(complete_change = change_relative_to_2011*change_relative_to_2015)
+
+# collate full results
+gam_bridged %>% select(easting, northing, year, change_cycles = complete_change)
+gam_early_results %>% select(easting, northing, year, change_cycles = change_relative_to_2011)
+
+gam_full_results = rbind(
+  (gam_early_results %>% select(easting, northing, year, change_cycles = change_relative_to_2011)),
+  (gam_bridged %>% select(easting, northing, year, change_cycles = complete_change) %>%
+     filter(year != 2015))
+)
+dim(gam_full_results)
+View(gam_full_results)
+
+forplot = gam_full_results %>% group_by(year) %>%
+  summarise(change_cycles = mean(change_cycles))
+ggplot(forplot) +
+  geom_line(aes(year, change_cycles)) +
+  xlab("Year") +
+  ylab("Mean change in predicted cycle count for London grid cells")
+
+saveRDS(gam_full_results, "gam-full-results-peak-grid.Rds")
+
+lads_data = inner_join(lads, gam_full_results)
+
+library(tmap)
+tm_shape(lads_data) +
+  tm_polygons("change_cycles", palette = "BrBG", n = 6) +
+  tm_text(text = "Name", size = 0.7) +
+  tm_facets("year")
+
