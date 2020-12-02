@@ -1,6 +1,6 @@
 # Aim: get clean geographic data with 2019 county and UA definitions used throughout
 # Script also removes counts from motorways and estimated counts
-# Output used in `dft-aadf.R` and `dft-aadf-descriptive.R`
+# Output used in `gam-model.R` (raw counts) and `dft-aadf.R` (annual average daily flows)
 
 library(tidyverse)
 remotes::install_github("itsleeds/dftTrafficCounts")

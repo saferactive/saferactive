@@ -1,3 +1,5 @@
+# This file brings together TfL count data from `tfl-verification.R` and DfT count data for London from `gam-model.R`. Both are modelled using raw counts for peak hours only, with quarterly seasonal adjustment factors applied for standardisation.
+
 library(tidyverse)
 library(sf)
 
@@ -169,6 +171,12 @@ forplot = counts_early_years %>%
   summarise(change_cycles_early = weighted.mean(change_cycles_early, w = sum_cycles_early))
 plot(change_cycles_early ~ year, data = forplot)
 
+ggplot(forplot) +
+  geom_line(aes(year, change_cycles_early, colour = "darkred")) +
+  xlab("Year") +
+  ylab("Mean change in peak cycle flows (DfT counts)") +
+  theme(legend.position = "none")
+
 counts_combined %>%
   group_by(year, name) %>%
   summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late)) %>%
@@ -184,7 +192,14 @@ forplot = counts_combined %>%
   summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late))
 plot(change_cycles_late ~ year, data = forplot)
 
-# ggplot(counts_combined) +
+ggplot(forplot, aes(x = year, y = change_cycles_late)) +
+  geom_line(aes(color = data_source)) +
+  scale_color_manual(values = c("darkred", "steelblue")) +
+  xlab("Year") +
+  ylab("Mean change in peak cycle flows") +
+  labs(colour = "Data source")
+
+# ggplot(forplot) +
 #   geom_line(aes(year, change_cycles_late, colour = data_source))
 
 plot(counts_combined$year, counts_combined$change_cycles_late)
@@ -226,7 +241,7 @@ pdata = with(counts_early_years,
 fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
-                      counts_early_years$easting, counts_early_years$northing, dist = 0.02)
+                      counts_early_years$easting, counts_early_years$northing, dist = 0.1)
 fitted[ind] = NA
 # join the predictions with the framework data
 pred_all_points_year = cbind(pdata, Fitted = fitted)
@@ -297,7 +312,7 @@ pdata = with(counts_combined,
 fitted = predict(m2, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
-                      counts_combined$easting, counts_combined$northing, dist = 0.02)
+                      counts_combined$easting, counts_combined$northing, dist = 0.1)
 fitted[ind] = NA
 # join the predictions with the framework data
 pred_all_points_year = cbind(pdata, Fitted = fitted)

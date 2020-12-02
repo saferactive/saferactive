@@ -1,4 +1,7 @@
-# GAM model for DfT count data from London only
+# Processing of DfT raw count data from London only.
+# Uses output from `geographical-data-cleaning.R`
+
+# File also includes GAM model for DfT counts only. GAM including DfT and TfL counts is in `dft-tfl-together.R`
 
 library(tidyverse)
 library(mgcv)
@@ -13,22 +16,11 @@ library(ggpubr)
 # piggyback::pb_download("traffic_london.Rds")
 # traffic_london = readRDS("traffic_london.Rds")
 
-##Latest DfT dataset including 2019 counts
-# remotes::install_github("itsleeds/dftTrafficCounts")
-# library(dftTrafficCounts)
-#
-# u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_raw_counts.zip"
-# d = dtc_import(u = u)
-#
-# saveRDS(d, "traffic-data-29092020.Rds")
-
-# traffic_latest = readRDS("traffic-data-29092020.Rds")
-
 traffic_latest = readRDS("traffic_cyclable_clean_raw.Rds")
 
-traffic_u = traffic_latest %>%
-  unique()
-dim(traffic_u) #4321788
+# traffic_u = traffic_latest %>%
+#   unique()
+# dim(traffic_u) #4321788
 
 # Get local authority names
 traffic_latest = traffic_latest %>%
@@ -40,11 +32,9 @@ traffic_latest = traffic_latest %>%
          road_category != "PM")
 dim(traffic_latest) #4321788
 
-traffic_lu = traffic_latest %>%
+traffic_latest = traffic_latest %>%
   unique()
-dim(traffic_lu) #4155984
-
-traffic_latest = traffic_lu
+dim(traffic_latest) #4155984
 
 # Fix points with location errors
 # traffic_latest %>% filter(count_point_id == 946853) %>%
