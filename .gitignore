@@ -22,3 +22,5 @@ counties-*
 rnet_split.gpkg
 *.asc
 *.xml
+*gpkg
+*.pbf
