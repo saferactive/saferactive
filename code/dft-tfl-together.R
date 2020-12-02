@@ -1,4 +1,8 @@
-# This file brings together TfL count data from `tfl-verification.R` and DfT count data for London from `gam-model.R`. Both are modelled using raw counts for peak hours only, with quarterly seasonal adjustment factors applied for standardisation.
+# This file brings together TfL count data from `tfl-verification.R` and DfT count data for London from `gam-model.R`.
+# Both are modelled using raw counts for peak hours only, with quarterly seasonal adjustment factors applied for standardisation.
+# All outputs are included in saferactive release 0.1.2
+# peak hour correction factors by borough are in `gam-full-results-peak.Rds`
+# peak hour correction factors by grid cell are in `gam-full-results-peak-grid.Rds`
 
 library(tidyverse)
 library(sf)
@@ -488,11 +492,4 @@ ggplot(forplot) +
 
 saveRDS(gam_full_results, "gam-full-results-peak-grid.Rds")
 
-lads_data = inner_join(lads, gam_full_results)
-
-library(tmap)
-tm_shape(lads_data) +
-  tm_polygons("change_cycles", palette = "BrBG", n = 6) +
-  tm_text(text = "Name", size = 0.7) +
-  tm_facets("year")
 
