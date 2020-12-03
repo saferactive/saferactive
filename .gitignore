@@ -24,3 +24,6 @@ rnet_split.gpkg
 *.xml
 *gpkg
 *.pbf
+/data
+/tmp
+/data_otp
