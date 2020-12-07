@@ -24,10 +24,6 @@ road safety in their areas.
 This first plot highlights the significant population and area variation
 in LAs.
 
-    ## Legend labels were too wide. The labels have been resized to 0.56, 0.48, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.41. Increase legend.width (argument of tm_layout) to make the legend wider and therefore the labels larger.
-
-    ## Some legend labels were too wide. These labels have been resized to 0.56, 0.51, 0.51, 0.51, 0.48, 0.45, 0.45, 0.45, 0.45, 0.45. Increase legend.width (argument of tm_layout) to make the legend wider and therefore the labels larger.
-
 ![](LA_trends_files/figure-gfm/pressure-1.png)<!-- -->
 
 As LAs vary signifianct is size, population, and character it is
@@ -72,81 +68,63 @@ serious and fatal ones. This could be use to more segregation of active
 travelers from motor traffic, lower traffic speed or greater driver
 awareness of active travelers.
 
-![](LA_trends_files/figure-gfm/crash_la_plot2-1.png)<!-- --> \#\#\# Top
-and Bottom LAs
+![](LA_trends_files/figure-gfm/crash_la_plot2-1.png)<!-- -->
+
+### Top and Bottom LAs
 
 This table lists the top 10 and bottom 10 LAs for Active Travel KSI per
 100,000 resident population.
 
-    ##                         la_name rank active_ksi_per100k total_crash crash_fatal
-    ## 93               City of London    1                525         229           1
-    ## 125                 Westminster    2                 73        1553           3
-    ## 112      Kensington and Chelsea    3                 48         668           3
-    ## 42                   Portsmouth    4                 46         485           3
-    ## 120                   Southwark    5                 40        1237           3
-    ## 105      Hammersmith and Fulham    6                 38         733           1
-    ## 104                     Hackney    7                 38         906           2
-    ## 10  Kingston upon Hull, City of    8                 37         807           5
-    ## 9                     Blackpool    9                 36         304           2
-    ## 41            Brighton and Hove   10                 36         686           2
-    ## 157          Na h-Eileanan Siar  196                  8          20           1
-    ## 194           Neath Port Talbot  197                  8         164           3
-    ## 201                     Torfaen  198                  8          77           1
-    ## 171               Aberdeenshire  199                  8         238           8
-    ## 195                    Bridgend  200                  7         165           5
-    ## 146               Staffordshire  201                  6        1017          23
-    ## 196           Vale of Glamorgan  202                  6         144           1
-    ## 34             Bracknell Forest  203                  3         107           3
-    ## 162                       Moray  204                  3          49           5
-    ## 50              Isles of Scilly  205                  0           2           0
+|     | la\_name                    | rank | active\_ksi\_per100k | total\_crash | crash\_fatal |
+| :-- | :-------------------------- | ---: | -------------------: | -----------: | -----------: |
+| 93  | City of London              |    1 |                  525 |          229 |            1 |
+| 125 | Westminster                 |    2 |                   73 |         1553 |            3 |
+| 112 | Kensington and Chelsea      |    3 |                   48 |          668 |            3 |
+| 42  | Portsmouth                  |    4 |                   46 |          485 |            3 |
+| 120 | Southwark                   |    5 |                   40 |         1237 |            3 |
+| 105 | Hammersmith and Fulham      |    6 |                   38 |          733 |            1 |
+| 104 | Hackney                     |    7 |                   38 |          906 |            2 |
+| 10  | Kingston upon Hull, City of |    8 |                   37 |          807 |            5 |
+| 9   | Blackpool                   |    9 |                   36 |          304 |            2 |
+| 41  | Brighton and Hove           |   10 |                   36 |          686 |            2 |
+| 157 | Na h-Eileanan Siar          |  196 |                    8 |           20 |            1 |
+| 194 | Neath Port Talbot           |  197 |                    8 |          164 |            3 |
+| 201 | Torfaen                     |  198 |                    8 |           77 |            1 |
+| 171 | Aberdeenshire               |  199 |                    8 |          238 |            8 |
+| 195 | Bridgend                    |  200 |                    7 |          165 |            5 |
+| 146 | Staffordshire               |  201 |                    6 |         1017 |           23 |
+| 196 | Vale of Glamorgan           |  202 |                    6 |          144 |            1 |
+| 34  | Bracknell Forest            |  203 |                    3 |          107 |            3 |
+| 162 | Moray                       |  204 |                    3 |           49 |            5 |
+| 50  | Isles of Scilly             |  205 |                    0 |            2 |            0 |
 
 As mention above City of London and Westminster are probably distorted
 due to there high daytime population. This emphasizes the need to adjust
 for the level of active travel activity not just population. Ranking by
 workplace population gives slightly different results.
 
-    ##                         la_name rank active_ksi_per100k_work total_crash
-    ## 104                     Hackney    1                     102         906
-    ## 42                   Portsmouth    2                      91         485
-    ## 124                  Wandsworth    3                      90         981
-    ## 9                     Blackpool    4                      79         304
-    ## 106                    Haringey    5                      79         832
-    ## 10  Kingston upon Hull, City of    6                      77         807
-    ## 41            Brighton and Hove    7                      77         686
-    ## 8         Blackburn with Darwen    8                      76         359
-    ## 43                  Southampton    9                      74         537
-    ## 114                     Lambeth   10                      74        1203
-    ## 201                     Torfaen  164                      20          77
-    ## 84                     Solihull  165                      20         259
-    ## 197                     Cardiff  166                      19         361
-    ## 25        South Gloucestershire  167                      18         432
-    ## 195                    Bridgend  168                      17         165
-    ## 196           Vale of Glamorgan  169                      17         144
-    ## 146               Staffordshire  170                      15        1017
-    ## 93               City of London  171                      14         229
-    ## 34             Bracknell Forest  172                       6         107
-    ## 50              Isles of Scilly  173                       0           2
-    ##     crash_fatal
-    ## 104           2
-    ## 42            3
-    ## 124           6
-    ## 9             2
-    ## 106           2
-    ## 10            5
-    ## 41            2
-    ## 8             2
-    ## 43            3
-    ## 114           1
-    ## 201           1
-    ## 84            5
-    ## 197           5
-    ## 25            5
-    ## 195           5
-    ## 196           1
-    ## 146          23
-    ## 93            1
-    ## 34            3
-    ## 50            0
+|     | la\_name                    | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
+| :-- | :-------------------------- | ---: | -------------------------: | -----------: | -----------: |
+| 104 | Hackney                     |    1 |                        102 |          906 |            2 |
+| 42  | Portsmouth                  |    2 |                         91 |          485 |            3 |
+| 124 | Wandsworth                  |    3 |                         90 |          981 |            6 |
+| 9   | Blackpool                   |    4 |                         79 |          304 |            2 |
+| 106 | Haringey                    |    5 |                         79 |          832 |            2 |
+| 10  | Kingston upon Hull, City of |    6 |                         77 |          807 |            5 |
+| 41  | Brighton and Hove           |    7 |                         77 |          686 |            2 |
+| 8   | Blackburn with Darwen       |    8 |                         76 |          359 |            2 |
+| 43  | Southampton                 |    9 |                         74 |          537 |            3 |
+| 114 | Lambeth                     |   10 |                         74 |         1203 |            1 |
+| 201 | Torfaen                     |  164 |                         20 |           77 |            1 |
+| 84  | Solihull                    |  165 |                         20 |          259 |            5 |
+| 197 | Cardiff                     |  166 |                         19 |          361 |            5 |
+| 25  | South Gloucestershire       |  167 |                         18 |          432 |            5 |
+| 195 | Bridgend                    |  168 |                         17 |          165 |            5 |
+| 196 | Vale of Glamorgan           |  169 |                         17 |          144 |            1 |
+| 146 | Staffordshire               |  170 |                         15 |         1017 |           23 |
+| 93  | City of London              |  171 |                         14 |          229 |            1 |
+| 34  | Bracknell Forest            |  172 |                          6 |          107 |            3 |
+| 50  | Isles of Scilly             |  173 |                          0 |            2 |            0 |
 
 # Historical Trends
 
@@ -155,8 +133,6 @@ in 2010 and 2019 suggesting no overall change. The plot blow shows the
 Active Travel KSI rate per 100,000 workplace population from 2010 to
 2019. The majority of LAs are shwon with the thin grey lines, while the
 top 5 and bottom 5 LAs are highlighted in colour.
-
-    ## Warning: Removed 330 row(s) containing missing values (geom_path).
 
 ![](LA_trends_files/figure-gfm/trends_plot-1.png)<!-- -->
 
@@ -169,8 +145,6 @@ If we look for areas with the biggest change in KSI rates between 2010
 and 2019 we can see some weak noisy trends, with areas such a Torbay
 appreasing to increas in KSIs and Stoke on Trent declining.
 
-    ## Warning: Removed 330 row(s) containing missing values (geom_path).
-
 ![](LA_trends_files/figure-gfm/trends2_plot-1.png)<!-- --> If we instead
 compare KSI against the resident population (adding in Scotland to the
 analysis) we can see that Aberdeen City have made a sustained decline in
@@ -181,19 +155,12 @@ represent a real world change in safety worthy of detailed study. In
 particular the Launch of Scotland’s Road Safety Framework in 2009 may
 have been successful in reducing Active Travel KSIs.
 
-    ## Scale for 'y' is already present. Adding another scale for 'y', which will
-    ## replace the existing scale.
-
-    ## Warning: Removed 190 row(s) containing missing values (geom_path).
-
 ![](LA_trends_files/figure-gfm/trends3_plot-1.png)<!-- -->
 
 ## Temporal Analysis
 
 If we consider when active travelers are most likely to be injured, it
 may provide insights into the causes of these crashes.
-
-    ## Warning: Removed 132 rows containing missing values (position_stack).
 
 ![](LA_trends_files/figure-gfm/tempo_plot-1.png)<!-- -->
 
@@ -202,10 +169,6 @@ of Active Travelers KSI between 2010 and 2019 for each hour of the day
 in Great Britain. There are clear spikes around the morning and
 afternoon rush hours and reduced levels during the night. This graph
 largely reflect the general pattern of traffic though the day.
-
-    ## Warning: `fun.y` is deprecated. Use `fun` instead.
-
-    ## Warning: Removed 132 rows containing non-finite values (stat_summary).
 
 ![](LA_trends_files/figure-gfm/tempo_plot2-1.png)<!-- -->
 

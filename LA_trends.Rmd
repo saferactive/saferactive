@@ -141,7 +141,7 @@ We are using upper tier local authorities for this analysis as they tend to be t
 
 This first plot highlights the significant population and area variation in LAs. 
 
-```{r pressure, echo=FALSE}
+```{r pressure, echo=FALSE, warning=FALSE, message=FALSE}
 m1 <- tm_shape(la) +
   tm_fill(col = "population_2019",
           title = "Population (2019)",
@@ -169,7 +169,7 @@ As LAs vary signifianct is size, population, and character it is unlikely that s
 
 ## Crashes by LA in context
 
-```{r crash_la, echo=FALSE, message=FALSE}
+```{r crash_la, echo=FALSE, warning=FALSE, message=FALSE}
 crash <- st_join(crash, la[,c("la_name", "code")])
 
 # Get Year and Month
@@ -209,7 +209,7 @@ We have adjusted the plots to show KSI rate of active travlers per 100,000 peopl
 
 
 
-```{r crash_la_plot, echo=FALSE}
+```{r crash_la_plot, echo=FALSE, warning=FALSE, message=FALSE}
 m1 <- tm_shape(la) +
   tm_fill(col = "active_ksi_per100k",
           title = "Active Travel KSI per 100,000 people (2018)",
@@ -241,7 +241,7 @@ We can also compare the proportion of slightly injured people vs the proportion 
 If this represent a genuine difference in safety, then LAs with a high ratio (dark green) are having proportionally more slight casualties than serious and fatal ones. This could be use to more segregation of active travelers from motor traffic, lower traffic speed or greater driver awareness of active travelers. 
 
 
-```{r crash_la_plot2, echo=FALSE}
+```{r crash_la_plot2, echo=FALSE, warning=FALSE, message=FALSE}
 tm_shape(la) +
   tm_fill(col = "active_slight_per_ksi",
           title = "Slight Active casualties per KSI",
@@ -253,23 +253,25 @@ tm_shape(la) +
   tm_borders() +
   tm_layout(legend.outside = TRUE)
 ```
+   
+
 ### Top and Bottom LAs
 
 This table lists the top 10 and bottom 10 LAs for Active Travel KSI per 100,000 resident population.
 
-```{r crash_top10, echo=FALSE}
+```{r crash_top10, echo=FALSE, warning=FALSE, message=FALSE}
 la_top10 <- st_drop_geometry(la)
 la_top10 <- la_top10[order(la_top10$active_ksi_per100k, decreasing = TRUE),]
 la_top10$rank <- seq(1,nrow(la_top10))
 la_top10 <- la_top10[c(1:10,196:205),]
 la_top10 <- la_top10[,c("la_name","rank","active_ksi_per100k","total_crash","crash_fatal")]
 la_top10$active_ksi_per100k <- round(la_top10$active_ksi_per100k)
-la_top10
+knitr::kable(la_top10)
 ```
 
 As mention above City of London and Westminster are probably distorted due to there high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population.  Ranking by workplace population gives slightly different results.
 
-```{r crash_top10_work, echo=FALSE}
+```{r crash_top10_work, echo=FALSE, warning=FALSE, message=FALSE}
 la_top10_work <- st_drop_geometry(la)
 la_top10_work <- la_top10_work[order(la_top10_work$active_ksi_per100k_work, decreasing = TRUE),]
 la_top10_work$rank <- seq(1,nrow(la_top10_work))
@@ -277,14 +279,14 @@ la_top10_work <- la_top10_work[!is.na(la_top10_work$active_ksi_per100k_work),]
 la_top10_work <- la_top10_work[c(1:10,seq(nrow(la_top10_work) - 9, nrow(la_top10_work))),]
 la_top10_work <- la_top10_work[,c("la_name","rank","active_ksi_per100k_work","total_crash","crash_fatal")]
 la_top10_work$active_ksi_per100k_work <- round(la_top10_work$active_ksi_per100k_work)
-la_top10_work
+knitr::kable(la_top10_work)
 ```
 
 # Historical Trends
 
 Looking at absolute number of KSI, the top 10 and bottom 10 are the same in 2010 and 2019 suggesting no overall change. The plot blow shows the Active Travel KSI rate per 100,000 workplace population from 2010 to 2019. The majority of LAs are shwon with the thin grey lines, while the top 5 and bottom 5 LAs are highlighted in colour.
 
-```{r trends, echo=FALSE}
+```{r trends, echo=FALSE, warning=FALSE, message=FALSE}
 la <- la[order(la$active_ksi_per100k_work, decreasing = TRUE),]
 top_5 <- la$la_name[1:5]
 bottom_5 <- la$la_name[seq(169,173)]
@@ -301,7 +303,7 @@ crash_yr$la_name_plot <- ifelse(crash_yr$la_name %in% c(top_5, bottom_5), crash_
 crash_yr$lwd <- ifelse(crash_yr$la_name_plot == "Other", FALSE, TRUE )
 ```
 
-```{r trends_plot, echo=FALSE}
+```{r trends_plot, echo=FALSE, warning=FALSE, message=FALSE}
 
 ggplot(crash_yr,
        aes(year, active_ksi_per100k_work, colour = la_name_plot, group = la_name)) +
@@ -326,7 +328,7 @@ The KSI rates fluctuate significantly per year, this reflects the noisy nature o
 
 If we look for areas with the biggest change in KSI rates between 2010 and 2019 we can see some weak noisy trends, with areas such a Torbay appreasing to increas in KSIs and Stoke on Trent declining. 
 
-```{r trends2, echo=FALSE}
+```{r trends2, echo=FALSE, warning=FALSE, message=FALSE}
 crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","active_ksi_per100k_work")],
                              values_from = "active_ksi_per100k_work",
                              names_from = "year")
@@ -342,7 +344,7 @@ crash_yr$la_name_plot <- ifelse(crash_yr$la_name %in% c(change_top_5, change_bot
 crash_yr$lwd <- ifelse(crash_yr$la_name_plot == "Other", FALSE, TRUE )
 ```
 
-```{r trends2_plot, echo=FALSE}
+```{r trends2_plot, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(crash_yr,
        aes(year, active_ksi_per100k_work, colour = la_name_plot, group = la_name)) +
   geom_line(data = subset(crash_yr, lwd == FALSE), aes(size = lwd)) +
@@ -363,7 +365,7 @@ ggplot(crash_yr,
 ```
 If we instead compare KSI against the resident population (adding in Scotland to the analysis) we can see that Aberdeen City have made a sustained decline in KSI rates over the last ten years, down over 60% from their high in 2011. Unlike some other LAs where the rate appears variable but steady, the KSI rate in Aberdeen has fallen almost every year and thus may represent a real world change in safety worthy of detailed study. In particular the Launch of Scotland's Road Safety Framework in 2009 may have been successful in reducing Active Travel KSIs.
 
-```{r trends3, echo=FALSE}
+```{r trends3, echo=FALSE, warning=FALSE, message=FALSE}
 crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","active_ksi_per100k")],
                              values_from = "active_ksi_per100k",
                              names_from = "year")
@@ -383,7 +385,7 @@ crash_yr$la_name_plot <- ifelse(crash_yr$la_name %in% c(change_top_5, change_bot
 crash_yr$lwd <- ifelse(crash_yr$la_name_plot == "Other", FALSE, TRUE )
 ```
 
-```{r trends3_plot, echo=FALSE}
+```{r trends3_plot, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(crash_yr,
        aes(year, active_ksi_per100k, colour = la_name_plot, group = la_name)) +
   geom_line(data = subset(crash_yr, lwd == FALSE), aes(size = lwd)) +
@@ -408,7 +410,7 @@ ggplot(crash_yr,
 
 If we consider when active travelers are most likely to be injured, it may provide insights into the causes of these crashes.
 
-```{r tempo, echo=FALSE}
+```{r tempo, echo=FALSE, warning=FALSE, message=FALSE}
 crash$hour <- hour(crash$datetime)
 crash$day_of_year <- yday(crash$datetime)
 crash$week_of_year <- week(crash$datetime)
@@ -416,7 +418,7 @@ crash$month_of_year <- month(crash$datetime)
 crash$active_ksi <- crash$casualty_fatal_cyclist + crash$casualty_fatal_pedestrian + crash$casualty_serious_cyclist + crash$casualty_serious_pedestrian
 ```
 
-```{r tempo_plot, echo=FALSE}
+```{r tempo_plot, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(crash, aes(hour, active_ksi)) +
   geom_col() +
   ylab("Active Travellers KSI") +
@@ -426,7 +428,7 @@ ggplot(crash, aes(hour, active_ksi)) +
 
 First we can consider the time of day. This plot show the total number of Active Travelers KSI between 2010 and 2019 for each hour of the day in Great Britain. There are clear spikes around the morning and afternoon rush hours and reduced levels during the night. This graph largely reflect the general pattern of traffic though the day.
 
-```{r tempo_plot2, echo=FALSE}
+```{r tempo_plot2, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(crash, aes(day_of_year, active_ksi)) +
   stat_summary(fun.y = sum, geom ='line') +
   ylab("Active Travellers KSI") +
@@ -436,7 +438,7 @@ ggplot(crash, aes(day_of_year, active_ksi)) +
 
 Consider change through the year, this plot shows the number of of Active Travelers KSI between 2010 and 2019 for each day of the year in Great Britain. The trend is mostly stable with low point around Christmas (day 360). KSI rates appear to decline over the summer (days 180 - 240) before rising sharply in September. This may reflect a change in travel behavior around the start of the new school year.  
 
-```{r tempo_plot3, echo=FALSE}
+```{r tempo_plot3, echo=FALSE, warning=FALSE, message=FALSE}
 crash_select <- crash[crash$la_name %in% c("City of London","Cumbria","Kingston upon Hull, City of"), ]
 
 ggplot(crash_select, aes(week_of_year, active_ksi, group = la_name, color = la_name)) +
@@ -462,7 +464,7 @@ commutert 7 am - 10 am 4 - 7 pm
 
 As we have the best data for cycling activity during communing times (via the PCT), we have filtered the data in this section to only conisder crashes between 7am - 10am and 4pm - 7pm. 
 
-```{r trends_commute, echo=FALSE}
+```{r trends_commute, echo=FALSE, warning=FALSE, message=FALSE}
  
 
 
