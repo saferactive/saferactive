@@ -213,6 +213,10 @@ plot(counts_combined$year, counts_combined$change_cycles_late)
 #   tally()
 # unique(dd$n)
 
+#investigate response variables
+hist(counts_combined$change_cycles_late, breaks = 100)
+hist(counts_early_years$change_cycles_early, breaks = 50)
+
 
 # GAM model for early years  ----------------------------------------------
 
@@ -329,6 +333,9 @@ pred_all_points_year = pred_all_points_year %>%
 
 saveRDS(pred_all_points_year, "gam_late_year_peak_grid.Rds")
 
+# Get confidence intervals
+confint = predict(m2, newdata = pdata, type = "link")
+
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
   viridis::scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
@@ -368,7 +375,7 @@ gam_late_year = readRDS("gam_late_year_peak.Rds")
 verify = left_join(counter_la_results, gam_late_year, by = c("year", "Borough"))
 
 cor(verify$change_tfl_cycles, verify$gam_change_cycles_late)^2 #R squared = 0.15 #peak 0.194
-plot(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late, xlab = "TfL change in cycle counts (adjusted daily flow)", ylab = "GAM predictions of change (AADF)")
+plot(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late, xlab = "TfL change in mean cycle counts (seasonally adjusted peak hour flow)", ylab = "GAM predictions of change in cycling uptake")
 # line(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late)
 # ggsave(plot = tosave, "figures/gam-change-late.png")
 
