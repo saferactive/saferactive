@@ -1,13 +1,15 @@
 # Get and analyse historic OSM data - starter for 10
 
 # install up-to-date osmextract
-remotes::install_github("itsleeds/osmextract")
+remotes::install_github("itsleeds/osmextract", "add_normalizepath")
+# remotes::install_github("itsleeds/osmextract")
 library(osmextract)
 library(tidyverse)
 library(sf)
 
 osm_directory = "/home/bananafan/Downloads/"
 osm_directory = "/home/robin/hd/data/osm/internal/"
+osm_directory = "~/hd/data/osm/internal/"
 
 # file.copy(file.path(osm_directory, "greater-london-160101-internal.osm.pbf"), ".")
 # fails:
@@ -65,10 +67,17 @@ wf_2018s$year = 2018
 
 wf_yrs = rbind(wf_2018s, wf_2016s)
 wf_yrs$year = as.character(wf_yrs$year)
+sort(table(wf_2018j$)
+
+     https://us02web.zoom.us/s/86909837868?pwd=TEM2bkhicnVBUEVrZlg1WUxOK1VYZz09#success
 
 ggplot(wf_yrs %>% filter(stringr::str_detect(string = highway, pattern = "cycle|res"))) +
   geom_bar(aes(year, n, fill = year), stat = "identity") +
   facet_grid(NAME ~ highway)
+
+ggplot(wf_yrs) +
+  geom_bar(aes(year, n, fill = year), stat = "identity") +
+  facet_grid(NAME ~ maxspeed)
 
 wf_percent = wf_yrs %>%
   group_by(NAME, highway) %>%

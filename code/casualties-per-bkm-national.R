@@ -55,18 +55,22 @@ bike_sum = c_london %>%
 
 # Walking to work ---------------------------------------------------------
 
-# walk = pct::get_pct_routes_fast(region = "london", purpose = "commute", geography = "lsoa")
-#
-# walk_lim = walk %>%
-#   select(1:12) %>%
-#   filter(foot > 0)
-#
-# write_rds(walk_lim, "walk.Rds")
-#
-# walk_net = stplanr::overline2(x = walk_lim, "foot")
-#
-# write_rds(walk_net, "walk_net.Rds")
+# rnet_walk = pct::get_pct_routes_fast(region = "london", purpose = "commute", geography = "lsoa")
+routes_fast_walk = readRDS("~/npct/pct-outputs-regional-R/commute/lsoa/london/rf.Rds")
+routes_fast_walk = sf::st_as_sf(routes_fast_walk)
+sf::st_crs(routes_fast_walk) = 4326
 
+walk_lim = routes_fast_walk %>%
+  select(1:12) %>%
+  filter(foot > 0)
+
+write_rds(walk_lim, "walk.Rds")
+
+walk_net = stplanr::overline(walk_lim, "foot")
+
+write_rds(walk_net, "walk_net.Rds")
+
+piggyback::pb_upload("walk_net.Rds")
 walk_net = readRDS("walk_net.Rds")
 
 walk_net$lengths = walk_net %>% st_transform(27700) %>%
@@ -153,7 +157,7 @@ rate_per_borough = inner_join(lads, rate_per_borough, by = c("Name" = "local_aut
 
 rate_per_borough
 
-View(rate_per_borough)
+# View(rate_per_borough)
 
 plot(rate_per_borough)
 
@@ -162,7 +166,8 @@ write_rds(rate_per_borough, "rate_per_borough.Rds")
 rate_per_borough = read_rds("rate_per_borough.Rds")
 
 library(tmap)
-tmap_mode("view")
+# tmap_mode("view")
+tmap_mode("plot")
 
 ##cycle
 map1 = tm_shape(rate_per_borough) +
