@@ -17,6 +17,7 @@ dim(tfl_zero) #6221
 counter_locations = sf::read_sf("tfl-cycle-counter-locations.geojson")
 counter_locations = counter_locations %>% rename(`Site ID` = UnqID)
 tfl_zero$Borough = gsub("&", "and", tfl_zero$Borough)
+counter_locations$Borough = gsub("&", "and", counter_locations$Borough)
 
 counter_sf = inner_join(counter_locations, tfl_zero)
 counter_bng = counter_sf %>%
@@ -29,7 +30,7 @@ tfl_0 = counter_bng %>%
 tfl_nonzero = counter_bng %>%
   filter(! `Site ID` %in% tfl_0$`Site ID`,
          mean_site >= 5.0)
-dim(tfl_nonzero) #6181 #5613
+dim(tfl_nonzero) #6181 #5613 #6121
 
 tfl_nonzero$easting = st_coordinates(tfl_nonzero)[,1]
 tfl_nonzero$northing = st_coordinates(tfl_nonzero)[,2]
@@ -42,7 +43,7 @@ tfl_repeats = tfl_nonzero %>%
 
 tfl_nonzero = tfl_nonzero %>%
   filter(`Site ID` %in% tfl_repeats$`Site ID`)
-dim(tfl_nonzero) #6173 #5605
+dim(tfl_nonzero) #6173 #5605 #6113
 
 # calculate sum of counts at each point (helps to avoid giving too much weight to counts missing some years)
 
@@ -182,7 +183,12 @@ ggplot(forplot) +
   theme(legend.position = "none")
 
 counts_combined %>%
-  group_by(year, name) %>%
+  group_by(name, year) %>%
+  summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late)) %>%
+  View()
+
+tfl_nonzero %>%
+  group_by(name, year) %>%
   summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late)) %>%
   View()
 
@@ -331,7 +337,7 @@ pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
-saveRDS(pred_all_points_year, "gam_late_year_peak_grid.Rds")
+saveRDS(pred_all_points_year, "gam-late-year-peak-grid.Rds")
 
 # Get confidence intervals
 confint = predict(m2, newdata = pdata, type = "link")
@@ -363,18 +369,18 @@ gam_late_year = point_to_borough %>%
 View(gam_late_year)
 
 # saveRDS(gam_late_year, "gam_late_year.Rds")
-saveRDS(gam_late_year, "gam_late_year_peak.Rds")
+saveRDS(gam_late_year, "gam-late-year-peak.Rds")
 
 
 # Compare TfL counts with joint GAM predictions -----------------------------------------
 
 # counter_la_results = read.csv("tfl-counter-results-london-boroughs-2015-2019.csv")
 counter_la_results = read.csv("tfl-counter-results-london-boroughs-2015-2019-peak.csv")
-gam_late_year = readRDS("gam_late_year_peak.Rds")
+gam_late_year = readRDS("gam-late-year-peak.Rds")
 
 verify = left_join(counter_la_results, gam_late_year, by = c("year", "Borough"))
 
-cor(verify$change_tfl_cycles, verify$gam_change_cycles_late)^2 #R squared = 0.15 #peak 0.194
+cor(verify$change_tfl_cycles, verify$gam_change_cycles_late)^2 #R squared = 0.15 #peak 0.194 #peak 0.166
 plot(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late, xlab = "TfL change in mean cycle counts (seasonally adjusted peak hour flow)", ylab = "GAM predictions of change in cycling uptake")
 # line(x = verify$change_tfl_cycles, y = verify$gam_change_cycles_late)
 # ggsave(plot = tosave, "figures/gam-change-late.png")
@@ -447,7 +453,7 @@ tm_shape(lads_data) +
 # Adjustment factors from 2011, for spatial grid --------------------------
 
 gam_early_year = readRDS("gam-early-year-peak-grid.Rds")
-gam_late_year = readRDS("gam_late_year_peak_grid.Rds")
+gam_late_year = readRDS("gam-late-year-peak-grid.Rds")
 
 # get change relative to 2011 for the early years
 gam_2011 = gam_early_year %>%
