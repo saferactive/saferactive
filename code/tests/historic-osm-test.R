@@ -7,7 +7,7 @@ library(osmextract)
 library(tidyverse)
 library(sf)
 
-osm_directory = "/home/bananafan/Downloads/"
+# osm_directory = "/home/bananafan/Downloads/"
 osm_directory = "/home/robin/hd/data/osm/internal/"
 osm_directory = "~/hd/data/osm/internal/"
 
@@ -22,7 +22,7 @@ lnd_2016 = osmextract::oe_read(file_path = f, layer = "lines", extra_tags = extr
 lnd_2016$length = as.numeric(sf::st_length(lnd_2016))
 lnd = spData::lnd
 lnd$NAME
-mapview::mapview(lnd)
+# mapview::mapview(lnd)
 wf_redbridge = lnd %>%
   filter(stringr::str_detect(string = NAME, pattern = "Wal|Red"))
 
@@ -67,9 +67,6 @@ wf_2018s$year = 2018
 
 wf_yrs = rbind(wf_2018s, wf_2016s)
 wf_yrs$year = as.character(wf_yrs$year)
-sort(table(wf_2018j$)
-
-     https://us02web.zoom.us/s/86909837868?pwd=TEM2bkhicnVBUEVrZlg1WUxOK1VYZz09#success
 
 ggplot(wf_yrs %>% filter(stringr::str_detect(string = highway, pattern = "cycle|res"))) +
   geom_bar(aes(year, n, fill = year), stat = "identity") +

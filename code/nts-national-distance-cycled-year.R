@@ -36,7 +36,8 @@ distance_cycled = nts_dist_long %>%
   filter(Mode == "Bicycle")
 distance_cycled_joined = inner_join(distance_cycled, population_england)
 distance_cycled_total = distance_cycled_joined %>%
-  mutate(km_cycled_yr_ew = miles_person_yr * population * wales_multiplier * 1.61)
+  mutate(km_cycled_yr_ew = miles_person_yr * population * wales_multiplier * 1.61,
+         year = as.integer(year))
 distance_cycled_total # in 2011: 4475741485
 summary(distance_cycled_total$km_cycled_yr_ew)
 # Min.   1st Qu.    Median      Mean   3rd Qu.      Max.
@@ -47,3 +48,20 @@ plot(distance_cycled_total$year, distance_cycled_total$km_cycled_yr_ew, ylim = c
 points(distance_cycled_total$year, distance_cycled_total$km_cycled_yr_gb, ylim = c(0, 6e9))
 summary(distance_cycled_total$km_cycled_yr_gb)
 readr::write_csv(distance_cycled_total, "small-output-datasets/distance_cycled_total.csv")
+
+# compare with dft cycle counter data
+u = "http://data.dft.gov.uk.s3.amazonaws.com/road-traffic/region_traffic.csv"
+cycle_counter_aggregated = readr::read_csv(u)
+cycle_counters_gb = cycle_counter_aggregated %>%
+  group_by(year) %>%
+  summarise(across(c(pedal_cycles, all_motor_vehicles), sum))
+g1 = ggplot(distance_cycled_total %>% ungroup()) +
+  geom_point(aes(year, km_cycled_yr_gb)) +
+  geom_smooth(aes(x = year, y = km_cycled_yr_gb))
+g2 = ggplot(cycle_counters_gb) +
+  geom_point(aes(year, pedal_cycles)) +
+  geom_smooth(aes(year, pedal_cycles)) +
+  xlim(range(distance_cycled_total$year))
+library(patchwork)
+
+g1 + g2

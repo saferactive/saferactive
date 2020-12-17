@@ -1,5 +1,6 @@
 # Aim: estimate risk levels at the 500m grid cell level
 library(raster)
+library(dplyr)
 
 cycle_commute_ksi = raster::raster("rasters/cycle_commute_ksi.tif")
 cycle_commute_ksi_agg = raster::calc(cycle_commute_ksi, fun = mean)
@@ -30,7 +31,7 @@ raster_i_bkm[is.nan(raster_i_bkm)] = 0
 raster_i_bkm[is.infinite(raster_i_bkm)] = 0
 
 raster_ksi_bkm = cycle_commute_ksi_agg / raster_rnet_bicycle * 1e6
-raster_ksi_bkm[is.na(raster_ksi_bkm)] = 0
+raster_ksi_bkm[is.nan(raster_ksi_bkm)] = 0
 raster_ksi_bkm[is.infinite(raster_ksi_bkm)] = 0
 
 summary(values(raster_i_bkm))
@@ -51,8 +52,11 @@ raster_i_bkm_london = raster::crop(raster_i_bkm, london)
 raster_i_bkm_london_2km = aggregate(raster_i_bkm_london, 4, fun = mean)
 raster_i_bkm_london_4km = aggregate(raster_i_bkm_london, 8, fun = mean)
 mapview::mapview(raster_i_bkm_london)
+mapview::mapview(cycle_commute_all_agg)
 mapview::mapview(raster_i_bkm_london_2km)
 mapview::mapview(raster_i_bkm_london_4km)
+
+# Ideas for better representing crashes
 
 tmap_mode("view")
 brks = c(0, 10, 100, 500, 1000, 5000, 10000)
