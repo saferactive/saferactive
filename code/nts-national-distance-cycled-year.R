@@ -65,3 +65,4 @@ g2 = ggplot(cycle_counters_gb) +
 library(patchwork)
 
 g1 + g2
+# ggsave(filename = "figures/nts-counter-comparison.png")
