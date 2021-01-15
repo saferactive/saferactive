@@ -287,12 +287,10 @@ ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
         axis.text = element_blank(),
         axis.ticks = element_blank())
 
-lads = spData::lnd %>% rename(Borough = NAME) %>%
-  mutate(Borough = as.character(Borough)) %>%
-  mutate(Name = abbreviate(Borough, minlength = 2))
+lads = readRDS("lads.Rds")
 
 borough_geom = lads %>%
-  dplyr::select(Borough) %>%
+  dplyr::select(Name) %>%
   st_transform(27700)
 
 ## Assign to borough for predictions by year
@@ -300,14 +298,47 @@ pred_sf = pred_all_points_year %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 point_to_borough = st_join(x = pred_sf, y = borough_geom)
 ## Calculate mean annual predictions for each borough
-gam_all_year = point_to_borough %>%
+gam_with_lads = point_to_borough %>%
   drop_na() %>%
   group_by(Borough, year) %>%
   summarise(gam_change_cycles = mean(Fitted))
-View(gam_all_year)
+View(gam_with_lads)
 
 # saveRDS(gam_all_year, "gam-all-year.Rds")
-saveRDS(gam_all_year, "gam-all-year-peak.Rds")
+saveRDS(gam_with_lads, "gam-national-with-lads-peak.Rds")
+
+
+# Adjustment factors for national grid --------------------------
+
+gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
+
+# get change relative to 2011 for the early years
+gam_2011 = gam_all_year %>%
+  filter(year == 2011) %>%
+  ungroup() %>%
+  mutate(change_2011 = Fitted) %>%
+  select(easting, northing, change_2011)
+
+gam_all_results = inner_join(gam_all_year, gam_2011) %>%
+  mutate(change_relative_to_2011 = Fitted / change_2011)
+
+
+# collate full results
+gam_full_results = gam_all_results %>%
+  select(easting, northing, year, change_cycles = change_relative_to_2011)
+dim(gam_full_results)
+View(gam_full_results)
+
+forplot = gam_full_results %>% group_by(year) %>%
+  summarise(change_cycles = mean(change_cycles))
+ggplot(forplot) +
+  geom_line(aes(year, change_cycles)) +
+  xlab("Year") +
+  ylab("Mean change in predicted cycle count for London grid cells")
+
+saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
+piggyback::pb_upload("gam-full-results-peak-grid-national.Rds")
+
 
 
 
@@ -592,36 +623,6 @@ ggplot(forplot) +
 
 saveRDS(gam_full_results, "gam-full-results-peak-grid.Rds")
 
-
-# Adjustment factors for national grid --------------------------
-
-gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
-
-# get change relative to 2011 for the early years
-gam_2011 = gam_all_year %>%
-  filter(year == 2011) %>%
-  ungroup() %>%
-  mutate(change_2011 = Fitted) %>%
-  select(easting, northing, change_2011)
-
-gam_all_results = inner_join(gam_all_year, gam_2011) %>%
-  mutate(change_relative_to_2011 = Fitted / change_2011)
-
-
-# collate full results
-gam_full_results = gam_all_results %>%
-  select(easting, northing, year, change_cycles = change_relative_to_2011)
-dim(gam_full_results)
-View(gam_full_results)
-
-forplot = gam_full_results %>% group_by(year) %>%
-  summarise(change_cycles = mean(change_cycles))
-ggplot(forplot) +
-  geom_line(aes(year, change_cycles)) +
-  xlab("Year") +
-  ylab("Mean change in predicted cycle count for London grid cells")
-
-saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
 
 
 
