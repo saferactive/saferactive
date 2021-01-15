@@ -104,16 +104,21 @@ dim(t_london) #370500 #354864
 # traffic_bam = traffic_bam %>%
 #   filter(hour %in% 7:18)
 
+# # use peak hours only
+# traffic_peak_only = t_london %>%
+#   filter(hour %in% c(7, 8, 9, 16, 17, 18))
+# dim(traffic_peak_only) #185250 #177432
+
 # use peak hours only
-traffic_peak_only = t_london %>%
+traffic_peak_only = traffic_corrected %>%
   filter(hour %in% c(7, 8, 9, 16, 17, 18))
-dim(traffic_peak_only) #185250 #177432
+dim(traffic_peak_only) #2077931
 
 # check each count point is consistently either bi-directional or unidirectional
-ford = traffic_peak_only %>%
+wrong = traffic_peak_only %>%
   group_by(year, count_date, count_point_id) %>%
   tally()
-unique(ford$n)
+unique(wrong$n)
 # [1] 12  6
 
 # check2 = inner_join(traffic_peak_only, ford, by = c("year", "count_point_id", "count_date"))
@@ -121,12 +126,22 @@ unique(ford$n)
 #   length(distinct(check2$n))
 # unique(ddd$n)
 
-# # # check 4-way points
-# ford[ford$n == 24,]
-# ford = ford %>% filter(n == 24)
-# fd = traffic_peak_only %>% filter(count_point_id == 942920)
-# fd %>% group_by(year) %>% tally()
-# View(fd %>% filter(year == 2018))
+# # check 4-way points
+wrong[wrong$n == 24,]
+ford = wrong %>% filter(n == 24)
+fd = traffic_peak_only %>% filter(count_point_id == 940071)
+fd %>% group_by(year) %>% tally()
+View(fd %>% filter(year == 2018))
+
+traffic_peak_only = traffic_peak_only %>%
+  filter(! count_point_id %in% ford$count_point_id)
+t11 = wrong %>% filter(n == 11)
+traffic_peak_only = traffic_peak_only %>%
+  filter(! count_point_id %in% t11$count_point_id)
+
+dim(traffic_peak_only) #2050446
+# fd = fd %>%
+#   select(-easting, -northing)
 
 # combine bidirectional counts
 traffic_london_points = traffic_peak_only %>%
@@ -176,17 +191,17 @@ summary(traffic_london_bam$pedal_cycles)
 traffic_london_bam = traffic_london_bam %>%
   mutate(grid_location = paste(signif(traffic_london_bam$easting, digits = 3),signif(traffic_london_bam$northing, digits = 3)))
 
-dim(traffic_london_bam) #91446 #91560
+dim(traffic_london_bam) #91446 #91560 #1037034
 length(unique(traffic_london_bam$grid_location)) #1197
 
-saveRDS(traffic_london_bam, "raw-dft-london-hourly.Rds")
+saveRDS(traffic_london_bam, "raw-dft-national-hourly.Rds")
 
 
 #  Investigate count point numbers and placements per/across the year ----------------
 traffic_london_days = traffic_london_bam %>%
   group_by(year, count_date, DoY, name, count_point_id, easting, northing, grid_location) %>%
   summarise(pedal_cycles_adj = sum(pedal_cycles_adj))
-dim(traffic_london_days) #15260
+dim(traffic_london_days) #15260 #172839
 
 # check one day per site per year
 ford = traffic_london_days %>%
@@ -195,7 +210,7 @@ ford = traffic_london_days %>%
 unique(ford$n)
 # [1] 1
 
-saveRDS(traffic_london_days, "raw-dft-london-daily.Rds")
+saveRDS(traffic_london_days, "raw-dft-national-daily.Rds")
 
 #Get London Borough boundaries for maps
 lads = readRDS("lads.Rds")

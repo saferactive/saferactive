@@ -58,11 +58,11 @@ tfl_nonzero = tfl_nonzero %>%
 # dft_nonzero = readRDS("dft-london-no-zeroes-no-esti.Rds")
 # dim(dft_nonzero) #5215
 
-dft_all = readRDS("raw-dft-london-daily.Rds")
+dft_all = readRDS("raw-dft-national-daily.Rds")
 
 dft_all = dft_all %>%
   filter(year %in% 2010:2019)
-dim(dft_all) #7121
+dim(dft_all) #7121 #80516 national
 
 # get mean count per site
 dft_all = dft_all %>%
@@ -79,11 +79,11 @@ dft_0 = dft_all %>%
 dft_nonzero = dft_all %>%
   filter(! count_point_id %in% dft_0$count_point_id,
          mean_cycles >= 5.0)
-dim(dft_nonzero) #5775
+dim(dft_nonzero) #5775 #53434
 
 counts_early_years = dft_nonzero %>%
   filter(year %in% 2010:2015)
-dim(counts_early_years) #3156
+dim(counts_early_years) #3156 #28013
 
 # recalculate change in cycles
 counts_early_years = counts_early_years %>%
@@ -101,14 +101,14 @@ dft_early_years_repeats = counts_early_years %>%
 
 counts_early_years = counts_early_years %>%
   filter(count_point_id %in% dft_early_years_repeats$count_point_id)
-dim(counts_early_years) #2326
+dim(counts_early_years) #2326 #22092
 
 
 # DfT dataset for the years 2015-2019 -------------------------------------
 
 dft_late_years = dft_nonzero %>%
   filter(year %in% 2015:2019)
-dim(dft_late_years) #3077
+dim(dft_late_years) #3077 #29424
 
 # recalculate change in cycles
 dft_late_years = dft_late_years %>%
@@ -126,7 +126,7 @@ dft_late_years_repeats = dft_late_years %>%
 
 dft_late_years = dft_late_years %>%
   filter(count_point_id %in% dft_late_years_repeats$count_point_id)
-dim(dft_late_years) #1498
+dim(dft_late_years) #1498 #15240
 
 
 # Annual change comparisons
@@ -168,6 +168,17 @@ dft_late_years$data_source = "DfT"
 tfl_nonzero$data_source = "TfL"
 
 counts_combined = rbind(dft_late_years, tfl_nonzero)
+
+
+# Combine the two time periods into a single dataset ----------------------
+
+# intersect(counts_combined, counts_early_years)
+counts_combined = counts_combined %>%
+  select(year, name, count_point_id, easting, northing, pedal_cycles, change_cycles = change_cycles_late, mean_cycles = mean_cycles_late, sum_cycles = sum_cycles_late, data_source)
+counts_early_years = counts_early_years %>%
+  mutate(data_source = "DfT") %>%
+  select(year, name, count_point_id, easting, northing, pedal_cycles = pedal_cycles_adj, change_cycles = change_cycles_early, mean_cycles = mean_cycles_early, sum_cycles = sum_cycles_early, data_source)
+counts_all_years = bind_rows(counts_early_years, counts_combined)
 
 # Explore data
 
@@ -224,6 +235,82 @@ hist(counts_combined$change_cycles_late, breaks = 100)
 hist(counts_early_years$change_cycles_early, breaks = 50)
 
 
+# GAM for all years -------------------------------------------------------
+
+
+library(mgcv)
+
+M = list(c(1, 0.5), NA)
+
+m = bam(change_cycles ~
+          s(year, bs = "cr", k = 4)
+        + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
+        ,
+        weights = sum_cycles,
+        family = scat,
+        data = counts_all_years, method = 'fREML',
+        nthreads = 4, discrete = TRUE)
+
+summary(m)
+plot(m, pages = 4, scheme = 2, shade = TRUE)
+
+
+
+# assign the framework that will be used as a basis for predictions
+pdata = with(counts_all_years,
+             expand.grid(year = seq(min(year), max(year), by = 1),
+                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+# make predictions according to the GAM model
+fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE) #SLOW
+# predictions for points far from any counts set to NA
+ind = exclude.too.far(pdata$easting, pdata$northing,
+                      counts_all_years$easting, counts_all_years$northing, dist = 0.1)
+# dist = 0.02) # for calculation of borough means
+fitted[ind] = NA
+# join the predictions with the framework data
+pred_all_points_year = cbind(pdata, Fitted = fitted)
+pred_all_points_year = pred_all_points_year %>%
+  drop_na
+
+saveRDS(pred_all_points_year, "gam-all-year-peak-grid-national.Rds")
+
+ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
+  geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
+  viridis::scale_fill_viridis(name = "Pedal cycles", option = 'plasma',
+                              na.value = 'transparent') +
+  coord_fixed(ratio = 1) +
+  # geom_line(lads, alpha(0.1)) +
+  theme(legend.position = 'top', legend.key.width = unit(2, 'cm'),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+lads = spData::lnd %>% rename(Borough = NAME) %>%
+  mutate(Borough = as.character(Borough)) %>%
+  mutate(Name = abbreviate(Borough, minlength = 2))
+
+borough_geom = lads %>%
+  dplyr::select(Borough) %>%
+  st_transform(27700)
+
+## Assign to borough for predictions by year
+pred_sf = pred_all_points_year %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+point_to_borough = st_join(x = pred_sf, y = borough_geom)
+## Calculate mean annual predictions for each borough
+gam_all_year = point_to_borough %>%
+  drop_na() %>%
+  group_by(Borough, year) %>%
+  summarise(gam_change_cycles = mean(Fitted))
+View(gam_all_year)
+
+# saveRDS(gam_all_year, "gam-all-year.Rds")
+saveRDS(gam_all_year, "gam-all-year-peak.Rds")
+
+
+
 # GAM model for early years  ----------------------------------------------
 
 
@@ -252,7 +339,7 @@ pdata = with(counts_early_years,
                          easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
                          northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
 # make predictions according to the GAM model
-fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE)
+fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE) #SLOW
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                       counts_early_years$easting, counts_early_years$northing, dist = 0.1)
@@ -263,7 +350,7 @@ pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
-saveRDS(pred_all_points_year, "gam-early-year-peak-grid.Rds")
+saveRDS(pred_all_points_year, "gam-early-year-peak-grid-national.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -504,5 +591,37 @@ ggplot(forplot) +
   ylab("Mean change in predicted cycle count for London grid cells")
 
 saveRDS(gam_full_results, "gam-full-results-peak-grid.Rds")
+
+
+# Adjustment factors for national grid --------------------------
+
+gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
+
+# get change relative to 2011 for the early years
+gam_2011 = gam_all_year %>%
+  filter(year == 2011) %>%
+  ungroup() %>%
+  mutate(change_2011 = Fitted) %>%
+  select(easting, northing, change_2011)
+
+gam_all_results = inner_join(gam_all_year, gam_2011) %>%
+  mutate(change_relative_to_2011 = Fitted / change_2011)
+
+
+# collate full results
+gam_full_results = gam_all_results %>%
+  select(easting, northing, year, change_cycles = change_relative_to_2011)
+dim(gam_full_results)
+View(gam_full_results)
+
+forplot = gam_full_results %>% group_by(year) %>%
+  summarise(change_cycles = mean(change_cycles))
+ggplot(forplot) +
+  geom_line(aes(year, change_cycles)) +
+  xlab("Year") +
+  ylab("Mean change in predicted cycle count for London grid cells")
+
+saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
+
 
 
