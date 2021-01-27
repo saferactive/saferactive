@@ -1,6 +1,9 @@
 library(tidyverse)
 library(trafficalmr)
 
+# rural drivers - who they hit
+# young driver - age/passenger/other/where?
+
 a = stats19::get_stats19(year = 2015:2019, type = "ac")
 c = stats19::get_stats19(year = 2015:2019, type = "cas")
 v = stats19::get_stats19(year = 2015:2019, type = "veh")
@@ -53,6 +56,11 @@ ggplot(cjv) +
   scale_fill_discrete("Casualty type") +
   xlab("Largest vehicle involved") +
   ylab("Number of casualties")
+
+
+cjv_active = cvj %>%
+  filter()
+# focus on walking cycling
 
 saveRDS(cjv, "code/tests/app-who-hit-who/cjv.Rds")
 names(cjv)

@@ -41,3 +41,23 @@ ch = readr::read_csv(file.path(dde, "2010_2019_Cycle Helmets_167206.csv"))
 skimr::skim(ch)
 table(ch$c20lab)
 table(ch$c16lab)
+
+
+# vt ----------------------------------------------------------------------
+
+u = "https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2017-provisional/co2_passengers_cars_v15_csv/at_download/file"
+download.file(u, "~/hd/data/stats19-private/co2.zip")
+dir.create("~/hd/data/stats19-private/co2")
+unzip("~/hd/data/stats19-private/co2.zip", exdir = "~/hd/data/stats19-private/co2")
+(f = list.files("~/hd/data/stats19-private/co2", full.names = TRUE))
+# every single car type
+co2_ue = readr::read_tsv(f[2])
+co2_ue = data.table::fread(f)
+
+# https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2019-provisional
+
+
+vt = read_csv("~/onedrive/projects-all/saferactive/make-model-data/genmodel_classification.csv")
+vt
+
+# todo: adjust make and model, find most common

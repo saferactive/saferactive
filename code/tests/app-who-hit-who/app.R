@@ -4,9 +4,22 @@ library(plotly)
 library(mapdeck)
 library(tidyverse)
 
+
+# crashes = readRDS("code/tests/app-who-hit-who/cjv.Rds")
 crashes = readRDS("cjv.Rds")
 crashes$year = lubridate::year(crashes$date)
 crashes$month = lubridate::round_date(crashes$date, unit = "month")
+
+# Todo: make la/police filter attribute
+# crashes_sf = stats19::format_sf(crashes, lonlat = TRUE)
+# crashes_leeds = crashes_sf[ukboundaries::leeds, ]
+# table(crashes_leeds$local_authority_district)
+# table(crashes_leeds$local_authority_highway)
+# table(crashes_leeds$police_force)
+# crashes_leeds_fatal =  crashes_leeds %>%
+#   filter(accident_severity == "Fatal")
+# mapview::mapview(crashes_leeds_fatal) +
+#   mapview::mapview(ukboundaries::leeds)
 
 geographic_levels = c("roads", "region", "police force", "local authority", "constituency", "heatmap")
 casualty_types = c(Walking = "Pedestrian", Cycling = "Cyclist")
