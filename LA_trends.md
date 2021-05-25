@@ -26,6 +26,11 @@ in LAs.
 
 ![](LA_trends_files/figure-gfm/pressure-1.png)<!-- -->
 
+    ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
+    ##  [8] "#BF4602" "#923204" "#662506"
+    ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
+    ##  [8] "#BF4602" "#923204" "#662506"
+
 As LAs vary signifianct is size, population, and character it is
 unlikely that simple comparing the number of crashes or casualties will
 be a far comparison. Therefore it would be better to adjust the raw
@@ -39,6 +44,11 @@ LAs being between 8.2 and 24.1 per 100,000 people. Scotland has notably
 low KSI rates while, Cumbria, has a very high rate.
 
 ![](LA_trends_files/figure-gfm/crash_la_plot-1.png)<!-- -->
+
+    ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
+    ##  [8] "#BF4602" "#923204" "#662506"
+    ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
+    ##  [8] "#BF4602" "#923204" "#662506"
 
 The City of London is an extreme outline due to it very low resident
 population. This highlights the denominator issue. That the KSI rate is
@@ -70,21 +80,24 @@ awareness of active travelers.
 
 ![](LA_trends_files/figure-gfm/crash_la_plot2-1.png)<!-- -->
 
+    ## [1] "#D4BCDB" "#DFCAE3" "#EADBEB" "#EFE5EF" "#E8F3E4" "#BFE5B9" "#80C480"
+    ## [8] "#3A934C" "#0D5D28"
+
 ### Top and Bottom LAs
 
 This table lists the top 10 and bottom 10 LAs for Active Travel KSI per
 100,000 resident population.
 
 |     | la\_name                    | rank | active\_ksi\_per100k | total\_crash | crash\_fatal |
-| :-- | :-------------------------- | ---: | -------------------: | -----------: | -----------: |
+|:----|:----------------------------|-----:|---------------------:|-------------:|-------------:|
 | 93  | City of London              |    1 |                  525 |          229 |            1 |
-| 125 | Westminster                 |    2 |                   73 |         1553 |            3 |
+| 125 | Westminster                 |    2 |                   73 |         1552 |            3 |
 | 112 | Kensington and Chelsea      |    3 |                   48 |          668 |            3 |
 | 42  | Portsmouth                  |    4 |                   46 |          485 |            3 |
 | 120 | Southwark                   |    5 |                   40 |         1237 |            3 |
-| 105 | Hammersmith and Fulham      |    6 |                   38 |          733 |            1 |
+| 105 | Hammersmith and Fulham      |    6 |                   38 |          734 |            1 |
 | 104 | Hackney                     |    7 |                   38 |          906 |            2 |
-| 10  | Kingston upon Hull, City of |    8 |                   37 |          807 |            5 |
+| 10  | Kingston upon Hull, City of |    8 |                   37 |          806 |            5 |
 | 9   | Blackpool                   |    9 |                   36 |          304 |            2 |
 | 41  | Brighton and Hove           |   10 |                   36 |          686 |            2 |
 | 157 | Na h-Eileanan Siar          |  196 |                    8 |           20 |            1 |
@@ -93,7 +106,7 @@ This table lists the top 10 and bottom 10 LAs for Active Travel KSI per
 | 171 | Aberdeenshire               |  199 |                    8 |          238 |            8 |
 | 195 | Bridgend                    |  200 |                    7 |          165 |            5 |
 | 146 | Staffordshire               |  201 |                    6 |         1017 |           23 |
-| 196 | Vale of Glamorgan           |  202 |                    6 |          144 |            1 |
+| 196 | Vale of Glamorgan           |  202 |                    6 |          143 |            1 |
 | 34  | Bracknell Forest            |  203 |                    3 |          107 |            3 |
 | 162 | Moray                       |  204 |                    3 |           49 |            5 |
 | 50  | Isles of Scilly             |  205 |                    0 |            2 |            0 |
@@ -104,23 +117,23 @@ for the level of active travel activity not just population. Ranking by
 workplace population gives slightly different results.
 
 |     | la\_name                    | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
-| :-- | :-------------------------- | ---: | -------------------------: | -----------: | -----------: |
+|:----|:----------------------------|-----:|---------------------------:|-------------:|-------------:|
 | 104 | Hackney                     |    1 |                        102 |          906 |            2 |
 | 42  | Portsmouth                  |    2 |                         91 |          485 |            3 |
 | 124 | Wandsworth                  |    3 |                         90 |          981 |            6 |
 | 9   | Blackpool                   |    4 |                         79 |          304 |            2 |
 | 106 | Haringey                    |    5 |                         79 |          832 |            2 |
-| 10  | Kingston upon Hull, City of |    6 |                         77 |          807 |            5 |
+| 10  | Kingston upon Hull, City of |    6 |                         77 |          806 |            5 |
 | 41  | Brighton and Hove           |    7 |                         77 |          686 |            2 |
 | 8   | Blackburn with Darwen       |    8 |                         76 |          359 |            2 |
 | 43  | Southampton                 |    9 |                         74 |          537 |            3 |
 | 114 | Lambeth                     |   10 |                         74 |         1203 |            1 |
 | 201 | Torfaen                     |  164 |                         20 |           77 |            1 |
 | 84  | Solihull                    |  165 |                         20 |          259 |            5 |
-| 197 | Cardiff                     |  166 |                         19 |          361 |            5 |
+| 197 | Cardiff                     |  166 |                         19 |          362 |            5 |
 | 25  | South Gloucestershire       |  167 |                         18 |          432 |            5 |
 | 195 | Bridgend                    |  168 |                         17 |          165 |            5 |
-| 196 | Vale of Glamorgan           |  169 |                         17 |          144 |            1 |
+| 196 | Vale of Glamorgan           |  169 |                         17 |          143 |            1 |
 | 146 | Staffordshire               |  170 |                         15 |         1017 |           23 |
 | 93  | City of London              |  171 |                         14 |          229 |            1 |
 | 34  | Bracknell Forest            |  172 |                          6 |          107 |            3 |

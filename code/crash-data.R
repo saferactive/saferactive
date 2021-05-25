@@ -1,3 +1,5 @@
+# Use adjusted casualty data created in `severity-adjustment.R`
+
 library(sf)
 library(stats19)
 library(tidyverse)

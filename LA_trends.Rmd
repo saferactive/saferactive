@@ -53,10 +53,11 @@ if(!file.exists("data/upper_LA_work_population.csv")){
               destfile = "data/upper_LA_work_population.csv", mode = "wb")
 }
 
-if(!file.exists("data/scot_work_population.csv")){
-  download.file(piggyback::pb_download_url("scot_work_population.csv", tag = "0.1.1"),
-              destfile = "data/scot_work_population.csv", mode = "wb")
-}
+# File doesn't exist - no valid source for Scotland's workplace population
+# if(!file.exists("data/scot_work_population.csv")){
+#   download.file(piggyback::pb_download_url("scot_work_population.csv", tag = "0.1.1"),
+#               destfile = "data/scot_work_population.csv", mode = "wb")
+# }
 
 if(!file.exists("data/bdline_gpkg_gb.zip")){
   download.file("https://api.os.uk/downloads/v1/products/BoundaryLine/downloads?area=GB&format=GeoPackage&redirect",
@@ -82,10 +83,13 @@ names(pop) <- c("code","population_2019")
 pop_work_ew <- read.csv("data/upper_LA_work_population.csv")
 pop_work_ew <- pop_work_ew[,c(3,4)]
 names(pop_work_ew) <- c("code","work_pop_2011")
-pop_work_sct <- read.csv("data/scot_work_population.csv")
-pop_work_sct <- pop_work_sct[6:358,]
-names(pop_work_sct) <- c("id","work_pop")
-pop_work_sct$code <- substr(pop_work_sct$id,1,9)
+
+# file doesn't exist
+# pop_work_sct <- read.csv("data/scot_work_population.csv")
+# pop_work_sct <- pop_work_sct[6:358,]
+# names(pop_work_sct) <- c("id","work_pop")
+# pop_work_sct$code <- substr(pop_work_sct$id,1,9)
+
 # Fix old codes
 pop_work_ew$code[pop_work_ew$code == "E10000002"] <- "E06000060"
 pop_work_ew$code[pop_work_ew$code == "E06000028"] <- "E06000058"
@@ -426,7 +430,12 @@ ggplot(crash, aes(hour, active_ksi)) +
   scale_x_continuous(breaks = 0:24, expand = c(0,0))
 ```
 
-First we can consider the time of day. This plot show the total number of Active Travelers KSI between 2010 and 2019 for each hour of the day in Great Britain. There are clear spikes around the morning and afternoon rush hours and reduced levels during the night. This graph largely reflect the general pattern of traffic though the day.
+First we can consider the time of day. This plot show the total number of Active Travelers KSI between 2010 and 2019 for each hour of the day in Great Britain. 
+There are clear spikes around the morning and afternoon rush hours and reduced levels during the night. 
+This graph largely reflect the general pattern of traffic though the day. 
+There are a greater number of active traveller casualties during the PM peak commuting and school run hours (roughly 15:00 - 19:00 PM) as compared to the morning rush hour.
+This may perhaps be related to the higher likelihood that people are travelling in darkness or poor light conditions in these hours, or because travellers are more tired at this time.
+
 
 ```{r tempo_plot2, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(crash, aes(day_of_year, active_ksi)) +
@@ -436,7 +445,14 @@ ggplot(crash, aes(day_of_year, active_ksi)) +
   scale_x_continuous(breaks = seq(1,366,30), expand = c(0,0))
 ```
 
-Consider change through the year, this plot shows the number of of Active Travelers KSI between 2010 and 2019 for each day of the year in Great Britain. The trend is mostly stable with low point around Christmas (day 360). KSI rates appear to decline over the summer (days 180 - 240) before rising sharply in September. This may reflect a change in travel behavior around the start of the new school year.  
+Consider change through the year, this plot shows the number of Active Travellers KSI between 2010 and 2019 for each day of the year in Great Britain.
+The trend is mostly fairly stable with a pronounced low point at Christmas (day 360), when few people travel.
+Similarly, rates are relatively low in early April, around the average date of Easter (day 90-100).
+KSI rates appear to decline over the summer (days 180 - 240) before rising sharply in September. 
+This may reflect a change in travel behavior around the start of the new school year.
+
+The highest active traveller KSI rates are in November and early December (days 300 - 350), which may be related to the early sunsets and dark evenings at this time of year. 
+Although the shortest day of the year is typically 21st December, the earliest sunset occurs on 12/13th December.
 
 ```{r tempo_plot3, echo=FALSE, warning=FALSE, message=FALSE}
 crash_select <- crash[crash$la_name %in% c("City of London","Cumbria","Kingston upon Hull, City of"), ]
@@ -447,9 +463,8 @@ ggplot(crash_select, aes(week_of_year, active_ksi, group = la_name, color = la_n
   xlab("Week of the Year") +
   scale_x_continuous(breaks = seq(0,53,4), expand = c(0,0))
 ```
+
 Selecting a few LAs we can see the the distribution of casualties through the year varies a little for place to place. Notable Cumbria's casualties are highest in early August, peek tourism season.
-
-
 
 ## Looking at commuting times
 
@@ -457,12 +472,12 @@ We can filter out the non-commuting crashes and look at the LA workplace populat
 
 
 
-commutert 7 am - 10 am 4 - 7 pm
+Commuter hours are classified as 07:00-10:00 and 16:00-19:00.
 
 
-# Focus on Cycling Communitng Times
+# Focus on Cycling Commuting Times
 
-As we have the best data for cycling activity during communing times (via the PCT), we have filtered the data in this section to only conisder crashes between 7am - 10am and 4pm - 7pm. 
+As we have the best data for cycling activity during commuting times (via the PCT), we have filtered the data in this section to only consider crashes between 7am - 10am and 4pm - 7pm. 
 
 ```{r trends_commute, echo=FALSE, warning=FALSE, message=FALSE}
  
