@@ -7,7 +7,7 @@ This short analysis is to highlight the variation in crashes affecting active tr
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(sf)
 library(dplyr)
 library(lubridate)
@@ -416,7 +416,8 @@ If we consider when active travelers are most likely to be injured, it may provi
 
 ```{r tempo, echo=FALSE, warning=FALSE, message=FALSE}
 crash$hour <- hour(crash$datetime)
-crash$day_of_year <- yday(crash$datetime)
+crash$day_of_year <- case_when(is.na(crash$datetime) ~ yday(crash$date),
+                               TRUE ~ yday(crash$datetime))
 crash$week_of_year <- week(crash$datetime)
 crash$month_of_year <- month(crash$datetime)
 crash$active_ksi <- crash$casualty_fatal_cyclist + crash$casualty_fatal_pedestrian + crash$casualty_serious_cyclist + crash$casualty_serious_pedestrian
@@ -466,6 +467,33 @@ ggplot(crash_select, aes(week_of_year, active_ksi, group = la_name, color = la_n
 
 Selecting a few LAs we can see the the distribution of casualties through the year varies a little for place to place. Notable Cumbria's casualties are highest in early August, peek tourism season.
 
+## Hour and day of year
+
+Looking at the distribution of active traveller KSI casualties over both hour and day of year, we can see that the number of casualties in the peak morning hour of 8-9am is high across most of the year, with the exception of the Christmas, Easter and Summer periods.
+However, casualties during the hour 5-6pm are highest in Days 300-350 and Days 5-40 (November, December and January, except the Christmas period), suggesting that the darker winter evenings are playing a role here.
+Casualties during the hour 4-5pm are highest in Days 320-350, further backing up this observation. 
+
+```{r heatmap}
+# there are NAs in the hour. these must be removed first
+crash = crash %>% 
+  mutate(fiveday = 5*(round(day_of_year/5)))
+crash_agg = crash %>%
+  st_drop_geometry() %>% 
+  select(fiveday, hour, active_ksi) %>% 
+  filter(! is.na(hour)) %>% 
+  group_by(fiveday, hour) %>% 
+  summarise(active_ksi = sum(active_ksi))
+summary(crash_agg)
+ggplot(crash_agg, aes(x = fiveday, y = hour, fill = active_ksi)) +
+  geom_tile() +
+  labs(x = "Day of year", y = "Hour")
+```
+
+## Hours of darkness
+
+Look at actual light levels
+crashes_all$light_conditions
+
 ## Looking at commuting times
 
 We can filter out the non-commuting crashes and look at the LA workplace population.
@@ -485,4 +513,14 @@ As we have the best data for cycling activity during commuting times (via the PC
 
 ```
 
+# Change in cycling
 
+Present the GAM results on change in cycling across England
+
+```{r cycle_trends, echo=FALSE, warning=FALSE, message=FALSE}
+ 
+
+
+```
+
+Use the GAM results to look at change in cycling v change in casualties
