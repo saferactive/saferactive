@@ -70,13 +70,13 @@ acc <- readRDS("data/crashes_2010_2019.Rds")
 
 cas <- readRDS("data/casualties_adjusted.Rds")
 
-la <- readRDS("data/counties_uas_gb_2019_ubc.Rds")
-la$ctyua19cd[la$ctyua19cd == "E10000002"] <- "E06000060"
-la <- la[,c("ctyua19cd","ctyua19nm")]
-names(la) <- c("code","la_name","geometry")
+la_raw <- readRDS("data/counties_uas_gb_2019_ubc.Rds")
+la_raw$ctyua19cd[la_raw$ctyua19cd == "E10000002"] <- "E06000060"
+la_raw <- la_raw[,c("ctyua19cd","ctyua19nm")]
+names(la_raw) <- c("code","la_name","geometry")
 
 pop <- read.csv("data/upper_LA_population_2019.csv")
-pop <- pop[pop$mnemonic %in% la$code,]
+pop <- pop[pop$mnemonic %in% la_raw$code,]
 pop <- pop[,2:3]
 names(pop) <- c("code","population_2019")
 
@@ -133,11 +133,11 @@ saveRDS(crash,"data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 
 
-la <- left_join(la,pop, by = "code")
-la <- left_join(la,pop_work_ew, by = "code")
+la_raw <- left_join(la_raw,pop, by = "code")
+la_raw <- left_join(la_raw,pop_work_ew, by = "code")
 
 crash <- st_transform(crash, 27700)
-la <- st_transform(la, 27700)
+la_raw <- st_transform(la_raw, 27700)
 ```
 ## Upper Tier Local Authorities and their population
 
@@ -146,7 +146,7 @@ We are using upper tier local authorities for this analysis as they tend to be t
 This first plot highlights the significant population and area variation in LAs. 
 
 ```{r pressure, echo=FALSE, warning=FALSE, message=FALSE}
-m1 <- tm_shape(la) +
+m1 <- tm_shape(la_raw) +
   tm_fill(col = "population_2019",
           title = "Population (2019)",
           style = "quantile",
@@ -156,7 +156,7 @@ m1 <- tm_shape(la) +
   tm_layout(legend.outside = TRUE,
             legend.hist.width = 1)
 
-m2 <- tm_shape(la) +
+m2 <- tm_shape(la_raw) +
   tm_fill(col = "work_pop_2011",
           title = "Workplace Population (2011)",
           style = "quantile",
@@ -174,7 +174,7 @@ As LAs vary signifianct is size, population, and character it is unlikely that s
 ## Crashes by LA in context
 
 ```{r crash_la, echo=FALSE, warning=FALSE, message=FALSE}
-crash <- st_join(crash, la[,c("la_name", "code")])
+crash <- st_join(crash, la_raw[,c("la_name", "code")])
 
 # Get Year and Month
 crash$year <- year(crash$date)
@@ -197,7 +197,7 @@ crash_yr <- crash %>%
             casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
             )
 
-la <- left_join(la, crash_yr[crash_yr$year == 2018,], by = c("la_name", "code"))
+la <- left_join(la_raw, crash_yr[crash_yr$year == 2018,], by = c("la_name", "code"))
 la$active_ksi_per100k <- (la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )/ la$population_2019 * 100000
 la$active_slight_per100k <- (la$casualty_slight_cyclist +  la$casualty_slight_pedestrian)  / la$population_2019 * 100000
 
@@ -493,12 +493,14 @@ crashes_all$light_conditions
 ## Looking at commuting times
 
 We can filter out the collisions that occur in non-peak commute hours and look at how the remaining collisions correspond with the LA workplace population.
+This better represents the safety of travel to work.
+We can see that tourist hotspots like Cumbria now show slightly lower KSI rates, while Lancashire retains a high rate.
 
 ```{r commute-hours}
 crash_commute_yr <- crash %>%
   st_drop_geometry() %>%
   filter(hour %in% c(7, 8, 9, 16, 17, 18)) %>% 
-  group_by(la_name, code, year, ) %>%
+  group_by(la_name, code, year) %>%
   summarise(total_crash = n(),
             crash_fatal = sum(accident_severity == "Fatal"),
             crash_serious = sum(accident_severity == "Serious"),
@@ -514,19 +516,19 @@ crash_commute_yr <- crash %>%
             casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
             )
 
-# la_commute <- left_join(la, crash_commute_yr[crash_commute_yr$year == 2018,], by = c("la_name"))
-# la_commute$active_ksi_per100k <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$popula_commutetion_2019 * 100000
-# la_commute$active_slight_per100k <- (la_commute$casualty_slight_cyclist +  la_commute$casualty_slight_pedestrian)  / la_commute$popula_commutetion_2019 * 100000
-# 
-# la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
-# 
-# la_commute$active_slight_per_ksi <- (la_commute$casualty_slight_pedestrian + la_commute$casualty_slight_cyclist) /(la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )
-# 
-# la_commute$active_slight_per_ksi[la_commute$active_slight_per_ksi == Inf] <- NA
-# 
-# la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+la_commute <- left_join(la_raw, crash_commute_yr[crash_commute_yr$year == 2018,], by = c("la_name", "code"))
+la_commute$active_ksi_per100k <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$population_2019 * 100000
+la_commute$active_slight_per100k <- (la_commute$casualty_slight_cyclist +  la_commute$casualty_slight_pedestrian)  / la_commute$population_2019 * 100000
 
-m2 <- tm_shape(la) +
+la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+
+la_commute$active_slight_per_ksi <- (la_commute$casualty_slight_pedestrian + la_commute$casualty_slight_cyclist) /(la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )
+
+la_commute$active_slight_per_ksi[la_commute$active_slight_per_ksi == Inf] <- NA
+
+la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+
+m2 <- tm_shape(la_commute) +
   tm_fill(col = "active_ksi_per100k_work",
           title = "Active Travel KSI per 100,000 workplace population (2011)",
           style = "quantile",
@@ -535,7 +537,7 @@ m2 <- tm_shape(la) +
   tm_borders() +
   tm_layout(legend.outside = TRUE,
             legend.hist.width = 1)
-tmap_arrange(m1, m2)
+m2
 ```
 
 
