@@ -1,0 +1,79 @@
+---
+title: "Saferactive datasets"
+author: "Joey Talbot"
+date: "18/05/2021"
+output: bookdown::github_document2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+```
+
+# Key Saferactive datasets
+
+## Raster casualty maps
+
+Raster bricks for casualties for each year 2010-2019 are stored as a set of tifs with 500m resolution, in saferactive release tag 0.1.1.
+
+- There are separate files for walking/cycling/all casualties.
+- There are also separate files for all hours of the day or for commuter hours (7-10am and 4-7pm).
+- There are also separate files for all casualties and for KSI only.
+
+The raster bricks have a layer per year
+https://github.com/saferactive/saferactive/releases/tag/0.1.1
+
+Code to produce the tifs:
+https://github.com/saferactive/saferactive/blob/master/code/rasters.R 
+
+For raster creation INT2U data type is specified to speed up the process.
+
+Data here was done without the casualty severity adjustment.
+Repeating after severity adjustment could be slower, because there would be non-integer numbers of casualties. 
+This slows the raster creation process as you have to use a different data type.
+
+## Report on trends at Local Authority level
+
+https://github.com/saferactive/saferactive/blob/master/LA_trends.md
+Malcolm assessed active travel KSI casualties at Local Authority level.
+He identified the top/bottom LAs in the country according to both resident and workplace population 
+For example, the City of London is an extremely high outlier in terms of casualties per resident population, but has one of the lowest casualty rates in relation to workplace population.
+Some places, such as Cumbria and the South Coast, have high active travel KSI rates in comparison to both resident and workplace population, but this is likely explained by high numbers of visitors/tourists.
+
+There are not many local authority trends - it's very noisy data. 
+But Scotland seems to have done well, especially Aberdeen City (and perhaps West Dumbartonshire). 
+This may be related to the launch of Scotland's Road Safety Framework in 2009.
+
+I have added:
+
+- combined analysis of time and date
+- LA patterns for peak commute hours only.
+
+Next steps:
+
+- compare (peak hour) PCT cycling estimates adjusted according to GAM model, with the peak hour collision data. Use cycling casualties only.
+- look at speed limits, and roads where the speed limit has changed
+
+
+## Datasets in road safety vis repo
+
+The key datasets are available at: 
+https://github.com/ITSLeeds/roadsafetyvis/tree/master/data/clean
+
+
+km_cycled_2010_2019_50m_grid.Rds 
+This is a 50m grid of km cycled per year 2010-2019.
+It is created using the PCT network (for England and Wales only), with flows adjusted according to the results of my GAM to estimate km cycled in each year.
+It's missing the tip of Cornwall and Lowestoft.
+
+- Highway authority = upper tier (normally) - for vehicle km
+- stats19 = data at lower tier
+- la_lower.Rds is the lookup table lower to upper
+- la_lower_for_plot.Rds = super generalised spatial resolution. useful for making quick maps.
+- wideform = a summary selection of the variables, not all of them.
+
+Next steps:
+
+- recreate this file adding in the Eastern and Western extremities of England.
+
+

@@ -4,14 +4,14 @@ library(raster)
 library(sf)
 library(stars)
 
-piggyback::pb_download_url("acc_with_cas.Rds")
+piggyback::pb_download_url("acc_with_cas.Rds", tag = "0.1.1")
 u = "https://github.com/saferactive/saferactive/releases/download/0.1.1/acc_with_cas.Rds"
 f = basename(u)
 
 if(file.exists("acc_with_cas.Rds")){
   acc <- readRDS("acc_with_cas.Rds")
 } else {
-  download.file(u, r)
+  download.file(u, f)
   acc <- readRDS("acc_with_cas.Rds")
   # uncomment the following to reproduce:
   # Bring in Crash Data
