@@ -31,17 +31,18 @@ in LAs.
     ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
     ##  [8] "#BF4602" "#923204" "#662506"
 
-As LAs vary signifianct is size, population, and character it is
-unlikely that simple comparing the number of crashes or casualties will
-be a far comparison. Therefore it would be better to adjust the raw
+As LAs vary significantly in size, population, and character it is
+unlikely that simply comparing the number of crashes or casualties will
+be a fair comparison. Therefore it would be better to adjust the raw
 crash rates to account for the local context.
 
 ## Crashes by LA in context
 
-We have adjusted the plots to show KSI rate of active travlers per
-100,000 people (left map). The KSI rate varies signiicantly with 90% of
-LAs being between 8.2 and 24.1 per 100,000 people. Scotland has notably
-low KSI rates while, Cumbria, has a very high rate.
+We have adjusted the plots to show the KSI rate of active travelers per
+100,000 people (left plot uses resident population; right plot uses
+workplace population). The KSI rate varies significantly with 90% of LAs
+being between 8.2 and 24.1 per 100,000 resident population. Scotland has
+notably low KSI rates, while Cumbria has a high rate.
 
 ![](LA_trends_files/figure-gfm/crash_la_plot-1.png)<!-- -->
 
@@ -50,8 +51,8 @@ low KSI rates while, Cumbria, has a very high rate.
     ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
     ##  [8] "#BF4602" "#923204" "#662506"
 
-The City of London is an extreme outline due to it very low resident
-population. This highlights the denominator issue. That the KSI rate is
+The City of London is an extreme outlier due to its very low resident
+population. This highlights the denominator issue. The KSI rate is
 depended on the value chosen as the denominator. In the case of the City
 of London, the resident population of about 2,500 is not representative
 of the amount of people traveling by road. A similar affect may be
@@ -66,15 +67,15 @@ higher. However the relative distribution of risk does change under a
 workplace population approach suggesting that in at least some areas
 this is an appropriate way to consider the data.
 
-We can also compare the proportion of slightly injured people vs the
-proportion of KSI casualties. This we are using the weighting factors to
-account for the adjusted proportion of serious causalities caused by the
-historic use of different reporting systems. However this difference may
-still be due to different reporting practices across the country.
+We can also compare the proportion of slight injuries vs the proportion
+of KSI casualties. We are using weighting factors to estimate the
+adjusted proportion of serious causalities caused by the historic use of
+different reporting systems. However there may still be an impact of
+different reporting practices across the country.
 
-If this represent a genuine difference in safety, then LAs with a high
+If this represents a genuine difference in safety, then LAs with a high
 ratio (dark green) are having proportionally more slight casualties than
-serious and fatal ones. This could be use to more segregation of active
+serious and fatal ones. This could be due to more segregation of active
 travelers from motor traffic, lower traffic speed or greater driver
 awareness of active travelers.
 
@@ -112,7 +113,7 @@ This table lists the top 10 and bottom 10 LAs for Active Travel KSI per
 | 50  | Isles of Scilly             |  205 |                    0 |            2 |            0 |
 
 As mention above City of London and Westminster are probably distorted
-due to there high daytime population. This emphasizes the need to adjust
+due to their high daytime population. This emphasizes the need to adjust
 for the level of active travel activity not just population. Ranking by
 workplace population gives slightly different results.
 
@@ -144,29 +145,31 @@ workplace population gives slightly different results.
 Looking at absolute number of KSI, the top 10 and bottom 10 are the same
 in 2010 and 2019 suggesting no overall change. The plot blow shows the
 Active Travel KSI rate per 100,000 workplace population from 2010 to
-2019. The majority of LAs are shwon with the thin grey lines, while the
+2019. The majority of LAs are shown with the thin grey lines, while the
 top 5 and bottom 5 LAs are highlighted in colour.
 
 ![](LA_trends_files/figure-gfm/trends_plot-1.png)<!-- -->
 
 The KSI rates fluctuate significantly per year, this reflects the noisy
 nature of crash data, especially for the subset of crashes that involve
-an active travelers who is killed or seriously injured. Note that this
+an active traveler who is killed or seriously injured. Note that this
 plot excluded Scotland.
 
 If we look for areas with the biggest change in KSI rates between 2010
 and 2019 we can see some weak noisy trends, with areas such a Torbay
-appreasing to increas in KSIs and Stoke on Trent declining.
+appearing to increase in KSIs and Stoke on Trent declining.
 
-![](LA_trends_files/figure-gfm/trends2_plot-1.png)<!-- --> If we instead
-compare KSI against the resident population (adding in Scotland to the
-analysis) we can see that Aberdeen City have made a sustained decline in
-KSI rates over the last ten years, down over 60% from their high in
-2011. Unlike some other LAs where the rate appears variable but steady,
-the KSI rate in Aberdeen has fallen almost every year and thus may
-represent a real world change in safety worthy of detailed study. In
-particular the Launch of Scotland’s Road Safety Framework in 2009 may
-have been successful in reducing Active Travel KSIs.
+![](LA_trends_files/figure-gfm/trends2_plot-1.png)<!-- -->
+
+If we instead compare KSI against the resident population (adding in
+Scotland to the analysis) we can see that Aberdeen City have made a
+sustained decline in KSI rates over the last ten years, down over 60%
+from their high in 2011. Unlike some other LAs where the rate appears
+variable but steady, the KSI rate in Aberdeen has fallen almost every
+year and thus may represent a real world change in safety worthy of
+detailed study. In particular the Launch of Scotland’s Road Safety
+Framework in 2009 may have been successful in reducing Active Travel
+KSIs.
 
 ![](LA_trends_files/figure-gfm/trends3_plot-1.png)<!-- -->
 
@@ -181,31 +184,198 @@ First we can consider the time of day. This plot show the total number
 of Active Travelers KSI between 2010 and 2019 for each hour of the day
 in Great Britain. There are clear spikes around the morning and
 afternoon rush hours and reduced levels during the night. This graph
-largely reflect the general pattern of traffic though the day.
+largely reflect the general pattern of traffic though the day. There are
+a greater number of active traveller casualties during the PM peak
+commuting and school run hours (roughly 15:00 - 19:00 PM) as compared to
+the morning rush hour. This may perhaps be related to the higher
+likelihood that people are travelling in darkness or poor light
+conditions in these hours, or because travellers are more tired at this
+time.
 
 ![](LA_trends_files/figure-gfm/tempo_plot2-1.png)<!-- -->
 
-Consider change through the year, this plot shows the number of of
-Active Travelers KSI between 2010 and 2019 for each day of the year in
-Great Britain. The trend is mostly stable with low point around
-Christmas (day 360). KSI rates appear to decline over the summer (days
-180 - 240) before rising sharply in September. This may reflect a change
-in travel behavior around the start of the new school year.
+Consider change through the year, this plot shows the number of Active
+Travellers KSI between 2010 and 2019 for each day of the year in Great
+Britain. The trend is mostly fairly stable with a pronounced low point
+at Christmas (day 360), when few people travel. Similarly, rates are
+relatively low in early April, around the average date of Easter (day
+90-100). KSI rates appear to decline over the summer (days 180 - 240)
+before rising sharply in September. This may reflect a change in travel
+behavior around the start of the new school year.
 
-![](LA_trends_files/figure-gfm/tempo_plot3-1.png)<!-- --> Selecting a
-few LAs we can see the the distribution of casualties through the year
-varies a little for place to place. Notable Cumbria’s casualties are
-highest in early August, peek tourism season.
+The highest active traveller KSI rates are in November and early
+December (days 300 - 350), which may be related to the early sunsets and
+dark evenings at this time of year. Although the shortest day of the
+year is typically 21st December, the earliest sunset occurs on 12/13th
+December.
 
-## Looking at commuting times
+![](LA_trends_files/figure-gfm/tempo_plot3-1.png)<!-- -->
 
-We can filter out the non-commuting crashes and look at the LA workplace
-population.
+Selecting a few LAs we can see the the distribution of casualties
+through the year varies a little for place to place. Notably, Cumbria’s
+casualties are highest in early August, peak tourism season.
 
-commutert 7 am - 10 am 4 - 7 pm
+## Hour and day of year
 
-# Focus on Cycling Communitng Times
+Looking at the distribution of active traveller KSI casualties over both
+hour and day of year, we can see that the number of casualties in the
+peak morning hour of 8-9am is high across most of the year, with the
+exception of the Christmas, Easter and Summer periods. However,
+casualties during the hour 5-6pm are highest in Days 300-350 and Days
+5-40 (November, December and January, except the Christmas period),
+suggesting that the darker winter evenings are playing a role here.
+Casualties during the hour 4-5pm are highest in Days 320-350, further
+backing up this observation.
 
-As we have the best data for cycling activity during communing times
+``` r
+# there are NAs in the hour. these must be removed first
+crash = crash %>% 
+  mutate(fiveday = 5*(round(day_of_year/5)))
+crash_agg = crash %>%
+  st_drop_geometry() %>% 
+  select(fiveday, hour, active_ksi) %>% 
+  filter(! is.na(hour)) %>% 
+  group_by(fiveday, hour) %>% 
+  summarise(active_ksi = sum(active_ksi))
+```
+
+    ## `summarise()` has grouped output by 'fiveday'. You can override using the `.groups` argument.
+
+``` r
+summary(crash_agg)
+```
+
+    ##     fiveday           hour         active_ksi    
+    ##  Min.   :  0.0   Min.   : 0.00   Min.   :  1.16  
+    ##  1st Qu.: 90.0   1st Qu.: 5.75   1st Qu.: 25.24  
+    ##  Median :182.5   Median :11.50   Median : 67.57  
+    ##  Mean   :182.5   Mean   :11.50   Mean   : 70.54  
+    ##  3rd Qu.:275.0   3rd Qu.:17.25   3rd Qu.: 99.47  
+    ##  Max.   :365.0   Max.   :23.00   Max.   :247.16
+
+``` r
+ggplot(crash_agg, aes(x = fiveday, y = hour, fill = active_ksi)) +
+  geom_tile() +
+  labs(x = "Day of year", y = "Hour")
+```
+
+![](LA_trends_files/figure-gfm/heatmap-1.png)<!-- -->
+
+## Hours of darkness
+
+Look at actual light levels crashes\_all$light\_conditions
+
+## Collisions during peak commuting hours
+
+We can filter out the collisions that occur in non-peak commute hours
+and look at how the remaining collisions correspond with the LA
+workplace population. This better represents the safety of travel to
+work. We can see that tourist hotspots like Cumbria now show slightly
+lower KSI rates, suggesting that non-commute journeys are relatively
+more important there, while Lancashire retains a high rate.
+
+``` r
+crash_commute_yr <- crash %>%
+  st_drop_geometry() %>%
+  filter(hour %in% c(7, 8, 9, 16, 17, 18)) %>% 
+  group_by(la_name, code, year) %>%
+  summarise(total_crash = n(),
+            crash_fatal = sum(accident_severity == "Fatal"),
+            crash_serious = sum(accident_severity == "Serious"),
+            crash_slight = sum(accident_severity == "Slight"),
+            casualty_slight = sum(casualty_slight),
+            casualty_serious = sum(casualty_serious),
+            casualty_fatal = sum(casualty_fatal),
+            casualty_slight_pedestrian = sum(casualty_slight_pedestrian),
+            casualty_serious_pedestrian = sum(casualty_serious_pedestrian),
+            casualty_fatal_pedestrian = sum(casualty_fatal_pedestrian),
+            casualty_slight_cyclist = sum(casualty_slight_cyclist),
+            casualty_serious_cyclist = sum(casualty_serious_cyclist),
+            casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
+            )
+```
+
+    ## `summarise()` has grouped output by 'la_name', 'code'. You can override using the `.groups` argument.
+
+``` r
+la_commute <- left_join(la_raw, crash_commute_yr[crash_commute_yr$year == 2018,], by = c("la_name", "code"))
+la_commute$active_ksi_per100k <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$population_2019 * 100000
+la_commute$active_slight_per100k <- (la_commute$casualty_slight_cyclist +  la_commute$casualty_slight_pedestrian)  / la_commute$population_2019 * 100000
+
+la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+
+la_commute$active_slight_per_ksi <- (la_commute$casualty_slight_pedestrian + la_commute$casualty_slight_cyclist) /(la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )
+
+la_commute$active_slight_per_ksi[la_commute$active_slight_per_ksi == Inf] <- NA
+
+la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+
+m2 <- tm_shape(la_commute) +
+  tm_fill(col = "active_ksi_per100k_work",
+          title = "Active Travel KSI per 100,000 workplace population (2011)",
+          style = "quantile",
+          n = 10, 
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
+m2
+```
+
+![](LA_trends_files/figure-gfm/commute-hours-1.png)<!-- -->
+
+    ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
+    ##  [8] "#BF4602" "#923204" "#662506"
+
+``` r
+la_top10_work <- st_drop_geometry(la_commute)
+la_top10_work <- la_top10_work[order(la_top10_work$active_ksi_per100k_work, decreasing = TRUE),]
+la_top10_work$rank <- seq(1,nrow(la_top10_work))
+la_top10_work <- la_top10_work[!is.na(la_top10_work$active_ksi_per100k_work),]
+la_top10_work <- la_top10_work[c(1:10,seq(nrow(la_top10_work) - 9, nrow(la_top10_work))),]
+la_top10_work <- la_top10_work[,c("la_name","rank","active_ksi_per100k_work","total_crash","crash_fatal")]
+la_top10_work$active_ksi_per100k_work <- round(la_top10_work$active_ksi_per100k_work)
+knitr::kable(la_top10_work)
+```
+
+|     | la\_name                     | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
+|:----|:-----------------------------|-----:|---------------------------:|-------------:|-------------:|
+| 124 | Wandsworth                   |    1 |                         44 |          445 |            2 |
+| 104 | Hackney                      |    2 |                         37 |          338 |            1 |
+| 42  | Portsmouth                   |    3 |                         36 |          193 |            1 |
+| 119 | Richmond upon Thames         |    4 |                         36 |          217 |            0 |
+| 10  | Kingston upon Hull, City of  |    5 |                         35 |          347 |            2 |
+| 41  | Brighton and Hove            |    6 |                         34 |          297 |            1 |
+| 106 | Haringey                     |    7 |                         33 |          302 |            1 |
+| 9   | Blackpool                    |    8 |                         31 |          130 |            0 |
+| 103 | Greenwich                    |    9 |                         30 |          306 |            5 |
+| 69  | St. Helens                   |   10 |                         30 |           91 |            4 |
+| 48  | Shropshire                   |  164 |                          8 |          183 |            2 |
+| 193 | Swansea                      |  165 |                          7 |           98 |            0 |
+| 196 | Vale of Glamorgan            |  166 |                          7 |           49 |            0 |
+| 21  | Stoke-on-Trent               |  167 |                          7 |          156 |            0 |
+| 146 | Staffordshire                |  168 |                          7 |          393 |            4 |
+| 22  | Bath and North East Somerset |  169 |                          7 |          111 |            0 |
+| 53  | Central Bedfordshire         |  170 |                          6 |          258 |            4 |
+| 195 | Bridgend                     |  171 |                          4 |           60 |            1 |
+| 34  | Bracknell Forest             |  172 |                          2 |           51 |            1 |
+| 50  | Isles of Scilly              |  173 |                          0 |            1 |            0 |
+
+Commuter hours are classified as 07:00-10:00 and 16:00-19:00.
+
+# Speed limits
+
+Look at roads where the speed limit has changed. Have collision rates
+changed?
+
+# Focus on Cycling Commuting Times
+
+As we have the best data for cycling activity during commuting times
 (via the PCT), we have filtered the data in this section to only
-conisder crashes between 7am - 10am and 4pm - 7pm.
+consider crashes between 7am - 10am and 4pm - 7pm.
+
+# Change in cycling
+
+Present the GAM results on change in cycling across England
+
+Use the GAM results to look at change in cycling v change in casualties

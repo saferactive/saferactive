@@ -260,14 +260,15 @@ plot(m, pages = 4, scheme = 2, shade = TRUE)
 # assign the framework that will be used as a basis for predictions
 pdata = with(counts_all_years,
              expand.grid(year = seq(min(year), max(year), by = 1),
-                         easting = seq(round((min(easting)*2), digits = -3)/2, round((max(easting)*2), digits = -3)/2, by = 500), # changed this to make regular 1km grid squares
-                         northing = seq(round((min(northing)*2), digits = -3)/2, round((max(northing)*2), digits = -3)/2, by = 500)))
+                         easting = seq(0, 656000, by = 500), # changed this to make regular 1km grid squares
+                         northing = seq(8000, 1215000, by = 500)))
 # make predictions according to the GAM model
 fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE) #SLOW
 # predictions for points far from any counts set to NA
 ind = exclude.too.far(pdata$easting, pdata$northing,
                       counts_all_years$easting, counts_all_years$northing, dist = 0.1)
 # dist = 0.02) # for calculation of borough means
+
 fitted[ind] = NA
 # join the predictions with the framework data
 pred_all_points_year = cbind(pdata, Fitted = fitted)
