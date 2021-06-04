@@ -169,7 +169,8 @@ tmap_arrange(m1, m2)
 
 ```
 
-As LAs vary signifianct is size, population, and character it is unlikely that simple comparing the number of crashes or casualties will be a far comparison. Therefore it would be better to adjust the raw crash rates to account for the local context.
+As LAs vary significantly in size, population, and character it is unlikely that simply comparing the number of crashes or casualties will be a fair comparison. 
+Therefore it would be better to adjust the raw crash rates to account for the local context.
 
 ## Crashes by LA in context
 
@@ -209,7 +210,9 @@ la$active_slight_per_ksi[la$active_slight_per_ksi == Inf] <- NA
 
 ```
 
-We have adjusted the plots to show the KSI rate of active travelers per 100,000 people (left plot uses resident population; right plot uses workplace population). The KSI rate varies significantly with 90% of LAs being between 8.2 and 24.1 per 100,000 resident population. Scotland has notably low KSI rates, while Cumbria has a high rate.
+We have adjusted the plots to show the KSI rate of active travelers per 100,000 people (left plot uses resident population; right plot uses workplace population). 
+The KSI rate varies significantly with 90% of LAs being between 8.2 and 24.1 per 100,000 resident population. 
+Scotland has notably low KSI rates, while Cumbria has a high rate.
 
 ```{r crash_la_plot, echo=FALSE, warning=FALSE, message=FALSE}
 m1 <- tm_shape(la) +
@@ -234,13 +237,23 @@ m2 <- tm_shape(la) +
 tmap_arrange(m1, m2)
 ```
 
-The City of London is an extreme outlier due to its very low resident population. This highlights the denominator issue. The KSI rate is depended on the value chosen as the denominator. In the case of the City of London, the resident population of about 2,500 is not representative of the amount of people traveling by road. A similar affect may be taking place in Cumbria which is a popular tourist destination and may have more active travelers than is represented by its population.
+The City of London is an extreme outlier due to its very low resident population. 
+This highlights the denominator issue. 
+The KSI rate is depended on the value chosen as the denominator. 
+In the case of the City of London, the resident population of about 2,500 is not representative of the amount of people traveling by road. 
+A similar affect may be taking place in Cumbria which is a popular tourist destination and may have more active travelers than is represented by its population.
 
-The right plot uses the 2011 census workplace population for England and Wales. The workplace population favors areas like the City of London which have high daytime activity but few nighttime residents. As people working is a subset of all people KSI rates will naturally appear higher. However the relative distribution of risk does change under a workplace population approach suggesting that in at least some areas this is an appropriate way to consider the data.
+The right plot uses the 2011 census workplace population for England and Wales. 
+The workplace population favors areas like the City of London which have high daytime activity but few nighttime residents. 
+As people working is a subset of all people KSI rates will naturally appear higher. 
+However the relative distribution of risk does change under a workplace population approach suggesting that in at least some areas this is an appropriate way to consider the data.
 
-We can also compare the proportion of slightly injured people vs the proportion of KSI casualties. This we are using the weighting factors to account for the adjusted proportion of serious causalities caused by the historic use of different reporting systems. However this difference may still be due to different reporting practices across the country. 
+We can also compare the proportion of slight injuries vs the proportion of KSI casualties. 
+We are using weighting factors to estimate the adjusted proportion of serious causalities caused by the historic use of different reporting systems. 
+However there may still be an impact of different reporting practices across the country. 
 
-If this represent a genuine difference in safety, then LAs with a high ratio (dark green) are having proportionally more slight casualties than serious and fatal ones. This could be use to more segregation of active travelers from motor traffic, lower traffic speed or greater driver awareness of active travelers. 
+If this represents a genuine difference in safety, then LAs with a high ratio (dark green) are having proportionally more slight casualties than serious and fatal ones.
+This could be due to more segregation of active travelers from motor traffic, lower traffic speed or greater driver awareness of active travelers. 
 
 
 ```{r crash_la_plot2, echo=FALSE, warning=FALSE, message=FALSE}
@@ -271,7 +284,9 @@ la_top10$active_ksi_per100k <- round(la_top10$active_ksi_per100k)
 knitr::kable(la_top10)
 ```
 
-As mention above City of London and Westminster are probably distorted due to their high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population.  Ranking by workplace population gives slightly different results.
+As mention above City of London and Westminster are probably distorted due to their high daytime population. 
+This emphasizes the need to adjust for the level of active travel activity not just population. 
+Ranking by workplace population gives slightly different results.
 
 ```{r crash_top10_work, echo=FALSE, warning=FALSE, message=FALSE}
 la_top10_work <- st_drop_geometry(la)
@@ -286,7 +301,9 @@ knitr::kable(la_top10_work)
 
 # Historical Trends
 
-Looking at absolute number of KSI, the top 10 and bottom 10 are the same in 2010 and 2019 suggesting no overall change. The plot blow shows the Active Travel KSI rate per 100,000 workplace population from 2010 to 2019. The majority of LAs are shwon with the thin grey lines, while the top 5 and bottom 5 LAs are highlighted in colour.
+Looking at absolute number of KSI, the top 10 and bottom 10 are the same in 2010 and 2019 suggesting no overall change. 
+The plot blow shows the Active Travel KSI rate per 100,000 workplace population from 2010 to 2019. 
+The majority of LAs are shown with the thin grey lines, while the top 5 and bottom 5 LAs are highlighted in colour.
 
 ```{r trends, echo=FALSE, warning=FALSE, message=FALSE}
 la <- la[order(la$active_ksi_per100k_work, decreasing = TRUE),]
@@ -326,9 +343,10 @@ ggplot(crash_yr,
 
 ```
 
-The KSI rates fluctuate significantly per year, this reflects the noisy nature of crash data, especially for the subset of crashes that involve an active travelers who is killed or seriously injured. Note that this plot excluded Scotland.
+The KSI rates fluctuate significantly per year, this reflects the noisy nature of crash data, especially for the subset of crashes that involve an active traveler who is killed or seriously injured. 
+Note that this plot excluded Scotland.
 
-If we look for areas with the biggest change in KSI rates between 2010 and 2019 we can see some weak noisy trends, with areas such a Torbay appreasing to increas in KSIs and Stoke on Trent declining. 
+If we look for areas with the biggest change in KSI rates between 2010 and 2019 we can see some weak noisy trends, with areas such a Torbay appearing to increase in KSIs and Stoke on Trent declining. 
 
 ```{r trends2, echo=FALSE, warning=FALSE, message=FALSE}
 crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","active_ksi_per100k_work")],
@@ -365,7 +383,10 @@ ggplot(crash_yr,
 
 
 ```
-If we instead compare KSI against the resident population (adding in Scotland to the analysis) we can see that Aberdeen City have made a sustained decline in KSI rates over the last ten years, down over 60% from their high in 2011. Unlike some other LAs where the rate appears variable but steady, the KSI rate in Aberdeen has fallen almost every year and thus may represent a real world change in safety worthy of detailed study. In particular the Launch of Scotland's Road Safety Framework in 2009 may have been successful in reducing Active Travel KSIs.
+
+If we instead compare KSI against the resident population (adding in Scotland to the analysis) we can see that Aberdeen City have made a sustained decline in KSI rates over the last ten years, down over 60% from their high in 2011. 
+Unlike some other LAs where the rate appears variable but steady, the KSI rate in Aberdeen has fallen almost every year and thus may represent a real world change in safety worthy of detailed study. 
+In particular the Launch of Scotland's Road Safety Framework in 2009 may have been successful in reducing Active Travel KSIs.
 
 ```{r trends3, echo=FALSE, warning=FALSE, message=FALSE}
 crash_yr_wide <- pivot_wider(crash_yr[,c("la_name","year","active_ksi_per100k")],
@@ -490,11 +511,11 @@ ggplot(crash_agg, aes(x = fiveday, y = hour, fill = active_ksi)) +
 Look at actual light levels
 crashes_all$light_conditions
 
-## Looking at commuting times
+## Collisions during peak commuting hours
 
 We can filter out the collisions that occur in non-peak commute hours and look at how the remaining collisions correspond with the LA workplace population.
 This better represents the safety of travel to work.
-We can see that tourist hotspots like Cumbria now show slightly lower KSI rates, while Lancashire retains a high rate.
+We can see that tourist hotspots like Cumbria now show slightly lower KSI rates, suggesting that non-commute journeys are relatively more important there, while Lancashire retains a high rate.
 
 ```{r commute-hours}
 crash_commute_yr <- crash %>%
