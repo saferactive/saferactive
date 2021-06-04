@@ -129,7 +129,7 @@ cas_summary <- cas %>%
   )
 
 crash <- left_join(acc, cas_summary, by = "accident_index")
-saveRDS(crash,"data/crash_2010_2019_with_summary_adjusted_casulaitied.Rds")
+saveRDS(crash,"data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 
 
@@ -197,7 +197,7 @@ crash_yr <- crash %>%
             casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
             )
 
-la <- left_join(la, crash_yr[crash_yr$year == 2018,], by = c("la_name"))
+la <- left_join(la, crash_yr[crash_yr$year == 2018,], by = c("la_name", "code"))
 la$active_ksi_per100k <- (la$casualty_fatal_pedestrian + la$casualty_fatal_cyclist + la$casualty_serious_pedestrian + la$casualty_serious_cyclist )/ la$population_2019 * 100000
 la$active_slight_per100k <- (la$casualty_slight_cyclist +  la$casualty_slight_pedestrian)  / la$population_2019 * 100000
 
@@ -209,9 +209,7 @@ la$active_slight_per_ksi[la$active_slight_per_ksi == Inf] <- NA
 
 ```
 
-We have adjusted the plots to show KSI rate of active travlers per 100,000 people (left map). The KSI rate varies signiicantly with 90% of LAs being between 8.2 and 24.1 per 100,000 people. Scotland has notably low KSI rates while, Cumbria, has a very high rate.
-
-
+We have adjusted the plots to show the KSI rate of active travelers per 100,000 people (left plot uses resident population; right plot uses workplace population). The KSI rate varies significantly with 90% of LAs being between 8.2 and 24.1 per 100,000 resident population. Scotland has notably low KSI rates, while Cumbria has a high rate.
 
 ```{r crash_la_plot, echo=FALSE, warning=FALSE, message=FALSE}
 m1 <- tm_shape(la) +
@@ -236,7 +234,7 @@ m2 <- tm_shape(la) +
 tmap_arrange(m1, m2)
 ```
 
-The City of London is an extreme outline due to it very low resident population. This highlights the denominator issue. That the KSI rate is depended on the value chosen as the denominator. In the case of the City of London, the resident population of about 2,500 is not representative of the amount of people traveling by road. A similar affect may be taking place in Cumbria which is a popular tourist destination and may have more active travelers than is represented by its population.
+The City of London is an extreme outlier due to its very low resident population. This highlights the denominator issue. The KSI rate is depended on the value chosen as the denominator. In the case of the City of London, the resident population of about 2,500 is not representative of the amount of people traveling by road. A similar affect may be taking place in Cumbria which is a popular tourist destination and may have more active travelers than is represented by its population.
 
 The right plot uses the 2011 census workplace population for England and Wales. The workplace population favors areas like the City of London which have high daytime activity but few nighttime residents. As people working is a subset of all people KSI rates will naturally appear higher. However the relative distribution of risk does change under a workplace population approach suggesting that in at least some areas this is an appropriate way to consider the data.
 
@@ -273,7 +271,7 @@ la_top10$active_ksi_per100k <- round(la_top10$active_ksi_per100k)
 knitr::kable(la_top10)
 ```
 
-As mention above City of London and Westminster are probably distorted due to there high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population.  Ranking by workplace population gives slightly different results.
+As mention above City of London and Westminster are probably distorted due to their high daytime population. This emphasizes the need to adjust for the level of active travel activity not just population.  Ranking by workplace population gives slightly different results.
 
 ```{r crash_top10_work, echo=FALSE, warning=FALSE, message=FALSE}
 la_top10_work <- st_drop_geometry(la)
@@ -406,8 +404,6 @@ ggplot(crash_yr,
   scale_y_continuous(expand = c(0,0)) +
   ylim(0,30) +
   ggtitle("LAs Change in KSI")
-
-
 ```
 
 ## Temporal Analysis
@@ -416,10 +412,9 @@ If we consider when active travelers are most likely to be injured, it may provi
 
 ```{r tempo, echo=FALSE, warning=FALSE, message=FALSE}
 crash$hour <- hour(crash$datetime)
-crash$day_of_year <- case_when(is.na(crash$datetime) ~ yday(crash$date),
-                               TRUE ~ yday(crash$datetime))
-crash$week_of_year <- week(crash$datetime)
-crash$month_of_year <- month(crash$datetime)
+crash$day_of_year <- yday(crash$date)
+crash$week_of_year <- week(crash$date)
+crash$month_of_year <- month(crash$date)
 crash$active_ksi <- crash$casualty_fatal_cyclist + crash$casualty_fatal_pedestrian + crash$casualty_serious_cyclist + crash$casualty_serious_pedestrian
 ```
 
@@ -465,7 +460,8 @@ ggplot(crash_select, aes(week_of_year, active_ksi, group = la_name, color = la_n
   scale_x_continuous(breaks = seq(0,53,4), expand = c(0,0))
 ```
 
-Selecting a few LAs we can see the the distribution of casualties through the year varies a little for place to place. Notable Cumbria's casualties are highest in early August, peek tourism season.
+Selecting a few LAs we can see the the distribution of casualties through the year varies a little for place to place. 
+Notably, Cumbria's casualties are highest in early August, peak tourism season.
 
 ## Hour and day of year
 
@@ -496,12 +492,58 @@ crashes_all$light_conditions
 
 ## Looking at commuting times
 
-We can filter out the non-commuting crashes and look at the LA workplace population.
+We can filter out the collisions that occur in non-peak commute hours and look at how the remaining collisions correspond with the LA workplace population.
 
+```{r commute-hours}
+crash_commute_yr <- crash %>%
+  st_drop_geometry() %>%
+  filter(hour %in% c(7, 8, 9, 16, 17, 18)) %>% 
+  group_by(la_name, code, year, ) %>%
+  summarise(total_crash = n(),
+            crash_fatal = sum(accident_severity == "Fatal"),
+            crash_serious = sum(accident_severity == "Serious"),
+            crash_slight = sum(accident_severity == "Slight"),
+            casualty_slight = sum(casualty_slight),
+            casualty_serious = sum(casualty_serious),
+            casualty_fatal = sum(casualty_fatal),
+            casualty_slight_pedestrian = sum(casualty_slight_pedestrian),
+            casualty_serious_pedestrian = sum(casualty_serious_pedestrian),
+            casualty_fatal_pedestrian = sum(casualty_fatal_pedestrian),
+            casualty_slight_cyclist = sum(casualty_slight_cyclist),
+            casualty_serious_cyclist = sum(casualty_serious_cyclist),
+            casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
+            )
+
+# la_commute <- left_join(la, crash_commute_yr[crash_commute_yr$year == 2018,], by = c("la_name"))
+# la_commute$active_ksi_per100k <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$popula_commutetion_2019 * 100000
+# la_commute$active_slight_per100k <- (la_commute$casualty_slight_cyclist +  la_commute$casualty_slight_pedestrian)  / la_commute$popula_commutetion_2019 * 100000
+# 
+# la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+# 
+# la_commute$active_slight_per_ksi <- (la_commute$casualty_slight_pedestrian + la_commute$casualty_slight_cyclist) /(la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )
+# 
+# la_commute$active_slight_per_ksi[la_commute$active_slight_per_ksi == Inf] <- NA
+# 
+# la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
+
+m2 <- tm_shape(la) +
+  tm_fill(col = "active_ksi_per100k_work",
+          title = "Active Travel KSI per 100,000 workplace population (2011)",
+          style = "quantile",
+          n = 10, 
+          legend.hist = TRUE) +
+  tm_borders() +
+  tm_layout(legend.outside = TRUE,
+            legend.hist.width = 1)
+tmap_arrange(m1, m2)
+```
 
 
 Commuter hours are classified as 07:00-10:00 and 16:00-19:00.
 
+# Speed limits
+
+Look at roads where the speed limit has changed. Have collision rates changed?
 
 # Focus on Cycling Commuting Times
 
