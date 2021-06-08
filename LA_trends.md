@@ -227,24 +227,6 @@ suggesting that the darker winter evenings are playing a role here.
 Casualties during the hour 4-5pm are highest in Days 320-350, further
 backing up this observation.
 
-``` r
-# there are NAs in the hour. these must be removed first
-crash = crash %>% 
-  mutate(fiveday = 5*(round(day_of_year/5)))
-crash_agg = crash %>%
-  st_drop_geometry() %>% 
-  select(fiveday, hour, active_ksi) %>% 
-  filter(! is.na(hour)) %>% 
-  group_by(fiveday, hour) %>% 
-  summarise(active_ksi = sum(active_ksi))
-```
-
-    ## `summarise()` has grouped output by 'fiveday'. You can override using the `.groups` argument.
-
-``` r
-summary(crash_agg)
-```
-
     ##     fiveday           hour         active_ksi    
     ##  Min.   :  0.0   Min.   : 0.00   Min.   :  1.16  
     ##  1st Qu.: 90.0   1st Qu.: 5.75   1st Qu.: 25.24  
@@ -253,90 +235,30 @@ summary(crash_agg)
     ##  3rd Qu.:275.0   3rd Qu.:17.25   3rd Qu.: 99.47  
     ##  Max.   :365.0   Max.   :23.00   Max.   :247.16
 
-``` r
-ggplot(crash_agg, aes(x = fiveday, y = hour, fill = active_ksi)) +
-  geom_tile() +
-  labs(x = "Day of year", y = "Hour")
-```
-
 ![](LA_trends_files/figure-gfm/heatmap-1.png)<!-- -->
 
 ## Hours of darkness
 
 Look at actual light levels crashes\_all$light\_conditions
 
-## Collisions during peak commuting hours
+# Focus on Cycling Commuting Times
 
-We can filter out the collisions that occur in non-peak commute hours
-and look at how the remaining collisions correspond with the LA
-workplace population. This better represents the safety of travel to
-work. We can see that tourist hotspots like Cumbria now show slightly
-lower KSI rates, suggesting that non-commute journeys are relatively
-more important there, while Lancashire retains a high rate.
-
-``` r
-crash_commute_yr <- crash %>%
-  st_drop_geometry() %>%
-  filter(hour %in% c(7, 8, 9, 16, 17, 18)) %>% 
-  group_by(la_name, code, year) %>%
-  summarise(total_crash = n(),
-            crash_fatal = sum(accident_severity == "Fatal"),
-            crash_serious = sum(accident_severity == "Serious"),
-            crash_slight = sum(accident_severity == "Slight"),
-            casualty_slight = sum(casualty_slight),
-            casualty_serious = sum(casualty_serious),
-            casualty_fatal = sum(casualty_fatal),
-            casualty_slight_pedestrian = sum(casualty_slight_pedestrian),
-            casualty_serious_pedestrian = sum(casualty_serious_pedestrian),
-            casualty_fatal_pedestrian = sum(casualty_fatal_pedestrian),
-            casualty_slight_cyclist = sum(casualty_slight_cyclist),
-            casualty_serious_cyclist = sum(casualty_serious_cyclist),
-            casualty_fatal_cyclist = sum(casualty_fatal_cyclist),
-            )
-```
-
-    ## `summarise()` has grouped output by 'la_name', 'code'. You can override using the `.groups` argument.
-
-``` r
-la_commute <- left_join(la_raw, crash_commute_yr[crash_commute_yr$year == 2018,], by = c("la_name", "code"))
-la_commute$active_ksi_per100k <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$population_2019 * 100000
-la_commute$active_slight_per100k <- (la_commute$casualty_slight_cyclist +  la_commute$casualty_slight_pedestrian)  / la_commute$population_2019 * 100000
-
-la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
-
-la_commute$active_slight_per_ksi <- (la_commute$casualty_slight_pedestrian + la_commute$casualty_slight_cyclist) /(la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )
-
-la_commute$active_slight_per_ksi[la_commute$active_slight_per_ksi == Inf] <- NA
-
-la_commute$active_ksi_per100k_work <- (la_commute$casualty_fatal_pedestrian + la_commute$casualty_fatal_cyclist + la_commute$casualty_serious_pedestrian + la_commute$casualty_serious_cyclist )/ la_commute$work_pop_2011 * 100000
-
-m2 <- tm_shape(la_commute) +
-  tm_fill(col = "active_ksi_per100k_work",
-          title = "Active Travel KSI per 100,000 workplace population (2011)",
-          style = "quantile",
-          n = 10, 
-          legend.hist = TRUE) +
-  tm_borders() +
-  tm_layout(legend.outside = TRUE,
-            legend.hist.width = 1)
-m2
-```
+As we have the best data for cycling activity during commuting times
+(via the PCT), we have filtered the data in this section to only
+consider crashes between 7am - 10am and 4pm - 7pm. We have removed the
+data from non-peak commute hours to look at how the remaining KSI
+collisions correspond with the LA workplace population. This more
+accurately represents the safety of travel to work. We can see that
+tourist hotspots like Cumbria now show slightly lower KSI rates,
+suggesting that a higher proportion of collisions happen outside peak
+hours there. Lancashire retains a high rate, but the highest collision
+rates are now in small urban LAs with high cycle commuting, including
+Wandsworth, Hackney and Portsmouth.
 
 ![](LA_trends_files/figure-gfm/commute-hours-1.png)<!-- -->
 
     ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
     ##  [8] "#BF4602" "#923204" "#662506"
-
-``` r
-la_top10_work <- st_drop_geometry(la_commute)
-la_top10_work <- la_top10_work[order(la_top10_work$active_ksi_per100k_work, decreasing = TRUE),]
-la_top10_work$rank <- seq(1,nrow(la_top10_work))
-la_top10_work <- la_top10_work[!is.na(la_top10_work$active_ksi_per100k_work),]
-la_top10_work <- la_top10_work[c(1:10,seq(nrow(la_top10_work) - 9, nrow(la_top10_work))),]
-la_top10_work <- la_top10_work[,c("la_name","rank","active_ksi_per100k_work","total_crash","crash_fatal")]
-la_top10_work$active_ksi_per100k_work <- round(la_top10_work$active_ksi_per100k_work)
-knitr::kable(la_top10_work)
-```
 
 |     | la\_name                     | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
 |:----|:-----------------------------|-----:|---------------------------:|-------------:|-------------:|
@@ -367,12 +289,6 @@ Commuter hours are classified as 07:00-10:00 and 16:00-19:00.
 
 Look at roads where the speed limit has changed. Have collision rates
 changed?
-
-# Focus on Cycling Commuting Times
-
-As we have the best data for cycling activity during commuting times
-(via the PCT), we have filtered the data in this section to only
-consider crashes between 7am - 10am and 4pm - 7pm.
 
 # Change in cycling
 

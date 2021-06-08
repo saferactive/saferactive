@@ -439,6 +439,8 @@ crash$active_ksi <- crash$casualty_fatal_cyclist + crash$casualty_fatal_pedestri
 ```
 
 ```{r tempo_plot}
+# may need to summarise to remove white lines on bar chart 
+# https://stackoverflow.com/questions/64055988/horizontal-white-lines-in-ggplot-bar-graph
 ggplot(crash, aes(hour, active_ksi)) +
   geom_col() +
   ylab("Active Travellers KSI") +
@@ -499,7 +501,7 @@ crash_agg = crash %>%
   filter(! is.na(hour)) %>% 
   group_by(fiveday, hour) %>% 
   summarise(active_ksi = sum(active_ksi))
-summary(crash_agg)
+# summary(crash_agg)
 ggplot(crash_agg, aes(x = fiveday, y = hour, fill = active_ksi)) +
   geom_tile() +
   labs(x = "Day of year", y = "Hour")
@@ -585,7 +587,7 @@ Look at roads where the speed limit has changed. Have collision rates changed?
 Present the GAM results on change in cycling across England
 
 ```{r cycle_trends}
-
+cycle_trends = readRDS("km_cycled_2010_2019_50m_grid.Rds")
 
 
 ```
