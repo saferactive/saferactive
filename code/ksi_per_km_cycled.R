@@ -163,5 +163,6 @@ tm_shape(bounds) +
   tm_layout(legend.outside = TRUE)
 
 
+
 piggyback::pb_download("la_upper_for_plots.Rds") #not found
 bounds_upper = readRDS("la_upper_for_plots.Rds")
