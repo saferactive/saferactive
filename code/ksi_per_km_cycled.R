@@ -13,7 +13,7 @@ library(lubridate)
 
 crash = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
-piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
+# piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
 la = readRDS("la_lower.Rds")
 
 crash = st_transform(crash, 27700)
@@ -21,20 +21,21 @@ crash = st_join(crash, la)
 crash$year = lubridate::year(crash$date)
 crash$hour = hour(crash$datetime)
 
-# use peak hours only
+# use peak hours on weekdays only
 crash_wide = crash %>%
   st_drop_geometry() %>%
-  filter(hour %in% c(7, 8, 9, 16, 17, 18)) %>%
+  filter(
+    hour %in% c(7, 8, 9, 16, 17, 18),
+    ! day_of_week %in% c("Saturday", "Sunday")
+    ) %>%
   group_by(la_name,
            la_code,
            year) %>%
-  summarise(ksi_active = sum(casualty_serious_cyclist) +
-              sum(casualty_fatal_cyclist) +
-              sum(casualty_serious_pedestrian) +
-              sum(casualty_fatal_pedestrian)) %>%
+  summarise(ksi_cycle = sum(casualty_serious_cyclist) +
+              sum(casualty_fatal_cyclist)) %>%
   pivot_wider(id_cols = c("la_name","la_code"),
               names_from = c("year"),
-              values_from = c("ksi_active"))
+              values_from = c("ksi_cycle"))
 
 piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
 cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv")
@@ -63,41 +64,46 @@ la$la_name = sapply(la$la_name, function(x){
 
 la$la_name = trimws(la$la_name)
 
-# remove extra columns
-la_cut = la[,c("la_name",names(la)[grepl("ksi_perMm_",names(la))])]
-la_cut = ungroup(la_cut)
-#removes Scottish LAs which we don't have estimated cycle flows for
-la_cut = la_cut[!is.na(la_cut$ksi_perMm_2019),]
-# head(la_cut)
+saveRDS(la, "cycle-collision-risk.Rds")
 
-# max and min annual rates in each LA
-la_cut$max = apply(la_cut[,names(la_cut)[grepl("ksi_perMm_",names(la_cut))]], 1, max, na.rm = TRUE)
-la_cut$min = apply(la_cut[,names(la_cut)[grepl("ksi_perMm_",names(la_cut))]], 1, min, na.rm = TRUE)
-la_cut$diff = la_cut$max - la_cut$min
-la_cut$diff1019 = la_cut$ksi_perMm_2010 - la_cut$ksi_perMm_2019
+la = readRDS("cycle-collision-risk.Rds")
+
+# remove extra columns
+# la_cut = la[,c("la_name",names(la)[grepl("ksi_perMm_",names(la))])]
+la = ungroup(la)
+
+#removes Scottish LAs which we don't have estimated cycle flows for
+la = la[!is.na(la$ksi_perMm_2019),]
+# head(la)
+
+# # max and min annual rates in each LA
+# la$max = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, max, na.rm = TRUE)
+# la$min = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, min, na.rm = TRUE)
+# la$diff = la$max - la$min
+# la$diff1019 = la$ksi_perMm_2010 - la$ksi_perMm_2019
 
 # mean rates in each LA
-la_cut$mean = apply(la_cut[,names(la_cut)[grepl("ksi_perMm_",names(la_cut))]], 1, mean, na.rm = TRUE)
-la_cut$early_mean = apply(la_cut[,names(la_cut)[grepl("ksi_perMm_",names(la_cut))]][,1:5], 1, mean, na.rm = TRUE)
-la_cut$late_mean = apply(la_cut[,names(la_cut)[grepl("ksi_perMm_",names(la_cut))]][,6:10], 1, mean, na.rm = TRUE)
-la_cut$diffmean = la_cut$late_mean - la_cut$early_mean
+la$mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, mean, na.rm = TRUE)
+la$early_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diffmean = la$late_mean - la$early_mean
 
 # select interesting LAs
 top_la = unique(c(
-  # top_n(la_cut, 4, diff)$la_name, # greatest difference between min and max rates
-  # top_n(la_cut, -4, diff1019)$la_name, # greatest increase in casualty rate from 2010 to 2019
-  # top_n(la_cut, 4, diff1019)$la_name, # greatest reduction in casualty rate from 2010 to 2019
-  # top_n(la_cut, 4, max)$la_name # greatest max casualty rate
+  # top_n(la, 4, diff)$la_name, # greatest difference between min and max rates
+  # top_n(la, -4, diff1019)$la_name, # greatest increase in casualty rate from 2010 to 2019
+  # top_n(la, 4, diff1019)$la_name, # greatest reduction in casualty rate from 2010 to 2019
+  # top_n(la, 4, max)$la_name # greatest max casualty rate
 
-  top_n(la_cut, 4, mean)$la_name, # greatest mean casualty rate
-  top_n(la_cut, 4, diffmean)$la_name, # greatest increase in casualty rate from early years to late years
-  top_n(la_cut, -4, diffmean)$la_name # greatest decrease in casualty rate from early years to late years
+  top_n(la, 4, mean)$la_name, # greatest mean casualty rate
+  top_n(la, 4, diffmean)$la_name, # greatest increase in casualty rate from early years to late years
+  top_n(la, -4, diffmean)$la_name # greatest decrease in casualty rate from early years to late years
   ))
 
-# top_la = top_n(la_cut, 4, diff)$la_name
+# top_la = top_n(la, 4, diff)$la_name
 
 
-la_long = pivot_longer(la_cut,
+la_long = pivot_longer(la,
                         cols = starts_with("ksi_perMm_"),
                         names_prefix = "ksi_perMm_",
                         names_to = "year",
@@ -146,21 +152,35 @@ ggplot(la_long, aes(year, ksi_perMm, colour = la_name_plot, group = la_name)) +
 #   ggtitle("Top and Bottom LAs")
 
 # get the geometry again
-piggyback::pb_download("la_lower_for_plots.Rds")
+# piggyback::pb_download("la_lower_for_plots.Rds")
 bounds = readRDS("la_lower_for_plots.Rds")
 bounds = left_join(bounds, la, by = "la_code")
 bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perMm_2010),]
 
-t1 = tm_shape(bounds) +
-  tm_fill("ksi_perMm_2010") +
+tm_shape(bounds) +
+  tm_fill("ksi_perMm_2019") +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
-tm_shape(bounds) +
-  tm_fill("ksi_perMm_2011") +
-  tm_borders(lwd = 0.1) +
-  tm_layout(legend.outside = TRUE)
+####
+
+t1 = tm_shape(bounds) +
+  tm_fill("mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2010-19") +
+  tm_borders(lwd = 0.1)
+  # + tm_layout(title = "Cycle KSI/Mkm 2010-19")
+
+t2 = tm_shape(bounds) +
+  tm_fill("early_mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2010-14") +
+  tm_borders(lwd = 0.1)
+ # + tm_layout(title = "Cycle KSI/Mkm 2010-14")
+
+t3 = tm_shape(bounds) +
+  tm_fill("late_mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2015-19") +
+  tm_borders(lwd = 0.1)
+  # + tm_layout(title = "Cycle KSI/Mkm 2015-19")
+
+tmap_arrange(t1, t2, t3)
 
 
 
