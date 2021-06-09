@@ -166,17 +166,17 @@ tm_shape(bounds) +
 ####
 
 t1 = tm_shape(bounds) +
-  tm_fill("mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2010-19") +
+  tm_fill("mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-19") +
   tm_borders(lwd = 0.1)
   # + tm_layout(title = "Cycle KSI/Mkm 2010-19")
 
 t2 = tm_shape(bounds) +
-  tm_fill("early_mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2010-14") +
+  tm_fill("early_mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-14") +
   tm_borders(lwd = 0.1)
  # + tm_layout(title = "Cycle KSI/Mkm 2010-14")
 
 t3 = tm_shape(bounds) +
-  tm_fill("late_mean", breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5), title = "2015-19") +
+  tm_fill("late_mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2015-19") +
   tm_borders(lwd = 0.1)
   # + tm_layout(title = "Cycle KSI/Mkm 2015-19")
 
@@ -184,5 +184,15 @@ tmap_arrange(t1, t2, t3)
 
 
 
-piggyback::pb_download("la_upper_for_plots.Rds") #not found
-bounds_upper = readRDS("la_upper_for_plots.Rds")
+# piggyback::pb_download("la_upper_for_plots.Rds") #not found
+# bounds_upper = readRDS("la_upper_for_plots.Rds")
+
+# top 10 lists
+highest_mean = arrange(top_n(la, 10, mean),-mean) # greatest mean casualty rate
+
+lowest_mean = arrange(top_n(la, 10, -mean),mean) # lowest mean casualty rate
+
+greatest_increase = arrange(top_n(la, 10, diffmean),-diffmean) # greatest increase in casualty rate
+
+greatest_decrease = arrange(top_n(la, 10, -diffmean),diffmean) # greatest decrease in casualty rate
+
