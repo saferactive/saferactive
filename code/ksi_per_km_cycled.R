@@ -69,8 +69,8 @@ cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle
 # Police forces and LA names now match up
 pf_lookup = crash %>%
   st_drop_geometry() %>%
-  select(LAD19NM, local_authority_highway, police_force) %>%
-  group_by(LAD19NM, local_authority_highway, police_force) %>%
+  select(la_code, LAD19NM, police_force) %>%
+  group_by(la_code, LAD19NM, police_force) %>%
   filter(n() > 3) %>%
   summarise()
 pf_lookup[duplicated(pf_lookup$LAD19NM),]
@@ -93,7 +93,7 @@ crash_wide = crash %>%
               names_from = c("year"),
               values_from = c("ksi_cycle"))
 
-la = left_join(crash_wide, cycle_km, by = c("la_code"))
+la = left_join(crash_wide, cycle_km, by = "la_code")
 
 la$ksi_perMm_2010 = la$`2010` / la$km_cycle_2010 * 1000
 la$ksi_perMm_2011 = la$`2011` / la$km_cycle_2011 * 1000
@@ -137,20 +137,34 @@ crash_pf = crash %>%
               names_from = c("year"),
               values_from = c("ksi_cycle"))
 
-cycle_km_pf = inner_join(cycle_km, pf_lookup)
+cycle_km_pf = inner_join(cycle_km, pf_lookup, by = "la_code")
+cycle_km_pf = cycle_km_pf %>%
+  group_by(police_force) %>%
+  summarise(
+    km_cycle_2010 = sum(km_cycle_2010),
+    km_cycle_2011 = sum(km_cycle_2011),
+    km_cycle_2012 = sum(km_cycle_2012),
+    km_cycle_2013 = sum(km_cycle_2013),
+    km_cycle_2014 = sum(km_cycle_2014),
+    km_cycle_2015 = sum(km_cycle_2015),
+    km_cycle_2016 = sum(km_cycle_2016),
+    km_cycle_2017 = sum(km_cycle_2017),
+    km_cycle_2018 = sum(km_cycle_2018),
+    km_cycle_2019 = sum(km_cycle_2019),
+            )
 
-la = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
+la_pf = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
 
-la$ksi_perMm_2010 = la$`2010` / la$km_cycle_2010 * 1000
-la$ksi_perMm_2011 = la$`2011` / la$km_cycle_2011 * 1000
-la$ksi_perMm_2012 = la$`2012` / la$km_cycle_2012 * 1000
-la$ksi_perMm_2013 = la$`2013` / la$km_cycle_2013 * 1000
-la$ksi_perMm_2014 = la$`2014` / la$km_cycle_2014 * 1000
-la$ksi_perMm_2015 = la$`2015` / la$km_cycle_2015 * 1000
-la$ksi_perMm_2016 = la$`2016` / la$km_cycle_2016 * 1000
-la$ksi_perMm_2017 = la$`2017` / la$km_cycle_2017 * 1000
-la$ksi_perMm_2018 = la$`2018` / la$km_cycle_2018 * 1000
-la$ksi_perMm_2019 = la$`2019` / la$km_cycle_2019 * 1000
+la_pf$ksi_perMm_2010 = la_pf$`2010` / la_pf$km_cycle_2010 * 1000
+la_pf$ksi_perMm_2011 = la_pf$`2011` / la_pf$km_cycle_2011 * 1000
+la_pf$ksi_perMm_2012 = la_pf$`2012` / la_pf$km_cycle_2012 * 1000
+la_pf$ksi_perMm_2013 = la_pf$`2013` / la_pf$km_cycle_2013 * 1000
+la_pf$ksi_perMm_2014 = la_pf$`2014` / la_pf$km_cycle_2014 * 1000
+la_pf$ksi_perMm_2015 = la_pf$`2015` / la_pf$km_cycle_2015 * 1000
+la_pf$ksi_perMm_2016 = la_pf$`2016` / la_pf$km_cycle_2016 * 1000
+la_pf$ksi_perMm_2017 = la_pf$`2017` / la_pf$km_cycle_2017 * 1000
+la_pf$ksi_perMm_2018 = la_pf$`2018` / la_pf$km_cycle_2018 * 1000
+la_pf$ksi_perMm_2019 = la_pf$`2019` / la_pf$km_cycle_2019 * 1000
 
 # No longer needed
 # la$la_name = sapply(la$la_name, function(x){
@@ -163,19 +177,22 @@ la$ksi_perMm_2019 = la$`2019` / la$km_cycle_2019 * 1000
 #
 # la$la_name = trimws(la$la_name)
 
-saveRDS(la, "cycle-collision-risk.Rds")
+saveRDS(la_pf, "cycle-collision-risk-pf.Rds")
 
 
 # Read in results ---------------------------------------------------------
 
 la = readRDS("cycle-collision-risk.Rds")
+la_pf = readRDS("cycle-collision-risk-pf.Rds")
 
 # remove extra columns
 # la_cut = la[,c("LAD19NM",names(la)[grepl("ksi_perMm_",names(la))])]
 la = ungroup(la)
+la_pf = ungroup(la_pf)
 
 #removes Scottish LAs which we don't have estimated cycle flows for
 la = la[!is.na(la$ksi_perMm_2019),]
+la_pf = la_pf[!is.na(la_pf$ksi_perMm_2019),]
 # head(la)
 
 # # max and min annual rates in each LA
@@ -190,6 +207,12 @@ la$early_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,1:5], 1, me
 la$late_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diffmean = la$late_mean - la$early_mean
 
+# mean rates in each LA
+la_pf$mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$early_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
+la_pf$late_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
+la_pf$diffmean = la_pf$late_mean - la_pf$early_mean
+
 # select interesting LAs
 top_la = unique(c(
   # top_n(la, 4, diff)$LAD19NM, # greatest difference between min and max rates
@@ -198,9 +221,17 @@ top_la = unique(c(
   # top_n(la, 4, max)$LAD19NM # greatest max casualty rate
 
   top_n(la, 4, mean)$LAD19NM, # greatest mean casualty rate
+  top_n(la, -4, mean)$LAD19NM, # lowest mean casualty rate
   top_n(la, 4, diffmean)$LAD19NM, # greatest increase in casualty rate from early years to late years
   top_n(la, -4, diffmean)$LAD19NM # greatest decrease in casualty rate from early years to late years
   ))
+
+top_la_pf = unique(c(
+  top_n(la_pf, 4, mean)$police_force, # greatest mean casualty rate
+  top_n(la_pf, -4, mean)$police_force, # lowest mean casualty rate
+  top_n(la_pf, 4, diffmean)$police_force, # greatest increase in casualty rate from early years to late years
+  top_n(la_pf, -4, diffmean)$police_force # greatest decrease in casualty rate from early years to late years
+))
 
 # top_la = top_n(la, 4, diff)$LAD19NM
 
@@ -212,11 +243,23 @@ la_long = pivot_longer(la,
                         values_to = "ksi_perMm"
 )
 
+la_pf_long = pivot_longer(la_pf,
+                       cols = starts_with("ksi_perMm_"),
+                       names_prefix = "ksi_perMm_",
+                       names_to = "year",
+                       values_to = "ksi_perMm"
+)
+
 # allow the interesting LAs to be highlighted in the plot
 la_long$sel = la_long$LAD19NM %in% top_la
 la_long$year = as.integer(la_long$year)
 la_long$LAD19NM_plot = ifelse(la_long$sel, la_long$LAD19NM, NA)
 head(la_long)
+
+la_pf_long$sel = la_pf_long$police_force %in% top_la_pf
+la_pf_long$year = as.integer(la_pf_long$year)
+la_pf_long$police_force_plot = ifelse(la_pf_long$sel, la_pf_long$police_force, NA)
+head(la_pf_long)
 
 ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
@@ -233,6 +276,22 @@ ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   scale_x_continuous(breaks = 2010:2019, expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0)) +
   ggtitle("KSI Risk, Selected LAs")
+
+ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = police_force)) +
+  geom_line(data = subset(la_pf_long, sel == FALSE), aes(size = sel)) +
+  geom_line(data = subset(la_pf_long, sel == TRUE), aes(size = sel)) +
+  ylab("Active Traveler KSI per 1000 km cycled") +
+  labs(color = "Police Force") +
+  guides(size = FALSE) +
+  guides(colour = guide_legend(override.aes = list(size=3))) +
+  scale_size_manual(values = c("TRUE" = 1.5, "FALSE" = 0.1)) +
+  # scale_color_manual(values=c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99",
+  #                             "#E31A1C",
+  #                             "#d3d3d3","#FDBF6F",
+  #                             "#FF7F00", "#CAB2D6", "#6A3D9A", "#CAB2D6")) +
+  scale_x_continuous(breaks = 2010:2019, expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  ggtitle("KSI Risk, Selected Police Forces")
 
 
 
@@ -260,8 +319,20 @@ bounds = left_join(bounds %>% select(-la_name), la, by = "la_code")
 bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perMm_2010),]
 
+# Police force geometry
+pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson")
+pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
+pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
+pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
+# pf_geom = pf_geom[!is.na(pf_geom$ksi_perMm_2019),]
+
 tm_shape(bounds) +
   tm_fill("ksi_perMm_2019") +
+  tm_borders(lwd = 0.1) +
+  tm_layout(legend.outside = TRUE)
+
+tm_shape(pf_geom) +
+  tm_fill("ksi_perMm_2019", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2)) +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
@@ -283,6 +354,26 @@ t3 = tm_shape(bounds) +
   # + tm_layout(title = "Cycle KSI/Mkm 2015-19")
 
 tmap_arrange(t1, t2, t3)
+
+####
+
+t1 = tm_shape(pf_geom) +
+  tm_fill("mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Mkm 2010-19")
+
+t2 = tm_shape(pf_geom) +
+  tm_fill("early_mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-14") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Mkm 2010-14")
+
+t3 = tm_shape(pf_geom) +
+  tm_fill("late_mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2015-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Mkm 2015-19")
+
+tmap_arrange(t1, t2, t3)
+
 
 
 
