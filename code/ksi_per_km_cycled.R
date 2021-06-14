@@ -5,21 +5,77 @@ library(tmap)
 library(sf)
 library(lubridate)
 
-# this just has annual rates per LA. but i want to select peak hour crashes only
+## this just has annual rates per LA. but i want to select peak hour crashes only
 # piggyback::pb_download("la_crash_summary_wideform.Rds", tag = "0.1.3")
 # crash = readRDS("la_crash_summary_wideform.Rds")
-
 # piggyback::pb_download("la_crash_summary_longform.Rds", tag = "0.1.3")
 
-crash = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
+crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
+# # Correct location error
+# # View(crash_raw %>% filter(local_authority_district == "Dover" & police_force == "Thames Valley"))
+# crash_raw$local_authority_district[crash_raw$accident_index == "2018430248885"] = "Windsor and Maidenhead"
+# crash_raw$local_authority_highway[crash_raw$accident_index == "2018430248885"] = "Windsor and Maidenhead"
+#
+# saveRDS(crash_raw, "data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
+
+# Get and apply LAD codes (joining using old LAD names)
+names_lad = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom_updated.csv")
+
+namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "LAD19NM"))
+namejoin = st_drop_geometry(namejoin)
+
+# Check no rows are mising codes
+xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) %>% summarise()
+
+# Standardise to new LAD names
+new_names = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom.csv") %>%
+  select(-LAD19NMW, -FID)
+
+nameagain = inner_join(new_names, namejoin, by = "LAD19CD")
+
+# Check no rows are mising codes
+xx = nameagain %>% filter(is.na(LAD19NM)) %>% group_by(local_authority_district) %>% summarise()
+length(unique(nameagain$local_authority_district)) #380
+length(unique(nameagain$LAD19NM)) #367
+length(unique(nameagain$LAD19CD)) #367
+
+## LA boundaries
+# bfc = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BFC.shp")
+
+# Get LAD geometry
 # piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
 la = readRDS("la_lower.Rds")
 
-crash = st_transform(crash, 27700)
-crash = st_join(crash, la)
+# # old method (which introduced geographical errors)
+# crash = st_transform(crash, 27700)
+# crash = st_join(crash, la)
+
+# new method
+crash = right_join(la, nameagain, by = c("la_code" = "LAD19CD"))
+
+xx = crash %>% st_drop_geometry() %>% filter(is.na(la_name))
+unique(xx$LAD19NM)
+
 crash$year = lubridate::year(crash$date)
-crash$hour = hour(crash$datetime)
+crash$hour = lubridate::hour(crash$datetime)
+crash$la_name = NULL
+crash$local_authority_district = NULL
+
+# piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
+cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv") %>% select(-la_name)
+cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
+
+# Police forces and LA names now match up
+pf_lookup = crash %>%
+  st_drop_geometry() %>%
+  select(LAD19NM, local_authority_highway, police_force) %>%
+  group_by(LAD19NM, local_authority_highway, police_force) %>%
+  filter(n() > 3) %>%
+  summarise()
+pf_lookup[duplicated(pf_lookup$LAD19NM),]
+
+# Group by lower tier LA --------------------------------------------------
 
 # use peak hours on weekdays only
 crash_wide = crash %>%
@@ -28,18 +84,14 @@ crash_wide = crash %>%
     hour %in% c(7, 8, 9, 16, 17, 18),
     ! day_of_week %in% c("Saturday", "Sunday")
     ) %>%
-  group_by(la_name,
+  group_by(LAD19NM,
            la_code,
            year) %>%
   summarise(ksi_cycle = sum(casualty_serious_cyclist) +
               sum(casualty_fatal_cyclist)) %>%
-  pivot_wider(id_cols = c("la_name","la_code"),
+  pivot_wider(id_cols = c("LAD19NM","la_code"),
               names_from = c("year"),
               values_from = c("ksi_cycle"))
-
-piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
-cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv")
-cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
 
 la = left_join(crash_wide, cycle_km, by = c("la_code"))
 
@@ -54,22 +106,72 @@ la$ksi_perMm_2017 = la$`2017` / la$km_cycle_2017 * 1000
 la$ksi_perMm_2018 = la$`2018` / la$km_cycle_2018 * 1000
 la$ksi_perMm_2019 = la$`2019` / la$km_cycle_2019 * 1000
 
-la$la_name = sapply(la$la_name, function(x){
-  x = strsplit(x, "-")[[1]]
-  if(length(x) > 1){
-    x = x[2]
-  }
-  x
-}, USE.NAMES = FALSE)
-
-la$la_name = trimws(la$la_name)
+# No longer needed
+# la$la_name = sapply(la$la_name, function(x){
+#   x = strsplit(x, "-")[[1]]
+#   if(length(x) > 1){
+#     x = x[2]
+#   }
+#   x
+# }, USE.NAMES = FALSE)
+#
+# la_name2 = trimws(la$la_name)
 
 saveRDS(la, "cycle-collision-risk.Rds")
+
+
+# Group by police force ---------------------------------------------------
+
+# use peak hours on weekdays only
+crash_pf = crash %>%
+  st_drop_geometry() %>%
+  filter(
+    hour %in% c(7, 8, 9, 16, 17, 18),
+    ! day_of_week %in% c("Saturday", "Sunday")
+  ) %>%
+  group_by(police_force,
+           year) %>%
+  summarise(ksi_cycle = sum(casualty_serious_cyclist) +
+              sum(casualty_fatal_cyclist)) %>%
+  pivot_wider(id_cols = c("police_force"),
+              names_from = c("year"),
+              values_from = c("ksi_cycle"))
+
+cycle_km_pf = inner_join(cycle_km, pf_lookup)
+
+la = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
+
+la$ksi_perMm_2010 = la$`2010` / la$km_cycle_2010 * 1000
+la$ksi_perMm_2011 = la$`2011` / la$km_cycle_2011 * 1000
+la$ksi_perMm_2012 = la$`2012` / la$km_cycle_2012 * 1000
+la$ksi_perMm_2013 = la$`2013` / la$km_cycle_2013 * 1000
+la$ksi_perMm_2014 = la$`2014` / la$km_cycle_2014 * 1000
+la$ksi_perMm_2015 = la$`2015` / la$km_cycle_2015 * 1000
+la$ksi_perMm_2016 = la$`2016` / la$km_cycle_2016 * 1000
+la$ksi_perMm_2017 = la$`2017` / la$km_cycle_2017 * 1000
+la$ksi_perMm_2018 = la$`2018` / la$km_cycle_2018 * 1000
+la$ksi_perMm_2019 = la$`2019` / la$km_cycle_2019 * 1000
+
+# No longer needed
+# la$la_name = sapply(la$la_name, function(x){
+#   x = strsplit(x, "-")[[1]]
+#   if(length(x) > 1){
+#     x = x[2]
+#   }
+#   x
+# }, USE.NAMES = FALSE)
+#
+# la$la_name = trimws(la$la_name)
+
+saveRDS(la, "cycle-collision-risk.Rds")
+
+
+# Read in results ---------------------------------------------------------
 
 la = readRDS("cycle-collision-risk.Rds")
 
 # remove extra columns
-# la_cut = la[,c("la_name",names(la)[grepl("ksi_perMm_",names(la))])]
+# la_cut = la[,c("LAD19NM",names(la)[grepl("ksi_perMm_",names(la))])]
 la = ungroup(la)
 
 #removes Scottish LAs which we don't have estimated cycle flows for
@@ -90,17 +192,17 @@ la$diffmean = la$late_mean - la$early_mean
 
 # select interesting LAs
 top_la = unique(c(
-  # top_n(la, 4, diff)$la_name, # greatest difference between min and max rates
-  # top_n(la, -4, diff1019)$la_name, # greatest increase in casualty rate from 2010 to 2019
-  # top_n(la, 4, diff1019)$la_name, # greatest reduction in casualty rate from 2010 to 2019
-  # top_n(la, 4, max)$la_name # greatest max casualty rate
+  # top_n(la, 4, diff)$LAD19NM, # greatest difference between min and max rates
+  # top_n(la, -4, diff1019)$LAD19NM, # greatest increase in casualty rate from 2010 to 2019
+  # top_n(la, 4, diff1019)$LAD19NM, # greatest reduction in casualty rate from 2010 to 2019
+  # top_n(la, 4, max)$LAD19NM # greatest max casualty rate
 
-  top_n(la, 4, mean)$la_name, # greatest mean casualty rate
-  top_n(la, 4, diffmean)$la_name, # greatest increase in casualty rate from early years to late years
-  top_n(la, -4, diffmean)$la_name # greatest decrease in casualty rate from early years to late years
+  top_n(la, 4, mean)$LAD19NM, # greatest mean casualty rate
+  top_n(la, 4, diffmean)$LAD19NM, # greatest increase in casualty rate from early years to late years
+  top_n(la, -4, diffmean)$LAD19NM # greatest decrease in casualty rate from early years to late years
   ))
 
-# top_la = top_n(la, 4, diff)$la_name
+# top_la = top_n(la, 4, diff)$LAD19NM
 
 
 la_long = pivot_longer(la,
@@ -111,12 +213,12 @@ la_long = pivot_longer(la,
 )
 
 # allow the interesting LAs to be highlighted in the plot
-la_long$sel = la_long$la_name %in% top_la
+la_long$sel = la_long$LAD19NM %in% top_la
 la_long$year = as.integer(la_long$year)
-la_long$la_name_plot = ifelse(la_long$sel, la_long$la_name, NA)
+la_long$LAD19NM_plot = ifelse(la_long$sel, la_long$LAD19NM, NA)
 head(la_long)
 
-ggplot(la_long, aes(year, ksi_perMm, colour = la_name_plot, group = la_name)) +
+ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_long, sel == TRUE), aes(size = sel)) +
   ylab("Active Traveler KSI per 1000 km cycled") +
@@ -135,7 +237,7 @@ ggplot(la_long, aes(year, ksi_perMm, colour = la_name_plot, group = la_name)) +
 
 
 # ggplot(crash_yr,
-#        aes(year, active_ksi_per100k_work, colour = la_name_plot, group = la_name)) +
+#        aes(year, active_ksi_per100k_work, colour = LAD19NM_plot, group = LAD19NM)) +
 #   geom_line(data = subset(crash_yr, lwd == FALSE), aes(size = lwd)) +
 #   geom_line(data = subset(crash_yr, lwd == TRUE), aes(size = lwd)) +
 #   ylab("Active Travel KSI per 100k workplace population") +
@@ -154,7 +256,7 @@ ggplot(la_long, aes(year, ksi_perMm, colour = la_name_plot, group = la_name)) +
 # get the geometry again
 # piggyback::pb_download("la_lower_for_plots.Rds")
 bounds = readRDS("la_lower_for_plots.Rds")
-bounds = left_join(bounds, la, by = "la_code")
+bounds = left_join(bounds %>% select(-la_name), la, by = "la_code")
 bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perMm_2010),]
 
@@ -186,6 +288,12 @@ tmap_arrange(t1, t2, t3)
 
 # piggyback::pb_download("la_upper_for_plots.Rds") #not found
 # bounds_upper = readRDS("la_upper_for_plots.Rds")
+
+## Histogram of LA values
+
+hist(bounds$mean, xlim = c(0, 4), breaks = 15)
+hist(bounds$early_mean, xlim = c(0, 4), breaks = 20)
+hist(bounds$late_mean, xlim = c(0, 4), breaks = 15)
 
 # top 10 lists
 highest_mean = arrange(top_n(la, 10, mean),-mean) # greatest mean casualty rate
