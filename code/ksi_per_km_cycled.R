@@ -361,6 +361,7 @@ ggplot(la, aes(x = mean_km_cycled, y = mean)) +
 ggplot(la, aes(x = mean_km_percap, y = mean)) +
   geom_point() +
   xlim(0, 0.5) +
+  ylim(0, 3) +
   labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled")
     # + geom_text(label = la$LAD19NM, nudge_y = +0.1, cex = 2)
 
