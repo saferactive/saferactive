@@ -11,6 +11,9 @@ library(readr)
 # crash = readRDS("la_crash_summary_wideform.Rds")
 # piggyback::pb_download("la_crash_summary_longform.Rds", tag = "0.1.3")
 
+# piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties", tag = "0.1.4")
+# crash_raw = readRDS("crash_2010_2019_with_summary_adjusted_casualties.Rds")
+
 crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 crash_raw = st_drop_geometry(crash_raw)
@@ -139,7 +142,8 @@ crash_pf = crash %>%
               sum(casualty_fatal_cyclist)) %>%
   pivot_wider(id_cols = c("police_force"),
               names_from = c("year"),
-              values_from = c("ksi_cycle"))
+              values_from = c("ksi_cycle"),
+              names_prefix = "ksi_")
 
 cycle_km_pf = inner_join(cycle_km, pf_lookup, by = "la_code")
 cycle_km_pf = cycle_km_pf %>%
@@ -159,16 +163,16 @@ cycle_km_pf = cycle_km_pf %>%
 
 la_pf = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
 
-la_pf$ksi_perMm_2010 = la_pf$`2010` / la_pf$km_cycle_2010 * 1000
-la_pf$ksi_perMm_2011 = la_pf$`2011` / la_pf$km_cycle_2011 * 1000
-la_pf$ksi_perMm_2012 = la_pf$`2012` / la_pf$km_cycle_2012 * 1000
-la_pf$ksi_perMm_2013 = la_pf$`2013` / la_pf$km_cycle_2013 * 1000
-la_pf$ksi_perMm_2014 = la_pf$`2014` / la_pf$km_cycle_2014 * 1000
-la_pf$ksi_perMm_2015 = la_pf$`2015` / la_pf$km_cycle_2015 * 1000
-la_pf$ksi_perMm_2016 = la_pf$`2016` / la_pf$km_cycle_2016 * 1000
-la_pf$ksi_perMm_2017 = la_pf$`2017` / la_pf$km_cycle_2017 * 1000
-la_pf$ksi_perMm_2018 = la_pf$`2018` / la_pf$km_cycle_2018 * 1000
-la_pf$ksi_perMm_2019 = la_pf$`2019` / la_pf$km_cycle_2019 * 1000
+la_pf$ksi_perMm_2010 = la_pf$ksi_2010 / la_pf$km_cycle_2010 * 1000
+la_pf$ksi_perMm_2011 = la_pf$ksi_2011 / la_pf$km_cycle_2011 * 1000
+la_pf$ksi_perMm_2012 = la_pf$ksi_2012 / la_pf$km_cycle_2012 * 1000
+la_pf$ksi_perMm_2013 = la_pf$ksi_2013 / la_pf$km_cycle_2013 * 1000
+la_pf$ksi_perMm_2014 = la_pf$ksi_2014 / la_pf$km_cycle_2014 * 1000
+la_pf$ksi_perMm_2015 = la_pf$ksi_2015 / la_pf$km_cycle_2015 * 1000
+la_pf$ksi_perMm_2016 = la_pf$ksi_2016 / la_pf$km_cycle_2016 * 1000
+la_pf$ksi_perMm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000
+la_pf$ksi_perMm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000
+la_pf$ksi_perMm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000
 
 # No longer needed
 # la$la_name = sapply(la$la_name, function(x){
@@ -320,7 +324,7 @@ ggplot(la, aes(x = mean_km_cycled, y = mean_cycle_ksi)) +
 #   ggtitle("Top and Bottom LAs")
 
 # get the geometry again
-# piggyback::pb_download("la_lower_for_plots.Rds")
+# piggyback::pb_download("la_lower_for_plots.Rds", tag = "0.1.3")
 bounds = readRDS("la_lower_for_plots.Rds")
 bounds = left_join(bounds %>% select(-la_name), la, by = "la_code")
 bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
