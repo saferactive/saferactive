@@ -205,7 +205,7 @@ la_pf = la_pf[!is.na(la_pf$ksi_perMm_2019),]
 
 
 # Get LAD populations -----------------------------------------------------
-
+# piggyback::pb_download("MYEB1_detailed_population_estimates_series_UK_(2019_geog20).csv", tag = "0.1.4")
 pop1 = read_csv("~/Documents/R/saferactive/MYEB1_detailed_population_estimates_series_UK_(2019_geog20).csv")
 
 names(pop1)
