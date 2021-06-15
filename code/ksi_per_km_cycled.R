@@ -205,11 +205,12 @@ la_pf = la_pf[!is.na(la_pf$ksi_perMm_2019),]
 
 
 # Get LAD populations -----------------------------------------------------
-# piggyback::pb_download("MYEB1_detailed_population_estimates_series_UK_(2019_geog20).csv", tag = "0.1.4")
-pop1 = read_csv("~/Documents/R/saferactive/MYEB1_detailed_population_estimates_series_UK_(2019_geog20).csv")
+# piggyback::pb_list()
+piggyback::pb_download("MYEB1_detailed_population_estimates_series_UK_.2019_geog20.csv", tag = "0.1.4")
+pop1 = read_csv("MYEB1_detailed_population_estimates_series_UK_.2019_geog20.csv")
 
 names(pop1)
-View(pop1)
+# View(pop1)
 
 pop2 = pop1 %>%
   group_by(ladcode20, laname20) %>%
@@ -315,6 +316,9 @@ la_pf_long$sel = la_pf_long$police_force %in% top_la_pf
 la_pf_long$year = as.integer(la_pf_long$year)
 la_pf_long$police_force_plot = ifelse(la_pf_long$sel, la_pf_long$police_force, NA)
 head(la_pf_long)
+
+# save la_long for future reference
+saveRDS(la_long, "la_long.Rds")
 
 ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
