@@ -270,7 +270,7 @@ head(la_pf_long)
 ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_long, sel == TRUE), aes(size = sel)) +
-  ylab("Active Traveler KSI per 1000 km cycled") +
+  ylab("KSI per 1000 km cycled") +
   labs(color = "Local Authority") +
   guides(size = FALSE) +
   guides(colour = guide_legend(override.aes = list(size=3))) +
@@ -286,7 +286,7 @@ ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
 ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = police_force)) +
   geom_line(data = subset(la_pf_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_pf_long, sel == TRUE), aes(size = sel)) +
-  ylab("Active Traveler KSI per 1000 km cycled") +
+  ylab("KSI per 1000 km cycled") +
   labs(color = "Police Force") +
   guides(size = FALSE) +
   guides(colour = guide_legend(override.aes = list(size=3))) +
@@ -296,12 +296,11 @@ ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = poli
   #                             "#d3d3d3","#FDBF6F",
   #                             "#FF7F00", "#CAB2D6", "#6A3D9A", "#CAB2D6")) +
   scale_x_continuous(breaks = 2010:2019, expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0, 2)) +
   ggtitle("KSI Risk, Selected Police Forces")
 
 ggplot(la, aes(x = mean_km_cycled, y = mean_cycle_ksi)) +
   geom_point()
-
 
 # ggplot(crash_yr,
 #        aes(year, active_ksi_per100k_work, colour = LAD19NM_plot, group = LAD19NM)) +
@@ -328,7 +327,7 @@ bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perMm_2010),]
 
 # Police force geometry
-pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson")
+pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson") # todo: make reproducible
 pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
 pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
 pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))

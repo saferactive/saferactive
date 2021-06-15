@@ -51,6 +51,7 @@ dir.create("~/hd/data/stats19-private/co2")
 unzip("~/hd/data/stats19-private/co2.zip", exdir = "~/hd/data/stats19-private/co2")
 (f = list.files("~/hd/data/stats19-private/co2", full.names = TRUE))
 # every single car type
+# co2_ue = readr::read_tsv(f[2], locale = locale(encoding="UTF-16LE"))
 co2_ue = readr::read_tsv(f[2])
 co2_ue = data.table::fread(f)
 
