@@ -1,34 +1,53 @@
----
-title: "Bradford data analysis"
-output: github_document
----
+Bradford data analysis
+================
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r, message=FALSE}
+``` r
 library(tidyverse)
 library(tmap)
 tmap_mode("view")
 ```
 
-
 ## Raw counter data
 
-Data from the DfT's manual count dataset was obtained using code hosted at https://github.com/ITSLeeds/dftTrafficCounts
+Data from the DfT’s manual count dataset was obtained using code hosted
+at <https://github.com/ITSLeeds/dftTrafficCounts>
 
-```{r}
+``` r
 remotes::install_github("ITSLeeds/dftTrafficCounts")
+```
+
+    ## Using github PAT from envvar GITHUB_PAT
+
+    ## Skipping install of 'dftTrafficCounts' from a github remote, the SHA1 (dacb7edd) has not changed since last install.
+    ##   Use `force = TRUE` to force installation
+
+``` r
 library(dftTrafficCounts)
 ```
 
 Aggregated local authority data can be obtained and plotted as follows:
 
-
-```{r cars}
+``` r
 d_las = dtc_import_la()
+```
+
+    ## Rows: 5,734
+    ## Columns: 9
+    ## Delimiter: ","
+    ## chr [2]: name, ons_code
+    ## dbl [7]: region_id, local_authority_id, year, link_length_km, link_length_miles, cars_an...
+    ## 
+    ## Use `spec()` to retrieve the guessed column specification
+    ## Pass a specification to the `col_types` argument to quiet this message
+
+``` r
 head(d_las$name)
+```
+
+    ## [1] "Hartlepool"           "Middlesbrough"        "Redcar and Cleveland"
+    ## [4] "Stockton-on-Tees"     "Darlington"           "Halton"
+
+``` r
 las_of_interest = c("Leeds", "Bradford", "Wakefield", "Calderdale", "Kirklees")
 d_las_of_interest = d_las %>%
    filter(name %in% las_of_interest)
@@ -39,9 +58,15 @@ d_las %>%
   ylim(c(0, 5e9))
 ```
 
-Counter level data can be obtained with the following commands, which downloads and reads in data representing 4.5 million manual count records, as of June 2021 (warning requires a decent computer):
+    ## Warning: Removed 174 row(s) containing missing values (geom_path).
 
-```{r, eval=FALSE}
+![](bradford_files/figure-gfm/cars-1.png)<!-- -->
+
+Counter level data can be obtained with the following commands, which
+downloads and reads in data representing 4.5 million manual count
+records, as of June 2021 (warning requires a decent computer):
+
+``` r
 u = "http://data.dft.gov.uk/road-traffic/dft_traffic_counts_raw_counts.zip"
 d = dtc_import(u = u)
 nrow(d)
@@ -68,9 +93,9 @@ d_year_count %>% filter(Year > 2010)
 # 10  2020 154783
 ```
 
-Let's subset this data to include only LAs of interest from 2011 to 2020
+Let’s subset this data to include only LAs of interest from 2011 to 2020
 
-```{r, eval=FALSE}
+``` r
 d_sample_points = d %>% 
   group_by(CP) %>% 
   summarise(n_records = n(),
@@ -122,19 +147,7 @@ d_summary_la = d_sample %>%
   tidyr::pivot_longer(cols = PedalCycles:BusesCoaches, names_to = "mode")
 ```
 
-```{r, eval=FALSE, echo=FALSE}
-saveRDS(d_summary_la, "dft_traffic_counts_d_summary_la.Rds")
-piggyback::pb_upload("dft_traffic_counts_d_summary_la.Rds")
-piggyback::pb_download_url("dft_traffic_counts_d_summary_la.Rds")
-vroom::vroom_write(d_joined, "dft_traffic_counts_raw_counts_2021-06-15.csv")
-vroom::vroom_write(d_joined, "dft_traffic_counts_raw_counts_2021-06-15.csv.gz")
-piggyback::pb_upload("dft_traffic_counts_raw_counts_2021-06-15.csv.gz", repo = "itsleeds/dftTrafficCounts")
-saveRDS(d_counter_west_yorks, "dft_traffic_count_d_counter_west_yorks.Rds")
-piggyback::pb_upload("dft_traffic_count_d_counter_west_yorks.Rds")
-piggyback::pb_download_url("dft_traffic_count_d_counter_west_yorks.Rds")
-```
-
-```{r}
+``` r
 u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/dft_traffic_counts_d_summary_la.Rds"
 d_summary_la = readRDS(url(u))
 ggplot(d_summary_la) +
@@ -143,62 +156,50 @@ ggplot(d_summary_la) +
   scale_y_log10()
 ```
 
+![](bradford_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
 We can observe individual counter points as follows:
 
-```{r}
+``` r
 u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/dft_traffic_count_d_counter_west_yorks.Rds"
 counters_year = readRDS(url(u))
 counters_sf = counters_year %>% 
   group_by(Easting, Northing) %>% 
   summarise(n = n(), LA = first(name)) %>% 
   sf::st_as_sf(coords = c("Easting", "Northing"), crs = 27700)
+```
+
+    ## `summarise()` has grouped output by 'Easting'. You can override using the `.groups` argument.
+
+``` r
 counters_bradford = counters_sf %>% filter(LA == "Bradford")
 qtm(counters_sf, bbox = sf::st_bbox(counters_bradford), basemaps = leaflet::providers$OpenStreetMap.Mapnik) +
   tm_shape(counters_bradford) +
   tm_dots(size = "n", col = "n", alpha = 0.3) 
+```
+
+    ## Legend for symbol sizes not available in view mode.
+
+![](bradford_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
 # nrow(counters_bradford)
 ```
 
-There are 1273 counters in Bradford, but only 225 with at least 2 readings since 2017.
-These are plotted below.
+There are 1273 counters in Bradford, but only 225 with at least 2
+readings since 2017. These are plotted below.
 
-```{r, echo=FALSE}
-# table(counters_bradford$n)
-# summary(counters_year$Year)
-counters_bradford_year = counters_year %>% 
-  group_by(CP) %>% 
-  mutate(n_years = n()) 
-counters_bradford_agg = counters_bradford_year %>% 
-  group_by(Year) %>% 
-  summarise(Cycles = mean(Cycles, na.rm = TRUE))
-summary(counters_bradford_year$Year)
-# table(counters_bradford_year$n_years)
-counters_bradford_lines = counters_bradford_year %>% filter(n_years > 1)
-counters_bradford_points = counters_bradford_year %>% filter(n_years == 1)
-length(unique(counters_bradford_year$CP))
-counters_bradford_year %>% 
-  ggplot() +
-  geom_line(aes(Year, Cycles, group = CP), alpha = 0.3) +
-  geom_point(aes(Year, Cycles, group = CP), alpha = 0.3) +
-  geom_line(aes(Year, Cycles), data = counters_bradford_agg, colour = "orange", size = 3) +
-  scale_x_continuous(breaks = c(2000, 2005, 2010, 2015, 2018:2020))
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##    2000    2005    2009    2010    2015    2020
 
-```
+    ## [1] 1273
 
+    ## Warning: Removed 1 rows containing missing values (geom_point).
 
-
+![](bradford_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ## Automatic count data
 
 Work in progress
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-
-
-```{r, eval=FALSE, echo=FALSE}
-# out takes
-```
-
+![](bradford_files/figure-gfm/pressure-1.png)<!-- -->
