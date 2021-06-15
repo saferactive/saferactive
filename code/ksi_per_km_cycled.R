@@ -4,6 +4,7 @@ library(dplyr)
 library(tmap)
 library(sf)
 library(lubridate)
+library(readr)
 
 ## this just has annual rates per LA. but i want to select peak hour crashes only
 # piggyback::pb_download("la_crash_summary_wideform.Rds", tag = "0.1.3")
@@ -11,6 +12,8 @@ library(lubridate)
 # piggyback::pb_download("la_crash_summary_longform.Rds", tag = "0.1.3")
 
 crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
+
+crash_raw = st_drop_geometry(crash_raw)
 
 # # Correct location error
 # # View(crash_raw %>% filter(local_authority_district == "Dover" & police_force == "Thames Valley"))
@@ -23,7 +26,7 @@ crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 names_lad = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom_updated.csv")
 
 namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "LAD19NM"))
-namejoin = st_drop_geometry(namejoin)
+
 
 # Check no rows are mising codes
 xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) %>% summarise()
@@ -73,7 +76,7 @@ pf_lookup = crash %>%
   group_by(la_code, LAD19NM, police_force) %>%
   filter(n() > 3) %>%
   summarise()
-pf_lookup[duplicated(pf_lookup$LAD19NM),]
+# pf_lookup[duplicated(pf_lookup$LAD19NM),]
 
 # Group by lower tier LA --------------------------------------------------
 
@@ -91,20 +94,21 @@ crash_wide = crash %>%
               sum(casualty_fatal_cyclist)) %>%
   pivot_wider(id_cols = c("LAD19NM","la_code"),
               names_from = c("year"),
-              values_from = c("ksi_cycle"))
+              values_from = c("ksi_cycle"),
+              names_prefix = "ksi_")
 
 la = left_join(crash_wide, cycle_km, by = "la_code")
 
-la$ksi_perMm_2010 = la$`2010` / la$km_cycle_2010 * 1000
-la$ksi_perMm_2011 = la$`2011` / la$km_cycle_2011 * 1000
-la$ksi_perMm_2012 = la$`2012` / la$km_cycle_2012 * 1000
-la$ksi_perMm_2013 = la$`2013` / la$km_cycle_2013 * 1000
-la$ksi_perMm_2014 = la$`2014` / la$km_cycle_2014 * 1000
-la$ksi_perMm_2015 = la$`2015` / la$km_cycle_2015 * 1000
-la$ksi_perMm_2016 = la$`2016` / la$km_cycle_2016 * 1000
-la$ksi_perMm_2017 = la$`2017` / la$km_cycle_2017 * 1000
-la$ksi_perMm_2018 = la$`2018` / la$km_cycle_2018 * 1000
-la$ksi_perMm_2019 = la$`2019` / la$km_cycle_2019 * 1000
+la$ksi_perMm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000
+la$ksi_perMm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000
+la$ksi_perMm_2012 = la$ksi_2012 / la$km_cycle_2012 * 1000
+la$ksi_perMm_2013 = la$ksi_2013 / la$km_cycle_2013 * 1000
+la$ksi_perMm_2014 = la$ksi_2014 / la$km_cycle_2014 * 1000
+la$ksi_perMm_2015 = la$ksi_2015 / la$km_cycle_2015 * 1000
+la$ksi_perMm_2016 = la$ksi_2016 / la$km_cycle_2016 * 1000
+la$ksi_perMm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000
+la$ksi_perMm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000
+la$ksi_perMm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000
 
 # No longer needed
 # la$la_name = sapply(la$la_name, function(x){
@@ -206,6 +210,8 @@ la$mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, mean, na.rm = 
 la$early_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diffmean = la$late_mean - la$early_mean
+la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_",names(la))]], 1, mean, na.rm = TRUE)
 
 # mean rates in each LA
 la_pf$mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]], 1, mean, na.rm = TRUE)
@@ -293,6 +299,8 @@ ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = poli
   scale_y_continuous(expand = c(0,0)) +
   ggtitle("KSI Risk, Selected Police Forces")
 
+ggplot(la, aes(x = mean_km_cycled, y = mean_cycle_ksi)) +
+  geom_point()
 
 
 # ggplot(crash_yr,
