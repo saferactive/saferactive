@@ -203,6 +203,50 @@ la = la[!is.na(la$ksi_perMm_2019),]
 la_pf = la_pf[!is.na(la_pf$ksi_perMm_2019),]
 # head(la)
 
+
+# Get LAD populations -----------------------------------------------------
+
+pop1 = read_csv("~/Documents/R/saferactive/MYEB1_detailed_population_estimates_series_UK_(2019_geog20).csv")
+
+names(pop1)
+View(pop1)
+
+pop2 = pop1 %>%
+  group_by(ladcode20, laname20) %>%
+  summarise(
+    population_2010 = sum(population_2010),
+    population_2011 = sum(population_2011),
+    population_2012 = sum(population_2012),
+    population_2013 = sum(population_2013),
+    population_2014 = sum(population_2014),
+    population_2015 = sum(population_2015),
+    population_2016 = sum(population_2016),
+    population_2017 = sum(population_2017),
+    population_2018 = sum(population_2018),
+    population_2019 = sum(population_2019),
+  )
+
+la = left_join(la, pop2, by = c("la_code" = "ladcode20"))
+
+# check for NAs
+xx = la_pop %>%
+  filter(is.na(laname20))
+
+# Calculate km_cycled per capita in each year
+la = la %>%
+  mutate(
+    km_percap_2010 = km_cycle_2010 / population_2010,
+    km_percap_2011 = km_cycle_2011 / population_2011,
+    km_percap_2012 = km_cycle_2012 / population_2012,
+    km_percap_2013 = km_cycle_2013 / population_2013,
+    km_percap_2014 = km_cycle_2014 / population_2014,
+    km_percap_2015 = km_cycle_2015 / population_2015,
+    km_percap_2016 = km_cycle_2016 / population_2016,
+    km_percap_2017 = km_cycle_2017 / population_2017,
+    km_percap_2018 = km_cycle_2018 / population_2018,
+    km_percap_2019 = km_cycle_2019 / population_2019
+  )
+
 # # max and min annual rates in each LA
 # la$max = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, max, na.rm = TRUE)
 # la$min = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, min, na.rm = TRUE)
@@ -215,7 +259,8 @@ la$early_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,1:5], 1, me
 la$late_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diffmean = la$late_mean - la$early_mean
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
-la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]], 1, mean, na.rm = TRUE)
 
 # mean rates in each LA
 la_pf$mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]], 1, mean, na.rm = TRUE)
@@ -303,8 +348,21 @@ ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = poli
   scale_y_continuous(expand = c(0,0), limits = c(0, 2)) +
   ggtitle("KSI Risk, Selected Police Forces")
 
+# this should be km cycled per capita, or as a % of travel to work, not absolute km cycled
+# but city of london is way too high. use workplace population?
 ggplot(la, aes(x = mean_km_cycled, y = mean_cycle_ksi)) +
+  geom_point() +
+  geom_text(label = la$LAD19NM, nudge_y = -1.5, cex = 2.8) +
+  labs(x = "Mean km (1000s) cycled", y = "Mean cycle KSI")
+
+ggplot(la, aes(x = mean_km_cycled, y = mean)) +
   geom_point()
+
+ggplot(la, aes(x = mean_km_percap, y = mean)) +
+  geom_point() +
+  xlim(0, 0.5) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled")
+    # + geom_text(label = la$LAD19NM, nudge_y = +0.1, cex = 2)
 
 # ggplot(crash_yr,
 #        aes(year, active_ksi_per100k_work, colour = LAD19NM_plot, group = LAD19NM)) +
