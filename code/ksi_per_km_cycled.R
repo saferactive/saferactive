@@ -102,16 +102,16 @@ crash_wide = crash %>%
 
 la = left_join(crash_wide, cycle_km, by = "la_code")
 
-la$ksi_perMm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000
-la$ksi_perMm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000
-la$ksi_perMm_2012 = la$ksi_2012 / la$km_cycle_2012 * 1000
-la$ksi_perMm_2013 = la$ksi_2013 / la$km_cycle_2013 * 1000
-la$ksi_perMm_2014 = la$ksi_2014 / la$km_cycle_2014 * 1000
-la$ksi_perMm_2015 = la$ksi_2015 / la$km_cycle_2015 * 1000
-la$ksi_perMm_2016 = la$ksi_2016 / la$km_cycle_2016 * 1000
-la$ksi_perMm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000
-la$ksi_perMm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000
-la$ksi_perMm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000
+la$ksi_perBkm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000000
+la$ksi_perBkm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000000
+la$ksi_perBkm_2012 = la$ksi_2012 / la$km_cycle_2012 * 1000000
+la$ksi_perBkm_2013 = la$ksi_2013 / la$km_cycle_2013 * 1000000
+la$ksi_perBkm_2014 = la$ksi_2014 / la$km_cycle_2014 * 1000000
+la$ksi_perBkm_2015 = la$ksi_2015 / la$km_cycle_2015 * 1000000
+la$ksi_perBkm_2016 = la$ksi_2016 / la$km_cycle_2016 * 1000000
+la$ksi_perBkm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000000
+la$ksi_perBkm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000000
+la$ksi_perBkm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000000
 
 # No longer needed
 # la$la_name = sapply(la$la_name, function(x){
@@ -163,16 +163,16 @@ cycle_km_pf = cycle_km_pf %>%
 
 la_pf = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
 
-la_pf$ksi_perMm_2010 = la_pf$ksi_2010 / la_pf$km_cycle_2010 * 1000
-la_pf$ksi_perMm_2011 = la_pf$ksi_2011 / la_pf$km_cycle_2011 * 1000
-la_pf$ksi_perMm_2012 = la_pf$ksi_2012 / la_pf$km_cycle_2012 * 1000
-la_pf$ksi_perMm_2013 = la_pf$ksi_2013 / la_pf$km_cycle_2013 * 1000
-la_pf$ksi_perMm_2014 = la_pf$ksi_2014 / la_pf$km_cycle_2014 * 1000
-la_pf$ksi_perMm_2015 = la_pf$ksi_2015 / la_pf$km_cycle_2015 * 1000
-la_pf$ksi_perMm_2016 = la_pf$ksi_2016 / la_pf$km_cycle_2016 * 1000
-la_pf$ksi_perMm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000
-la_pf$ksi_perMm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000
-la_pf$ksi_perMm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000
+la_pf$ksi_perBkm_2010 = la_pf$ksi_2010 / la_pf$km_cycle_2010 * 1000000
+la_pf$ksi_perBkm_2011 = la_pf$ksi_2011 / la_pf$km_cycle_2011 * 1000000
+la_pf$ksi_perBkm_2012 = la_pf$ksi_2012 / la_pf$km_cycle_2012 * 1000000
+la_pf$ksi_perBkm_2013 = la_pf$ksi_2013 / la_pf$km_cycle_2013 * 1000000
+la_pf$ksi_perBkm_2014 = la_pf$ksi_2014 / la_pf$km_cycle_2014 * 1000000
+la_pf$ksi_perBkm_2015 = la_pf$ksi_2015 / la_pf$km_cycle_2015 * 1000000
+la_pf$ksi_perBkm_2016 = la_pf$ksi_2016 / la_pf$km_cycle_2016 * 1000000
+la_pf$ksi_perBkm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000000
+la_pf$ksi_perBkm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000000
+la_pf$ksi_perBkm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000000
 
 # No longer needed
 # la$la_name = sapply(la$la_name, function(x){
@@ -194,13 +194,13 @@ la = readRDS("cycle-collision-risk.Rds")
 la_pf = readRDS("cycle-collision-risk-pf.Rds")
 
 # remove extra columns
-# la_cut = la[,c("LAD19NM",names(la)[grepl("ksi_perMm_",names(la))])]
+# la_cut = la[,c("LAD19NM",names(la)[grepl("ksi_perBkm_",names(la))])]
 la = ungroup(la)
 la_pf = ungroup(la_pf)
 
 #removes Scottish LAs which we don't have estimated cycle flows for
-la = la[!is.na(la$ksi_perMm_2019),]
-la_pf = la_pf[!is.na(la_pf$ksi_perMm_2019),]
+la = la[!is.na(la$ksi_perBkm_2019),]
+la_pf = la_pf[!is.na(la_pf$ksi_perBkm_2019),]
 # head(la)
 
 
@@ -251,22 +251,22 @@ la = la %>%
 # Calculate rates ---------------------------------------------------------
 
 # mean rates in each LA
-la$mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, mean, na.rm = TRUE)
-la$early_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
-la$late_mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
-la$diffmean = la$late_mean - la$early_mean
+la$mean_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]], 1, mean, na.rm = TRUE)
+la$early_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diff_risk = (la$late_risk / la$early_risk -1) * 100
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
 la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
 la$mean_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]], 1, mean, na.rm = TRUE)
 la$early_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
-la$diffcycle = la$late_km_percap - la$early_km_percap
+la$diff_cycle = (la$late_km_percap / la$early_km_percap - 1) * 100
 
-# mean rates in each LA
-la_pf$mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]], 1, mean, na.rm = TRUE)
-la_pf$early_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
-la_pf$late_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
-la_pf$diffmean = la_pf$late_mean - la_pf$early_mean
+# mean rates in each Police Force area
+la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$early_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
+la_pf$late_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
+la_pf$diff_risk = la_pf$late_risk - la_pf$early_risk
 
 # Get urban rural classification (England only) ---------------------------
 
@@ -293,12 +293,12 @@ is_outlier <- function(x) {
 
 la_urb %>%
   group_by(RUC11) %>%
-  mutate(outlier = ifelse(is_outlier(mean), LAD19NM, as.character(NA))) %>%
-  ggplot(., aes(x=factor(RUC11), y=mean)) +
+  mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
+  ggplot(., aes(x=factor(RUC11), y=mean_risk)) +
   geom_boxplot(notch = TRUE) +
   theme(axis.text.x=element_text(angle=45,hjust=1)) +
-  labs(x = "", y = "Mean cycle KSI per Mkm cycled") +
-  ylim(0, 3)
+  labs(x = "", y = "Mean cycle KSI per Bkm cycled")
+  ylim(0, 3000)
   # + geom_text(aes(label = outlier), na.rm = TRUE, hjust = -0.2, cex = 2.5)
 
 # Look at major conurbations only
@@ -306,11 +306,11 @@ la_urb %>%
 maj_con = la_urb %>%
   filter(RUC11CD == 6)
 
-ggplot(maj_con, aes(x = mean_km_percap, y = mean)) +
+ggplot(maj_con, aes(x = mean_km_percap, y = mean_risk)) +
   geom_point() +
   xlim(0, 0.3) +
-  ylim(0, 3) +
-  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled") +
+  ylim(0, 3000) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled") +
   geom_text(label = maj_con$LAD19NM, nudge_y = +0.1, cex = 2.5)
 
 # Generate figures --------------------------------------------------------
@@ -322,34 +322,34 @@ top_la = unique(c(
   # top_n(la, 4, diff1019)$LAD19NM, # greatest reduction in casualty rate from 2010 to 2019
   # top_n(la, 4, max)$LAD19NM # greatest max casualty rate
 
-  top_n(la, 4, mean)$LAD19NM, # greatest mean casualty rate
-  top_n(la, -4, mean)$LAD19NM, # lowest mean casualty rate
-  top_n(la, 4, diffmean)$LAD19NM, # greatest increase in casualty rate from early years to late years
-  top_n(la, -4, diffmean)$LAD19NM # greatest decrease in casualty rate from early years to late years
+  top_n(la, 4, mean_risk)$LAD19NM, # greatest mean casualty rate
+  top_n(la, -4, mean_risk)$LAD19NM, # lowest mean casualty rate
+  top_n(la, 4, diff_risk)$LAD19NM, # greatest increase in casualty rate from early years to late years
+  top_n(la, -4, diff_risk)$LAD19NM # greatest decrease in casualty rate from early years to late years
   ))
 
 top_la_pf = unique(c(
-  top_n(la_pf, 4, mean)$police_force, # greatest mean casualty rate
-  top_n(la_pf, -4, mean)$police_force, # lowest mean casualty rate
-  top_n(la_pf, 4, diffmean)$police_force, # greatest increase in casualty rate from early years to late years
-  top_n(la_pf, -4, diffmean)$police_force # greatest decrease in casualty rate from early years to late years
+  top_n(la_pf, 4, mean_risk)$police_force, # greatest mean casualty rate
+  top_n(la_pf, -4, mean_risk)$police_force, # lowest mean casualty rate
+  top_n(la_pf, 4, diff_risk)$police_force, # greatest increase in casualty rate from early years to late years
+  top_n(la_pf, -4, diff_risk)$police_force # greatest decrease in casualty rate from early years to late years
 ))
 
 # top_la = top_n(la, 4, diff)$LAD19NM
 
 
 la_long = pivot_longer(la,
-                        cols = starts_with("ksi_perMm_"),
-                        names_prefix = "ksi_perMm_",
+                        cols = starts_with("ksi_perBkm_"),
+                        names_prefix = "ksi_perBkm_",
                         names_to = "year",
-                        values_to = "ksi_perMm"
+                        values_to = "ksi_perBkm"
 )
 
 la_pf_long = pivot_longer(la_pf,
-                       cols = starts_with("ksi_perMm_"),
-                       names_prefix = "ksi_perMm_",
+                       cols = starts_with("ksi_perBkm_"),
+                       names_prefix = "ksi_perBkm_",
                        names_to = "year",
-                       values_to = "ksi_perMm"
+                       values_to = "ksi_perBkm"
 )
 
 # allow the interesting LAs to be highlighted in the plot
@@ -366,7 +366,7 @@ head(la_pf_long)
 # save la_long for future reference
 saveRDS(la_long, "la_long.Rds")
 
-ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
+ggplot(la_long, aes(year, ksi_perBkm, colour = LAD19NM_plot, group = LAD19NM)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_long, sel == TRUE), aes(size = sel)) +
   ylab("KSI per 1000 km cycled") +
@@ -382,7 +382,7 @@ ggplot(la_long, aes(year, ksi_perMm, colour = LAD19NM_plot, group = LAD19NM)) +
   scale_y_continuous(expand = c(0,0)) +
   ggtitle("KSI Risk, Selected LAs")
 
-ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = police_force)) +
+ggplot(la_pf_long, aes(year, ksi_perBkm, colour = police_force_plot, group = police_force)) +
   geom_line(data = subset(la_pf_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_pf_long, sel == TRUE), aes(size = sel)) +
   ylab("KSI per 1000 km cycled") +
@@ -405,22 +405,22 @@ ggplot(la_urb, aes(x = mean_km_cycled, y = mean_cycle_ksi, group = RUC11)) +
   # geom_text(label = la$LAD19NM, nudge_y = -1.5, cex = 2.8) +
   labs(x = "Mean km (1000s) cycled", y = "Mean cycle KSI")
 
-ggplot(la, aes(x = mean_km_cycled, y = mean)) +
+ggplot(la, aes(x = mean_km_cycled, y = mean_risk)) +
   geom_point()
 
-ggplot(la_urb, aes(x = mean_km_percap, y = mean, group = RUC11)) +
+ggplot(la_urb, aes(x = mean_km_percap, y = mean_risk, group = RUC11)) +
   geom_point(aes(color = RUC11, shape = RUC11)) +
   xlim(0, 0.5) +
-  ylim(0, 3) +
-  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled")
+  ylim(0, 3000) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled")
     # + geom_text(label = la$LAD19NM, nudge_y = +0.1, cex = 2)
 
 # Change in cycling uptake and risk
 # this should probably use absolute change in KSI, or change in KSI per capita, not change in KSI/Bkm, because the latter is partly dependent on our estimates of cycle uptake
-ggplot(la, aes(x = diffcycle, y = diffmean)) +
+ggplot(la, aes(x = diff_cycle, y = diff_risk)) +
   geom_point() +
-  ylim(-2, 1) +
-  xlim(-0.01, 0.01) +
+  # ylim(-2, 1) +
+  # xlim(-0.01, 0.01) +
   labs(x = "Estimated change in cycling uptake", y = "Change in road safety danger")
   # + geom_text(label = la$LAD19NM, nudge_y = -0.1, cex = 3)
 
@@ -445,61 +445,61 @@ ggplot(la, aes(x = diffcycle, y = diffmean)) +
 # piggyback::pb_download("la_lower_for_plots.Rds", tag = "0.1.3")
 bounds = readRDS("la_lower_for_plots.Rds")
 bounds = left_join(bounds %>% select(-la_name), la, by = "la_code")
-bounds = bounds[!is.na(bounds$ksi_perMm_2019),]
-# bounds10 = bounds[is.na(bounds$ksi_perMm_2010),]
+bounds = bounds[!is.na(bounds$ksi_perBkm_2019),]
+# bounds10 = bounds[is.na(bounds$ksi_perBkm_2010),]
 
 # Police force geometry
 pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson") # todo: make reproducible
 pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
 pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
 pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
-# pf_geom = pf_geom[!is.na(pf_geom$ksi_perMm_2019),]
+# pf_geom = pf_geom[!is.na(pf_geom$ksi_perBkm_2019),]
 
 tm_shape(bounds) +
-  tm_fill("ksi_perMm_2019") +
+  tm_fill("ksi_perBkm_2019") +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
 tm_shape(pf_geom) +
-  tm_fill("ksi_perMm_2019", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2)) +
+  tm_fill("ksi_perBkm_2019", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2)) +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
 ####
 
 t1 = tm_shape(bounds) +
-  tm_fill("mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-19") +
+  tm_fill("mean_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-19") +
   tm_borders(lwd = 0.1)
-  # + tm_layout(title = "Cycle KSI/Mkm 2010-19")
+  # + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 
 t2 = tm_shape(bounds) +
-  tm_fill("early_mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-14") +
+  tm_fill("early_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-14") +
   tm_borders(lwd = 0.1)
- # + tm_layout(title = "Cycle KSI/Mkm 2010-14")
+ # + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
 t3 = tm_shape(bounds) +
-  tm_fill("late_mean", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2015-19") +
+  tm_fill("late_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2015-19") +
   tm_borders(lwd = 0.1)
-  # + tm_layout(title = "Cycle KSI/Mkm 2015-19")
+  # + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
 tmap_arrange(t1, t2, t3)
 
 ####
 
 t1 = tm_shape(pf_geom) +
-  tm_fill("mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-19") +
+  tm_fill("mean_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-19") +
   tm_borders(lwd = 0.1)
-# + tm_layout(title = "Cycle KSI/Mkm 2010-19")
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 
 t2 = tm_shape(pf_geom) +
-  tm_fill("early_mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-14") +
+  tm_fill("early_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-14") +
   tm_borders(lwd = 0.1)
-# + tm_layout(title = "Cycle KSI/Mkm 2010-14")
+# + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
 t3 = tm_shape(pf_geom) +
-  tm_fill("late_mean", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2015-19") +
+  tm_fill("late_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2015-19") +
   tm_borders(lwd = 0.1)
-# + tm_layout(title = "Cycle KSI/Mkm 2015-19")
+# + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
 tmap_arrange(t1, t2, t3)
 
@@ -511,16 +511,16 @@ tmap_arrange(t1, t2, t3)
 
 ## Histogram of LA values
 
-hist(bounds$mean, xlim = c(0, 4), breaks = 15)
-hist(bounds$early_mean, xlim = c(0, 4), breaks = 20)
-hist(bounds$late_mean, xlim = c(0, 4), breaks = 15)
+hist(bounds$mean_risk, xlim = c(0, 4), breaks = 15)
+hist(bounds$early_risk, xlim = c(0, 4), breaks = 20)
+hist(bounds$late_risk, xlim = c(0, 4), breaks = 15)
 
 # top 10 lists
-highest_mean = arrange(top_n(la, 10, mean),-mean) # greatest mean casualty rate
+highest_mean = arrange(top_n(la, 10, mean_risk),-mean_risk) # greatest mean casualty rate
 
-lowest_mean = arrange(top_n(la, 10, -mean),mean) # lowest mean casualty rate
+lowest_mean = arrange(top_n(la, 10, -mean_risk),mean_risk) # lowest mean casualty rate
 
-greatest_increase = arrange(top_n(la, 10, diffmean),-diffmean) # greatest increase in casualty rate
+greatest_increase = arrange(top_n(la, 10, diff_risk),-diff_risk) # greatest increase in casualty rate
 
-greatest_decrease = arrange(top_n(la, 10, -diffmean),diffmean) # greatest decrease in casualty rate
+greatest_decrease = arrange(top_n(la, 10, -diff_risk),diff_risk) # greatest decrease in casualty rate
 
