@@ -113,17 +113,6 @@ la$ksi_perBkm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000000
 la$ksi_perBkm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000000
 la$ksi_perBkm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000000
 
-# No longer needed
-# la$la_name = sapply(la$la_name, function(x){
-#   x = strsplit(x, "-")[[1]]
-#   if(length(x) > 1){
-#     x = x[2]
-#   }
-#   x
-# }, USE.NAMES = FALSE)
-#
-# la_name2 = trimws(la$la_name)
-
 saveRDS(la, "cycle-collision-risk.Rds")
 
 
@@ -174,19 +163,7 @@ la_pf$ksi_perBkm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000000
 la_pf$ksi_perBkm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000000
 la_pf$ksi_perBkm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000000
 
-# No longer needed
-# la$la_name = sapply(la$la_name, function(x){
-#   x = strsplit(x, "-")[[1]]
-#   if(length(x) > 1){
-#     x = x[2]
-#   }
-#   x
-# }, USE.NAMES = FALSE)
-#
-# la$la_name = trimws(la$la_name)
-
 saveRDS(la_pf, "cycle-collision-risk-pf.Rds")
-
 
 # Read in results ---------------------------------------------------------
 
@@ -317,11 +294,6 @@ ggplot(maj_con, aes(x = mean_km_percap, y = mean_risk)) +
 
 # select interesting LAs
 top_la = unique(c(
-  # top_n(la, 4, diff)$LAD19NM, # greatest difference between min and max rates
-  # top_n(la, -4, diff1019)$LAD19NM, # greatest increase in casualty rate from 2010 to 2019
-  # top_n(la, 4, diff1019)$LAD19NM, # greatest reduction in casualty rate from 2010 to 2019
-  # top_n(la, 4, max)$LAD19NM # greatest max casualty rate
-
   top_n(la, 4, mean_risk)$LAD19NM, # greatest mean casualty rate
   top_n(la, -4, mean_risk)$LAD19NM, # lowest mean casualty rate
   top_n(la, 4, diff_risk)$LAD19NM, # greatest increase in casualty rate from early years to late years
@@ -334,8 +306,6 @@ top_la_pf = unique(c(
   top_n(la_pf, 4, diff_risk)$police_force, # greatest increase in casualty rate from early years to late years
   top_n(la_pf, -4, diff_risk)$police_force # greatest decrease in casualty rate from early years to late years
 ))
-
-# top_la = top_n(la, 4, diff)$LAD19NM
 
 
 la_long = pivot_longer(la,
@@ -408,20 +378,27 @@ ggplot(la_urb, aes(x = mean_km_cycled, y = mean_cycle_ksi, group = RUC11)) +
 ggplot(la, aes(x = mean_km_cycled, y = mean_risk)) +
   geom_point()
 
-ggplot(la_urb, aes(x = mean_km_percap, y = mean_risk, group = RUC11)) +
+# could do separate inverse exponential trend lines for each group. if these lines differ, it shows urban/rural classification is a factor
+# a caveat - the more rural the area, the higher proportion of leisure cycling there is likely to be. this could be skewing our results, but if it's true it means rural areas are even safer than this analysis suggests
+g = ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = mean_km_percap, y = mean_risk, group = RUC11)) +
   geom_point(aes(color = RUC11, shape = RUC11)) +
-  xlim(0, 0.5) +
+  xlim(0, 0.2) +
   ylim(0, 3000) +
-  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled")
-    # + geom_text(label = la$LAD19NM, nudge_y = +0.1, cex = 2)
+  theme(legend.title = element_blank()) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled") # +
+  # geom_text
+g + scale_x_continuous(trans="log10") +
+  geom_smooth(method = lm, aes(colour = RUC11), alpha = 0.2)
 
 # Change in cycling uptake and risk
 # this should probably use absolute change in KSI, or change in KSI per capita, not change in KSI/Bkm, because the latter is partly dependent on our estimates of cycle uptake
-ggplot(la, aes(x = diff_cycle, y = diff_risk)) +
-  geom_point() +
+ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = diff_risk, group = RUC11CD)) +
+  geom_point(aes(color = RUC11, shape = RUC11)) +
   # ylim(-2, 1) +
   # xlim(-0.01, 0.01) +
-  labs(x = "Estimated change in cycling uptake", y = "Change in road safety danger")
+  theme(legend.title = element_blank()) +
+  labs(x = "Modelled % change in cycling uptake", y = "% change in road safety risk") +
+  geom_smooth(method = lm, aes(colour = RUC11), alpha = 0.2)
   # + geom_text(label = la$LAD19NM, nudge_y = -0.1, cex = 3)
 
 # ggplot(crash_yr,
