@@ -230,7 +230,7 @@ pop2 = pop1 %>%
 la = left_join(la, pop2, by = c("la_code" = "ladcode20"))
 
 # check for NAs
-xx = la_pop %>%
+xx = la %>%
   filter(is.na(laname20))
 
 # Calculate km_cycled per capita in each year
@@ -248,11 +248,7 @@ la = la %>%
     km_percap_2019 = km_cycle_2019 / population_2019
   )
 
-# # max and min annual rates in each LA
-# la$max = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, max, na.rm = TRUE)
-# la$min = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, min, na.rm = TRUE)
-# la$diff = la$max - la$min
-# la$diff1019 = la$ksi_perMm_2010 - la$ksi_perMm_2019
+# Calculate rates ---------------------------------------------------------
 
 # mean rates in each LA
 la$mean = apply(la[,names(la)[grepl("ksi_perMm_",names(la))]], 1, mean, na.rm = TRUE)
@@ -262,12 +258,62 @@ la$diffmean = la$late_mean - la$early_mean
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
 la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
 la$mean_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]], 1, mean, na.rm = TRUE)
+la$early_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diffcycle = la$late_km_percap - la$early_km_percap
 
 # mean rates in each LA
 la_pf$mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]], 1, mean, na.rm = TRUE)
 la_pf$early_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_mean = apply(la_pf[,names(la_pf)[grepl("ksi_perMm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diffmean = la_pf$late_mean - la_pf$early_mean
+
+# Get urban rural classification (England only) ---------------------------
+
+urban_rural = read_csv("RUC11_LAD11_ENv2.csv")
+
+urban_rural$RUC11[urban_rural$RUC11 == "Mainly Rural (rural including hub towns >=80%)"] = "Mainly Rural"
+urban_rural$RUC11[urban_rural$RUC11 == "Largely Rural (rural including hub towns 50-79%)"] = "Largely Rural"
+urban_rural$RUC11[urban_rural$RUC11 == "Urban with Significant Rural (rural including hub towns 26-49%)"] = "Urban with Significant Rural"
+
+unique(urban_rural$RUC11)
+
+la_urb = left_join(la, urban_rural, by = c("la_code" = "LAD11CD"))
+
+# Many are missing due to LA changes, need to fix this
+xx = la_urb %>% filter(is.na(RUC11CD))
+
+la_urb$RUC11 = factor(la_urb$RUC11, levels = unique(la_urb$RUC11[order(la_urb$RUC11CD)]))
+
+# Boxplots of urban rural classification
+
+is_outlier <- function(x) {
+  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+la_urb %>%
+  group_by(RUC11) %>%
+  mutate(outlier = ifelse(is_outlier(mean), LAD19NM, as.character(NA))) %>%
+  ggplot(., aes(x=factor(RUC11), y=mean)) +
+  geom_boxplot(notch = TRUE) +
+  theme(axis.text.x=element_text(angle=45,hjust=1)) +
+  labs(x = "", y = "Mean cycle KSI per Mkm cycled") +
+  ylim(0, 3)
+  # + geom_text(aes(label = outlier), na.rm = TRUE, hjust = -0.2, cex = 2.5)
+
+# Look at major conurbations only
+
+maj_con = la_urb %>%
+  filter(RUC11CD == 6)
+
+ggplot(maj_con, aes(x = mean_km_percap, y = mean)) +
+  geom_point() +
+  xlim(0, 0.3) +
+  ylim(0, 3) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled") +
+  geom_text(label = maj_con$LAD19NM, nudge_y = +0.1, cex = 2.5)
+
+# Generate figures --------------------------------------------------------
 
 # select interesting LAs
 top_la = unique(c(
@@ -354,20 +400,29 @@ ggplot(la_pf_long, aes(year, ksi_perMm, colour = police_force_plot, group = poli
 
 # this should be km cycled per capita, or as a % of travel to work, not absolute km cycled
 # but city of london is way too high. use workplace population?
-ggplot(la, aes(x = mean_km_cycled, y = mean_cycle_ksi)) +
-  geom_point() +
-  geom_text(label = la$LAD19NM, nudge_y = -1.5, cex = 2.8) +
+ggplot(la_urb, aes(x = mean_km_cycled, y = mean_cycle_ksi, group = RUC11)) +
+  geom_point(aes(color = RUC11, shape = RUC11)) +
+  # geom_text(label = la$LAD19NM, nudge_y = -1.5, cex = 2.8) +
   labs(x = "Mean km (1000s) cycled", y = "Mean cycle KSI")
 
 ggplot(la, aes(x = mean_km_cycled, y = mean)) +
   geom_point()
 
-ggplot(la, aes(x = mean_km_percap, y = mean)) +
-  geom_point() +
+ggplot(la_urb, aes(x = mean_km_percap, y = mean, group = RUC11)) +
+  geom_point(aes(color = RUC11, shape = RUC11)) +
   xlim(0, 0.5) +
   ylim(0, 3) +
   labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Mkm cycled")
     # + geom_text(label = la$LAD19NM, nudge_y = +0.1, cex = 2)
+
+# Change in cycling uptake and risk
+# this should probably use absolute change in KSI, or change in KSI per capita, not change in KSI/Bkm, because the latter is partly dependent on our estimates of cycle uptake
+ggplot(la, aes(x = diffcycle, y = diffmean)) +
+  geom_point() +
+  ylim(-2, 1) +
+  xlim(-0.01, 0.01) +
+  labs(x = "Estimated change in cycling uptake", y = "Change in road safety danger")
+  # + geom_text(label = la$LAD19NM, nudge_y = -0.1, cex = 3)
 
 # ggplot(crash_yr,
 #        aes(year, active_ksi_per100k_work, colour = LAD19NM_plot, group = LAD19NM)) +
