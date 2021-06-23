@@ -18,6 +18,16 @@ crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 crash_raw = st_drop_geometry(crash_raw)
 
+
+
+
+# For 2019 LAD names ------------------------------------------------------
+
+
+crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
+
+crash_raw = st_drop_geometry(crash_raw)
+
 # # Correct location error
 # # View(crash_raw %>% filter(local_authority_district == "Dover" & police_force == "Thames Valley"))
 # crash_raw$local_authority_district[crash_raw$accident_index == "2018430248885"] = "Windsor and Maidenhead"
@@ -25,7 +35,7 @@ crash_raw = st_drop_geometry(crash_raw)
 #
 # saveRDS(crash_raw, "data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
-# Get and apply LAD codes (joining using old LAD names)
+# Get and apply LAD codes (joining using 2011 LAD names)
 names_lad = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom_updated.csv")
 
 namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "LAD19NM"))
@@ -34,7 +44,7 @@ namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "
 # Check no rows are mising codes
 xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) %>% summarise()
 
-# Standardise to new LAD names
+# Standardise to 2019 LAD names
 new_names = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom.csv") %>%
   select(-LAD19NMW, -FID)
 
@@ -45,6 +55,13 @@ xx = nameagain %>% filter(is.na(LAD19NM)) %>% group_by(local_authority_district)
 length(unique(nameagain$local_authority_district)) #380
 length(unique(nameagain$LAD19NM)) #367
 length(unique(nameagain$LAD19CD)) #367
+
+nameagain$local_authority_district[nameagain$local_authority_district == "St. Albans"] = "St Albans"
+nameagain$local_authority_district[nameagain$local_authority_district == "St. Edmundsbury"] = "St Edmundsbury"
+nameagain$local_authority_district[nameagain$local_authority_district == "Stratford-upon-Avon"] = "Stratford-on-Avon"
+
+nameagain = nameagain %>%
+  rename(LAD11NM = local_authority_district)
 
 ## LA boundaries
 # bfc = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BFC.shp")
@@ -66,8 +83,8 @@ unique(xx$LAD19NM)
 crash$year = lubridate::year(crash$date)
 crash$hour = lubridate::hour(crash$datetime)
 crash$la_name = NULL
-crash$local_authority_district = NULL
 
+# these use LAD19NM. I will need to regenerate the data using LAD11NM to make it compatible with the rural_urban LAD classifications
 # piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
 cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv") %>% select(-la_name)
 cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
@@ -227,6 +244,47 @@ la = la %>%
   )
 
 
+# Police force area populations -------------------------------------------
+
+pf_pop = left_join(pop2, pf_lookup, by = c("ladcode20" = "la_code"))
+
+# check for NAs
+xx = pf_pop %>%
+  filter(is.na(LAD19NM))
+
+pf_pop = pf_pop %>%
+  group_by(police_force) %>%
+  summarise(
+    population_2010 = sum(population_2010),
+    population_2011 = sum(population_2011),
+    population_2012 = sum(population_2012),
+    population_2013 = sum(population_2013),
+    population_2014 = sum(population_2014),
+    population_2015 = sum(population_2015),
+    population_2016 = sum(population_2016),
+    population_2017 = sum(population_2017),
+    population_2018 = sum(population_2018),
+    population_2019 = sum(population_2019),
+  )
+
+la_pf = left_join(la_pf, pf_pop, by = "police_force")
+
+# Calculate km_cycled per capita in each year
+la_pf = la_pf %>%
+  mutate(
+    km_percap_2010 = km_cycle_2010 / population_2010,
+    km_percap_2011 = km_cycle_2011 / population_2011,
+    km_percap_2012 = km_cycle_2012 / population_2012,
+    km_percap_2013 = km_cycle_2013 / population_2013,
+    km_percap_2014 = km_cycle_2014 / population_2014,
+    km_percap_2015 = km_cycle_2015 / population_2015,
+    km_percap_2016 = km_cycle_2016 / population_2016,
+    km_percap_2017 = km_cycle_2017 / population_2017,
+    km_percap_2018 = km_cycle_2018 / population_2018,
+    km_percap_2019 = km_cycle_2019 / population_2019
+  )
+
+
 # Workday population ------------------------------------------------------
 # (workplace population plus residents who don't work)
 # Repeat analyses using this. km_percap will decrease for inner london and increase for outer london / rural areas
@@ -281,6 +339,13 @@ la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]],
 la_pf$early_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diff_risk = la_pf$late_risk - la_pf$early_risk
+la_pf$mean_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$mean_cycle_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]], 1, mean, na.rm = TRUE)
+
+la_pf$mean_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$early_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
+la_pf$late_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
+la_pf$diff_cycle = (la_pf$late_km_percap / la_pf$early_km_percap - 1) * 100
 
 # Get urban rural classification (England only) ---------------------------
 # from https://www.gov.uk/government/statistics/2011-rural-urban-classification-of-local-authority-and-other-higher-level-geographies-for-statistical-purposes
