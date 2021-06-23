@@ -182,6 +182,7 @@ la_pf = la_pf[!is.na(la_pf$ksi_perBkm_2019),]
 
 
 # Get LAD populations -----------------------------------------------------
+# from https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
 # piggyback::pb_list()
 piggyback::pb_download("MYEB1_detailed_population_estimates_series_UK_.2019_geog20.csv", tag = "0.1.4")
 pop1 = read_csv("MYEB1_detailed_population_estimates_series_UK_.2019_geog20.csv")
@@ -225,6 +226,36 @@ la = la %>%
     km_percap_2019 = km_cycle_2019 / population_2019
   )
 
+
+# Workday population ------------------------------------------------------
+# (workplace population plus residents who don't work)
+# Repeat analyses using this. km_percap will decrease for inner london and increase for outer london / rural areas
+# from https://www.nomisweb.co.uk/census/2011/wd102ew
+
+# piggyback::pb_download("workday-population.csv", tag = "0.1.4")
+workday_pop = read_csv("workday-population.csv")
+
+la = left_join(la, workday_pop, by = c("la_code" = "lad_code"))
+
+# check for NAs
+xx = la %>%
+  filter(is.na(wdpop_2011))
+
+# Calculate km_cycled per workday capita in each year (based on 2011 workday population)
+la = la %>%
+  mutate(
+    km_perwd_2010 = km_cycle_2010 / wdpop_2011,
+    km_perwd_2011 = km_cycle_2011 / wdpop_2011,
+    km_perwd_2012 = km_cycle_2012 / wdpop_2011,
+    km_perwd_2013 = km_cycle_2013 / wdpop_2011,
+    km_perwd_2014 = km_cycle_2014 / wdpop_2011,
+    km_perwd_2015 = km_cycle_2015 / wdpop_2011,
+    km_perwd_2016 = km_cycle_2016 / wdpop_2011,
+    km_perwd_2017 = km_cycle_2017 / wdpop_2011,
+    km_perwd_2018 = km_cycle_2018 / wdpop_2011,
+    km_perwd_2019 = km_cycle_2019 / wdpop_2011
+    )
+
 # Calculate rates ---------------------------------------------------------
 
 # mean rates in each LA
@@ -234,10 +265,16 @@ la$late_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,6:10], 1, m
 la$diff_risk = (la$late_risk / la$early_risk -1) * 100
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
 la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
+
 la$mean_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]], 1, mean, na.rm = TRUE)
 la$early_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_cycle = (la$late_km_percap / la$early_km_percap - 1) * 100
+
+la$mean_km_perwd = apply(la[,names(la)[grepl("km_perwd_",names(la))]], 1, mean, na.rm = TRUE)
+la$early_km_perwd = apply(la[,names(la)[grepl("km_perwd_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_km_perwd = apply(la[,names(la)[grepl("km_perwd_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diff_cycle_wd = (la$late_km_perwd / la$early_km_perwd - 1) * 100
 
 # mean rates in each Police Force area
 la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]], 1, mean, na.rm = TRUE)
@@ -246,6 +283,7 @@ la_pf$late_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][
 la_pf$diff_risk = la_pf$late_risk - la_pf$early_risk
 
 # Get urban rural classification (England only) ---------------------------
+# from https://www.gov.uk/government/statistics/2011-rural-urban-classification-of-local-authority-and-other-higher-level-geographies-for-statistical-purposes
 
 urban_rural = read_csv("RUC11_LAD11_ENv2.csv")
 
@@ -256,11 +294,10 @@ urban_rural$RUC11[urban_rural$RUC11 == "Urban with Significant Rural (rural incl
 unique(urban_rural$RUC11)
 
 la_urb = left_join(la, urban_rural, by = c("la_code" = "LAD11CD"))
+la_urb$RUC11 = factor(la_urb$RUC11, levels = unique(la_urb$RUC11[order(la_urb$RUC11CD)]))
 
 # Many are missing due to LA changes, need to fix this
 xx = la_urb %>% filter(is.na(RUC11CD))
-
-la_urb$RUC11 = factor(la_urb$RUC11, levels = unique(la_urb$RUC11[order(la_urb$RUC11CD)]))
 
 # Boxplots of urban rural classification
 
@@ -271,12 +308,38 @@ is_outlier <- function(x) {
 la_urb %>%
   group_by(RUC11) %>%
   mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
-  ggplot(., aes(x=factor(RUC11), y=mean_risk)) +
-  geom_boxplot(notch = TRUE) +
+  ggplot(., aes(x=factor(RUC11), y=mean_risk
+                , weight = population_2011
+                )) +
+  geom_boxplot(notch = TRUE
+               , aes(weight = population_2011)
+               ) +
   theme(axis.text.x=element_text(angle=45,hjust=1)) +
-  labs(x = "", y = "Mean cycle KSI per Bkm cycled")
+  labs(x = "", y = "Mean cycle KSI per Bkm cycled") +
   ylim(0, 3000)
   # + geom_text(aes(label = outlier), na.rm = TRUE, hjust = -0.2, cex = 2.5)
+
+# boxplot of km per cap residential popn
+  b = la_urb %>%
+    filter(! LAD19NM == "City of London") %>%
+    group_by(RUC11) %>%
+    mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
+    ggplot(., aes(x=factor(RUC11), y=mean_km_percap)) +
+    geom_boxplot(notch = TRUE) +
+    theme(axis.text.x=element_text(angle=45,hjust=1)) +
+    labs(x = "", y = "Km (1000s) per cap")
+  b + scale_y_continuous(trans="log10")
+
+  # boxplot of km per cap workday popn
+  b = la_urb %>%
+    filter(! LAD19NM == "City of London") %>%
+    group_by(RUC11) %>%
+    mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
+    ggplot(., aes(x=factor(RUC11), y=mean_km_percap)) +
+    geom_boxplot(notch = TRUE) +
+    theme(axis.text.x=element_text(angle=45,hjust=1)) +
+    labs(x = "", y = "Km (1000s) per cap")
+  b + scale_y_continuous(trans="log10")
 
 # Look at major conurbations only
 
@@ -380,13 +443,25 @@ ggplot(la, aes(x = mean_km_cycled, y = mean_risk)) +
 
 # could do separate inverse exponential trend lines for each group. if these lines differ, it shows urban/rural classification is a factor
 # a caveat - the more rural the area, the higher proportion of leisure cycling there is likely to be. this could be skewing our results, but if it's true it means rural areas are even safer than this analysis suggests
-g = ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = mean_km_percap, y = mean_risk, group = RUC11)) +
+lau = la_urb %>% filter(! LAD19NM == "City of London")
+g = ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = mean_km_percap, y = mean_risk, group = RUC11)) + #can be percap or perwd
+  geom_point(aes(color = RUC11, shape = RUC11)) +
+  # xlim(0, 0.2) +
+  # ylim(0, 3000) +
+  theme(legend.title = element_blank()) +
+  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled") # +
+   # geom_text(label = lau$LAD19NM)
+g + scale_x_continuous(trans="log10") +
+  geom_smooth(method = lm, aes(colour = RUC11), alpha = 0.2)
+
+#same with workday population
+g = ggplot(la_urb, aes(x = mean_km_perwd, y = mean_risk, group = RUC11)) + #can be percap or perwd
   geom_point(aes(color = RUC11, shape = RUC11)) +
   xlim(0, 0.2) +
   ylim(0, 3000) +
   theme(legend.title = element_blank()) +
-  labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled") # +
-  # geom_text
+  labs(x = "Mean km (1000s) cycled per capita (workday pop'n)", y = "Mean cycle KSI per Bkm cycled") # +
+# geom_text(label = lau$LAD19NM)
 g + scale_x_continuous(trans="log10") +
   geom_smooth(method = lm, aes(colour = RUC11), alpha = 0.2)
 
@@ -438,24 +513,24 @@ tm_shape(bounds) +
   tm_layout(legend.outside = TRUE)
 
 tm_shape(pf_geom) +
-  tm_fill("ksi_perBkm_2019", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2)) +
+  tm_fill("ksi_perBkm_2019", breaks = c(0, 400, 800, 1200, 1600, 2000)) +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
 ####
 
 t1 = tm_shape(bounds) +
-  tm_fill("mean_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-19") +
+  tm_fill("mean_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2010-19") +
   tm_borders(lwd = 0.1)
   # + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 
 t2 = tm_shape(bounds) +
-  tm_fill("early_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2010-14") +
+  tm_fill("early_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2010-14") +
   tm_borders(lwd = 0.1)
  # + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
 t3 = tm_shape(bounds) +
-  tm_fill("late_risk", breaks = c(0, 0.5, 1, 1.5, 2, 3, 4), title = "2015-19") +
+  tm_fill("late_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2015-19") +
   tm_borders(lwd = 0.1)
   # + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
@@ -464,17 +539,17 @@ tmap_arrange(t1, t2, t3)
 ####
 
 t1 = tm_shape(pf_geom) +
-  tm_fill("mean_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-19") +
+  tm_fill("mean_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-19") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 
 t2 = tm_shape(pf_geom) +
-  tm_fill("early_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2010-14") +
+  tm_fill("early_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-14") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
 t3 = tm_shape(pf_geom) +
-  tm_fill("late_risk", breaks = c(0, 0.4, 0.8, 1.2, 1.6, 2), title = "2015-19") +
+  tm_fill("late_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2015-19") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
