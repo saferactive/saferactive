@@ -1,7 +1,7 @@
 # Aim get estimates of cycling uptake regionally from the NTS's summary datasets
 
-install.packages("ows4R")
-library(ows4R)
+# install.packages("ows4R")
+# library(ows4R)
 library(sf)
 library(tidyverse)
 library(tmap)
@@ -78,12 +78,37 @@ d_region_clean = map_dfr(row_d1s, function(i) d_region[i:(i + 8), ], .id = "year
 d_region_clean = d_region_clean %>%
   as_tibble() %>%
   mutate(across(walk:wnweighted_sample, as.numeric)) %>%
+  mutate(across(walk:wnweighted_sample, function(x) x * 1.61)) %>%
   mutate(year = as.numeric(years_after_2002) + 2002)
 
 d_region_clean %>%
   ggplot() +
   geom_line(aes(year, bicycle, colour = region), alpha = 0.3) +
-  geom_smooth(aes(year, bicycle, colour = region), alpha = 0.3, fill = NA)
+  geom_smooth(aes(year, bicycle, colour = region), alpha = 0.3, fill = NA) +
+  ylab("Distance cycled/person/yr (km)")
 
-uk_regions = ukboundaries::lad2016_simple
+regions_renamed = regions_simple %>%
+  rename(region = RGN20NM)
+
+regions_joined = left_join(d_region_clean, regions_renamed) %>%
+  sf::st_as_sf()
+
+names(rnaturalearth::countries110)
+ukborder = rnaturalearth::ne_countries(country = "United Kingdom", returnclass = "sf", scale = "medium")
+
+tmap_mode("plot")
+map_facetted = tm_shape(regions_joined) +
+  tm_polygons("bicycle", palette = "viridis", title = "Distance cycled\nPer person/yr (km)") +
+  tm_facets(by = "year") +
+  tm_shape(ukborder) + tm_borders()
+map_facetted
+map_facetted2 = tm_shape(regions_joined) +
+  tm_polygons("bicycle", palette = "viridis", title = "Distance cycled\nPer person/yr (km)") +
+  tm_facets(by = "year", ncol = 1, nrow = 1) +
+  tm_shape(ukborder) + tm_borders()  +
+  tm_layout(legend.position = c("right", "top"))
+
+tmap_animation(map_facetted2, filename = "facetted_map_nts_bicycle.gif", delay = 50)
+
+write_csv(d_region_clean, "d_region_clean.csv")
 
