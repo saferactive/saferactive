@@ -82,8 +82,8 @@ d_region_clean = d_region_clean %>%
 
 d_region_clean %>%
   ggplot() +
-  geom_line(aes(year, bicycle, colour = region))
-
+  geom_line(aes(year, bicycle, colour = region), alpha = 0.3) +
+  geom_smooth(aes(year, bicycle, colour = region), alpha = 0.3, fill = NA)
 
 uk_regions = ukboundaries::lad2016_simple
 
