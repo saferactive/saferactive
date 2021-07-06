@@ -1,0 +1,153 @@
+---
+title: "LA data analysis"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, message=FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(tmap)
+tmap_mode("view")
+```
+
+
+The starting point of this analysis is [Bradford data analysis](https://github.com/saferactive/saferactive/blob/master/code/tests/bradford.md) which compares the DfT's sporadic but widely spread-out manual count data with data from three automatic cycle counters in Bradford, with aggregate results shown in the figure below.
+
+![](bradford_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+The aim of this document is to build on that by including more local authorities in the analysis.
+
+```{r}
+las_of_interest = c("Bradford", "Leeds", "Derby", "Southampton")
+```
+
+The map below shows the geographic distribution of countpoints associated with the local authorities of interest:
+
+
+```{r}
+las_of_interest
+u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/d_counter_summaries.Rds"
+f = basename(u)
+if(!file.exists(f)) download.file(u, f)
+counters_year = readRDS(f)
+counters_sf = counters_year %>% 
+  group_by(Easting, Northing) %>% 
+  summarise(n = n(), LA = first(name)) %>% 
+  sf::st_as_sf(coords = c("Easting", "Northing"), crs = 27700)
+counters_of_interest = counters_sf %>% filter(LA %in% las_of_interest)
+qtm(counters_sf, bbox = sf::st_bbox(counters_of_interest), basemaps = leaflet::providers$OpenStreetMap.Mapnik) +
+  tm_shape(counters_of_interest) +
+  tm_dots(size = "n", col = "n", alpha = 0.3) 
+```
+
+The temporal trend of the manual counts is as follows:
+
+```{r}
+# u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/d_counter_summaries.Rds"
+# f = basename(u)
+# d_joined = vroom::vroom("~/saferactive/saferactive/dft_traffic_counts_raw_counts_2021-06-15.csv.gz")
+# saveRDS(d_joined, "~/saferactive/saferactive/dft_traffic_counts_raw_counts_2021-06-15.Rds")
+# d_joined = readRDS("~/saferactive/saferactive/dft_traffic_counts_raw_counts_2021-06-15.Rds")
+# 
+# d_sample = d_joined %>% filter(name %in% las_of_interest)
+# class(d_sample)
+# d_sample_df = as.data.frame(d_sample)
+# write_rds(d_sample, "~/saferactive/saferactive/d_sample.Rds")
+d_sample = readRDS("~/saferactive/saferactive/d_sample.Rds")
+
+d_summary_la = d_sample %>%
+  select(PedalCycles:BusesCoaches | matches("Year|name")) %>% 
+  group_by(Year, name) %>%
+  summarise_all(sum, na.rm = TRUE) %>%
+  tidyr::pivot_longer(cols = PedalCycles:BusesCoaches, names_to = "mode")
+
+```
+
+
+```{r}
+ggplot(d_summary_la) +
+  geom_line(aes(Year, value, colour = mode)) +
+  facet_wrap(~name) +
+  scale_y_log10()
+```
+
+
+```{r}
+manu_counts = d_sample %>% 
+  group_by(count_date = lubridate::ymd(count_date)) %>% 
+  summarise(mean_flow = mean(PedalCycles, na.rm = TRUE), name = first(name))
+
+ggplot() +
+  geom_point(aes(count_date, mean_flow), data = manu_counts) +
+  geom_smooth(aes(count_date, mean_flow), data = manu_counts) +
+  facet_wrap(~name) +
+  ylim(c(0, 10))
+
+
+# auto_counts %>% 
+#   group_by(date) %>% 
+#   summarise(mean_flow = mean(hourly_mean_flow, na.rm = TRUE)) %>% 
+#   ggplot() +
+#   geom_line(aes(date, mean_flow)) +
+#   geom_smooth(aes(date, mean_flow)) +
+#   geom_point(aes(count_date, mean_flow), data = manu_counts, colour = "red") +
+#   geom_smooth(aes(count_date, mean_flow), data = manu_counts, colour = "red") 
+```
+
+Plots showing all counter point trends in the case study local authorities, and average counter values per year are shown in the graph below.
+
+
+```{r, echo=FALSE}
+# table(counters_of_interest$n)
+# summary(counters_year$Year)
+counters_of_interest_year = d_sample %>% 
+  group_by(CP) %>% 
+  mutate(n_years = n(), Cycles = PedalCycles) 
+counters_of_interest_agg = counters_of_interest_year %>% 
+  group_by(Year) %>% 
+  summarise(Cycles = mean(Cycles, na.rm = TRUE), name = last(name))
+# table(counters_of_interest_year$n_years)
+counters_of_interest_lines = counters_of_interest_year %>% filter(n_years > 1)
+counters_of_interest_points = counters_of_interest_year %>% filter(n_years == 1)
+table(counters_of_interest_lines$n_years)
+table(counters_of_interest_year$name)
+table(counters_of_interest_agg$name)
+summary(counters_of_interest_year$Year)
+
+length(unique(counters_of_interest_year$CP))
+counters_of_interest_year %>% 
+  ggplot() +
+  geom_line(aes(Year, Cycles, group = CP), alpha = 0.3) +
+  geom_point(aes(Year, Cycles, group = CP), alpha = 0.3) +
+  geom_line(aes(Year, Cycles), data = counters_of_interest_agg, colour = "orange", size = 3) +
+  scale_x_continuous(breaks = c(2000, 2005, 2010, 2015, 2018:2020)) +
+  ylim(c(0, 10))
+# u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/dft_traffic_count_d_joined_of_interest.Rds"
+# d_joined_of_interest = readRDS(url(u))
+```
+
+Plotting this per LA suggests cycling uptake during the pandemic has been variable.
+
+```{r, echo=FALSE}
+# table(counters_of_interest$n)
+# summary(counters_year$Year)
+summary(counters_of_interest_agg %>% filter(name == "Derby"))
+counters_of_interest_year %>% 
+  ggplot() +
+  geom_line(aes(Year, Cycles, group = CP), alpha = 0.3) +
+  geom_point(aes(Year, Cycles, group = CP), alpha = 0.3) +
+  geom_line(aes(Year, Cycles), data = counters_of_interest_agg, colour = "orange", size = 3) +
+  scale_x_continuous(breaks = c(2000, 2005, 2010, 2015, 2018:2020)) +
+  ylim(c(0, 30)) +
+  facet_wrap(~name)
+# u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/dft_traffic_count_d_joined_of_interest.Rds"
+# d_joined_of_interest = readRDS(url(u))
+```
+
+
+## Automatic count data
+
+

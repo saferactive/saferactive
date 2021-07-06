@@ -97,6 +97,9 @@ d_to_join = sf::st_join(d_sf, las_to_join) %>%
   sf::st_drop_geometry()
 
 d_joined = inner_join(d, d_to_join)
+d_joined_bradford = d_joined %>% 
+  filter(name == "Bradford") %>% 
+  filter(Year > 2017)
 
 d_counter_summaries = d_joined %>% 
   group_by(CP, Easting, Northing, Year) %>% 
@@ -123,6 +126,10 @@ d_summary_la = d_sample %>%
 ```
 
 ```{r, eval=FALSE, echo=FALSE}
+saveRDS(d_counter_summaries, "d_counter_summaries.Rds")
+piggyback::pb_upload("d_counter_summaries.Rds")
+piggyback::pb_download_url("d_counter_summaries.Rds")
+
 saveRDS(d_summary_la, "dft_traffic_counts_d_summary_la.Rds")
 piggyback::pb_upload("dft_traffic_counts_d_summary_la.Rds")
 piggyback::pb_download_url("dft_traffic_counts_d_summary_la.Rds")
@@ -132,6 +139,11 @@ piggyback::pb_upload("dft_traffic_counts_raw_counts_2021-06-15.csv.gz", repo = "
 saveRDS(d_counter_west_yorks, "dft_traffic_count_d_counter_west_yorks.Rds")
 piggyback::pb_upload("dft_traffic_count_d_counter_west_yorks.Rds")
 piggyback::pb_download_url("dft_traffic_count_d_counter_west_yorks.Rds")
+saveRDS(d_joined_bradford, "dft_traffic_count_d_joined_bradford.Rds")
+piggyback::pb_upload("dft_traffic_count_d_joined_bradford.Rds")
+piggyback::pb_download_url("dft_traffic_count_d_joined_bradford.Rds")
+
+
 ```
 
 ```{r}
@@ -182,7 +194,8 @@ counters_bradford_year %>%
   geom_point(aes(Year, Cycles, group = CP), alpha = 0.3) +
   geom_line(aes(Year, Cycles), data = counters_bradford_agg, colour = "orange", size = 3) +
   scale_x_continuous(breaks = c(2000, 2005, 2010, 2015, 2018:2020))
-
+u = "https://github.com/saferactive/saferactive/releases/download/0.1.4/dft_traffic_count_d_joined_bradford.Rds"
+d_joined_bradford = readRDS(url(u))
 ```
 
 
@@ -190,11 +203,39 @@ counters_bradford_year %>%
 
 ## Automatic count data
 
-Work in progress
+The location of auto count points, compared with the location of manual counts in Bradford, is shown below.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r pressure}
+# auto_counts = readr::read_csv("code/tests/daily_cycle_data_bfd.csv")
+auto_counts = readr::read_csv("daily_cycle_data_bfd.csv")
+auto_count_locations = auto_counts %>% 
+  group_by(longitude, latitude) %>% 
+  summarise(mean_flow = mean(hourly_mean_flow)) %>% 
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+plot(auto_count_locations$geometry)
+qtm(auto_count_locations, bbox = sf::st_bbox(counters_bradford), basemaps = leaflet::providers$OpenStreetMap.Mapnik) +
+  tm_shape(counters_bradford) +
+  tm_dots(size = "n", col = "n", alpha = 0.3) 
 ```
+
+Their temporal trends are compared below.
+
+```{r}
+manu_counts = d_joined_bradford %>% 
+  group_by(count_date = lubridate::ymd(count_date)) %>% 
+  summarise(mean_flow = mean(PedalCycles, na.rm = TRUE))
+
+auto_counts %>% 
+  group_by(date) %>% 
+  summarise(mean_flow = mean(hourly_mean_flow, na.rm = TRUE)) %>% 
+  ggplot() +
+  geom_line(aes(date, mean_flow)) +
+  geom_smooth(aes(date, mean_flow)) +
+  geom_point(aes(count_date, mean_flow), data = manu_counts, colour = "red") +
+  geom_smooth(aes(count_date, mean_flow), data = manu_counts, colour = "red") 
+
+```
+
 
 
 

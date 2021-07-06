@@ -122,6 +122,9 @@ d_to_join = sf::st_join(d_sf, las_to_join) %>%
   sf::st_drop_geometry()
 
 d_joined = inner_join(d, d_to_join)
+d_joined_bradford = d_joined %>% 
+  filter(name == "Bradford") %>% 
+  filter(Year > 2017)
 
 d_counter_summaries = d_joined %>% 
   group_by(CP, Easting, Northing, Year) %>% 
@@ -200,6 +203,79 @@ readings since 2017. These are plotted below.
 
 ## Automatic count data
 
-Work in progress
+The location of auto count points, compared with the location of manual
+counts in Bradford, is shown below.
+
+``` r
+# auto_counts = readr::read_csv("code/tests/daily_cycle_data_bfd.csv")
+auto_counts = readr::read_csv("daily_cycle_data_bfd.csv")
+```
+
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## cols(
+    ##   SiteID = col_character(),
+    ##   date = col_date(format = ""),
+    ##   count_vehicles = col_double(),
+    ##   hourly_mean_flow = col_double(),
+    ##   Site_Name = col_character(),
+    ##   name_2 = col_character(),
+    ##   Speed_Limit = col_double(),
+    ##   Orientation = col_character(),
+    ##   Grid = col_double(),
+    ##   latitude = col_double(),
+    ##   longitude = col_double(),
+    ##   data_type = col_character()
+    ## )
+
+``` r
+auto_count_locations = auto_counts %>% 
+  group_by(longitude, latitude) %>% 
+  summarise(mean_flow = mean(hourly_mean_flow)) %>% 
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+```
+
+    ## `summarise()` has grouped output by 'longitude'. You can override using the `.groups` argument.
+
+``` r
+plot(auto_count_locations$geometry)
+```
 
 ![](bradford_files/figure-gfm/pressure-1.png)<!-- -->
+
+``` r
+qtm(auto_count_locations, bbox = sf::st_bbox(counters_bradford), basemaps = leaflet::providers$OpenStreetMap.Mapnik) +
+  tm_shape(counters_bradford) +
+  tm_dots(size = "n", col = "n", alpha = 0.3) 
+```
+
+    ## Legend for symbol sizes not available in view mode.
+
+![](bradford_files/figure-gfm/pressure-2.png)<!-- -->
+
+Their temporal trends are compared below.
+
+``` r
+manu_counts = d_joined_bradford %>% 
+  group_by(count_date = lubridate::ymd(count_date)) %>% 
+  summarise(mean_flow = mean(PedalCycles, na.rm = TRUE))
+
+auto_counts %>% 
+  group_by(date) %>% 
+  summarise(mean_flow = mean(hourly_mean_flow, na.rm = TRUE)) %>% 
+  ggplot() +
+  geom_line(aes(date, mean_flow)) +
+  geom_smooth(aes(date, mean_flow)) +
+  geom_point(aes(count_date, mean_flow), data = manu_counts, colour = "red") +
+  geom_smooth(aes(count_date, mean_flow), data = manu_counts, colour = "red") 
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 27 rows containing non-finite values (stat_smooth).
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 27 row(s) containing missing values (geom_path).
+
+![](bradford_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
