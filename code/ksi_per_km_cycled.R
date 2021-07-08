@@ -98,6 +98,8 @@ pf_lookup = crash %>%
   summarise()
 # pf_lookup[duplicated(pf_lookup$LAD19NM),]
 
+saveRDS(pf_lookup, "pf_lookup.Rds")
+
 # Group by lower tier LA --------------------------------------------------
 
 # use peak hours on weekdays only
@@ -245,6 +247,8 @@ la = la %>%
 
 
 # Police force area populations -------------------------------------------
+# piggyback::pb_download("pf_lookup.Rds")
+pf_lookup = readRDS("pf_lookup.Rds")
 
 pf_pop = left_join(pop2, pf_lookup, by = c("ladcode20" = "la_code"))
 
@@ -322,7 +326,11 @@ la$early_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,1:5], 1, m
 la$late_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_risk = (la$late_risk / la$early_risk -1) * 100
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
+
 la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
+la$early_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diff_ksi = (la$late_ksi / la$early_ksi -1) * 100
 
 la$mean_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]], 1, mean, na.rm = TRUE)
 la$early_km_percap = apply(la[,names(la)[grepl("km_percap_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
@@ -532,7 +540,7 @@ g + scale_x_continuous(trans="log10") +
 
 # Change in cycling uptake and risk
 # this should probably use absolute change in KSI, or change in KSI per capita, not change in KSI/Bkm, because the latter is partly dependent on our estimates of cycle uptake
-ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = diff_risk, group = RUC11CD)) +
+ggplot(la_urb%>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = diff_risk, group = RUC11CD)) +
   geom_point(aes(color = RUC11, shape = RUC11)) +
   # ylim(-2, 1) +
   # xlim(-0.01, 0.01) +
@@ -540,6 +548,13 @@ ggplot(la_urb %>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y =
   labs(x = "Modelled % change in cycling uptake", y = "% change in road safety risk") +
   geom_smooth(method = lm, aes(colour = RUC11), alpha = 0.2)
   # + geom_text(label = la$LAD19NM, nudge_y = -0.1, cex = 3)
+
+# change in absolute KSI
+ggplot(la %>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = diff_ksi)) +
+  geom_point() +
+  theme(legend.title = element_blank()) +
+  labs(x = "Modelled % change in cycling uptake", y = "% change in absolute cycle KSI") +
+  geom_smooth(method = lm, alpha = 0.2)
 
 # ggplot(crash_yr,
 #        aes(year, active_ksi_per100k_work, colour = LAD19NM_plot, group = LAD19NM)) +
@@ -583,7 +598,7 @@ tm_shape(pf_geom) +
   tm_layout(legend.outside = TRUE)
 
 ####
-
+tmap_options(check.and.fix = TRUE)
 t1 = tm_shape(bounds) +
   tm_fill("mean_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2010-19") +
   tm_borders(lwd = 0.1)
@@ -602,7 +617,7 @@ t3 = tm_shape(bounds) +
 tmap_arrange(t1, t2, t3)
 
 ####
-
+tmap_options(check.and.fix = TRUE)
 t1 = tm_shape(pf_geom) +
   tm_fill("mean_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-19") +
   tm_borders(lwd = 0.1)
@@ -620,7 +635,19 @@ t3 = tm_shape(pf_geom) +
 
 tmap_arrange(t1, t2, t3)
 
+# Map change in cycle uptake and risk
 
+bounds = bounds %>% mutate(
+  change = case_when(
+    diff_cycle > 0 & diff_risk <= 0 ~ "1. more uptake, less risk",
+    diff_cycle <= 0 & diff_risk <= 0 ~ "2. less uptake, less risk",
+    diff_cycle > 0 & diff_risk > 0 ~ "3. more uptake, more risk",
+    diff_cycle <= 0 & diff_risk > 0 ~ "4. less uptake, more risk"
+    )
+)
+
+tm_shape(bounds) +
+  tm_fill("change")
 
 
 # piggyback::pb_download("la_upper_for_plots.Rds") #not found
