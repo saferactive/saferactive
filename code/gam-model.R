@@ -1,4 +1,5 @@
-# Processing of DfT raw count data from London only.
+# Processing of DfT raw count data
+# Was originally for London only, but now includes whole country.
 # Uses output from `geographical-data-cleaning.R`
 
 # File also includes GAM model for DfT counts only. GAM including DfT and TfL counts is in `dft-tfl-together.R`
@@ -109,42 +110,54 @@ dim(t_london) #370500 #354864
 #   filter(hour %in% c(7, 8, 9, 16, 17, 18))
 # dim(traffic_peak_only) #185250 #177432
 
-# use peak hours only
-traffic_peak_only = traffic_corrected %>%
-  filter(hour %in% c(7, 8, 9, 16, 17, 18))
-dim(traffic_peak_only) #2077931
+# # use peak hours only
+# traffic_peak_only = traffic_corrected %>%
+#   filter(hour %in% c(7, 8, 9, 16, 17, 18))
+# dim(traffic_peak_only) #2077931
 
 # check each count point is consistently either bi-directional or unidirectional
-wrong = traffic_peak_only %>%
+wrong = traffic_corrected %>%
   group_by(year, count_date, count_point_id) %>%
-  tally()
+  summarise(
+    n_periods = n()
+  )
 unique(wrong$n)
 # [1] 12  6
 
-# check2 = inner_join(traffic_peak_only, ford, by = c("year", "count_point_id", "count_date"))
+#check
+View(wrong %>%
+       group_by(n_periods) %>%
+       tally())
+
+# remove those not consistently bidirectional or unidirectional
+traffic_corrected = left_join(traffic_corrected, wrong, by = c("year", "count_date", "count_point_id")) %>%
+  filter(n_periods == 12 | n_periods == 24)
+dim(traffic_corrected) #4146852
+
+# check2 = inner_join(traffic_corrected, ford, by = c("year", "count_point_id", "count_date"))
 # ddd = check2 %>% group_by(count_point_id) %>%
 #   length(distinct(check2$n))
 # unique(ddd$n)
 
-# # check 4-way points
-wrong[wrong$n == 24,]
-ford = wrong %>% filter(n == 24)
-fd = traffic_peak_only %>% filter(count_point_id == 940071)
-fd %>% group_by(year) %>% tally()
-View(fd %>% filter(year == 2018))
-
-traffic_peak_only = traffic_peak_only %>%
-  filter(! count_point_id %in% ford$count_point_id)
-t11 = wrong %>% filter(n == 11)
-traffic_peak_only = traffic_peak_only %>%
-  filter(! count_point_id %in% t11$count_point_id)
-
-dim(traffic_peak_only) #2050446
-# fd = fd %>%
-#   select(-easting, -northing)
+# # # check 4-way points
+# wrong[wrong$n == 48,]
+# ford = wrong %>% filter(n == 24)
+# fd = traffic_corrected %>% filter(count_point_id == 940071)
+# fd %>% group_by(year) %>% tally()
+# View(fd %>% filter(year == 2018))
+#
+# traffic_corrected = traffic_corrected %>%
+#   filter(! count_point_id %in% ford$count_point_id)
+# t11 = wrong %>% filter(n == 11)
+# traffic_corrected = traffic_corrected %>%
+#   filter(! count_point_id %in% t11$count_point_id)
+#
+# dim(traffic_corrected) #2050446
+# # fd = fd %>%
+# #   select(-easting, -northing)
 
 # combine bidirectional counts
-traffic_london_points = traffic_peak_only %>%
+traffic_london_points = traffic_corrected %>%
   group_by(year, count_date, hour, name, count_point_id, easting, northing) %>%
   summarise(pedal_cycles = sum(pedal_cycles)) %>% #sums movements in both directions
   ungroup()
@@ -169,12 +182,20 @@ traffic_london_bam = traffic_london_bam %>%
     )
   )
 
-# check each count point has 6 hours of data
+# check each count point has 12 hours of data
 ford = traffic_london_bam %>%
   group_by(year, count_date, count_point_id) %>%
+  summarise(
+    n_periods = n()
+  )
+ford %>%
+  group_by(n_periods) %>%
   tally()
-unique(ford$n)
-# [1] 6
+
+# remove those with the wrong number of hours
+traffic_london_bam = left_join(traffic_london_bam, ford, by = c("year", "count_date", "count_point_id")) %>%
+  filter(n_periods == 12)
+dim(traffic_london_bam) #2096988
 
 # check and remove rogue points
 # ford[ford$n == 12,]

@@ -7,22 +7,25 @@ dim(counter_df) #1264064
 
 # saveRDS(counter_df, "counter_df.Rds")
 
-#filter daytime counts
-unique(counter_df$Period)
-counter_daytime = counter_df %>%
-  filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)" | Period == "Inter-peak (10:00-16:00)")
-unique(counter_daytime$Period)
+# #filter daytime counts
+# unique(counter_df$Period)
+# counter_daytime = counter_df %>%
+#   filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)" | Period == "Inter-peak (10:00-16:00)")
+# unique(counter_daytime$Period)
+#
+# counter_peak = counter_df %>%
+#   filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)")
+# unique(counter_peak$Period)
 
-counter_peak = counter_df %>%
-  filter(Period == "AM peak (07:00-10:00)" | Period == "PM peak (16:00-19:00)")
-unique(counter_peak$Period)
+# use all hours
+counter_peak = counter_df
 
 
 #find year
 counter_peak$year = case_when(is.na(counter_peak$Survey_wave) ~ lubridate::year(counter_peak$`Survey date`), TRUE ~ as.numeric(substr(counter_peak$Survey_wave, 1, 4)))
 counter_peak = counter_peak %>%
   filter(! is.na(year))
-dim(counter_peak) #945728 #472856 peak
+dim(counter_peak) #945728 #472856 peak #1260912
 
 
 # Select the correct survey wave only
@@ -55,7 +58,7 @@ remove4 = counter_peak %>%
 counter_peak = counter_peak %>%
   filter(! id %in% remove4$id)
 
-dim(counter_peak) #929008 #464694 peak
+dim(counter_peak) #929008 #464694 peak #1238644
 
 ############# Weather
 doubles = counter_peak %>%
@@ -72,7 +75,7 @@ remove5 = weather_repeats %>%
 
 counter_peak = counter_peak %>%
   filter(! id %in% remove5$id)
-dim(counter_peak) #928816 #464598 peak
+dim(counter_peak) #928816 #464598 peak #1238388
 
 ###################
 
@@ -86,17 +89,19 @@ counter_daily = counter_peak %>%
     mean_daily = mean(`Total cycles`, na.rm = TRUE)) %>%
   ungroup()
 
+#check
+View(counter_daily %>%
+       group_by(n_periods) %>%
+       tally())
+
 counter_clean = left_join(counter_peak, counter_daily, by = c("Site ID", "Direction", "year", "Survey_wave")) %>%
-  # filter(n_periods == 48) #for whole day
-  filter(n_periods == 24) #for peak hours
-dim(counter_clean) #919440 #460824
+  filter(n_periods == 64) #for whole day
+  # filter(n_periods == 48) #for daytime
+  # filter(n_periods == 24) #for peak hours
+dim(counter_clean) #919440 #460824 #1224640
 
 # CENCY201 Tooley Street Survey wave changes while Survey date stays the same
 # not enough hours only covers 7am - 2pm
-
-# View(counter_clean %>%
-#   group_by(n_periods) %>%
-#   tally())
 
 # unique(counter_clean$year)
 # unique(substr(counter_clean$Survey_wave,6,7))
@@ -129,7 +134,7 @@ View(counter_clean %>%
 # Full 2014 data is available for Central London (all 4 survey waves) but no 2014 data is available for the Inner or Outer London locations
 counter_clean = counter_clean %>%
   filter(year != 2014)
-dim(counter_clean) #846528 #424320 peak
+dim(counter_clean) #846528 #424320 peak #1127808
 
 # saveRDS(counter_clean, "counter_clean.Rds")
 saveRDS(counter_clean, "counter_clean_peak.Rds")
@@ -228,7 +233,7 @@ dim(counter_year %>% filter(ProgID == "OUTCY")) #2247
 
 
 saveRDS(counter_year, "tfl-counts-by-site.Rds")
-saveRDS(counter_year, "tfl-counts-by-site-peak.Rds")
+# saveRDS(counter_year, "tfl-counts-by-site-peak.Rds")
 
 
 # Group by borough --------------------------------------------------------

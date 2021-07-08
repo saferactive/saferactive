@@ -1,5 +1,5 @@
-# This file brings together TfL count data from `tfl-verification.R` and DfT count data for London from `gam-model.R`.
-# Both are modelled using raw counts for peak hours only, with quarterly seasonal adjustment factors applied for standardisation.
+# This file brings together TfL count data from `tfl-verification.R` and DfT count data for the whole country from `gam-model.R`.
+# Both are modelled using raw counts for the whole day (was originally peak hours only), with quarterly seasonal adjustment factors applied for standardisation.
 # All outputs are included in saferactive release 0.1.2
 # peak hour correction factors by borough are in `gam-full-results-peak.Rds`
 # peak hour correction factors by grid cell are in `gam-full-results-peak-grid.Rds`
@@ -10,7 +10,8 @@ library(sf)
 # Organise TfL dataset ----------------------------------------------------
 
 # TfL counts
-tfl_zero = readRDS("tfl-counts-by-site-peak.Rds")
+# tfl_zero = readRDS("tfl-counts-by-site-peak.Rds")
+tfl_zero = readRDS("tfl-counts-by-site.Rds")
 dim(tfl_zero) #6221
 
 # add geometry
@@ -62,7 +63,7 @@ dft_all = readRDS("raw-dft-national-daily.Rds")
 
 dft_all = dft_all %>%
   filter(year %in% 2010:2019)
-dim(dft_all) #7121 #80516 national
+dim(dft_all) #7121 #80516 national #82083
 
 # get mean count per site
 dft_all = dft_all %>%
@@ -79,11 +80,11 @@ dft_0 = dft_all %>%
 dft_nonzero = dft_all %>%
   filter(! count_point_id %in% dft_0$count_point_id,
          mean_cycles >= 5.0)
-dim(dft_nonzero) #5775 #53434
+dim(dft_nonzero) #5775 #53434 #63225
 
 counts_early_years = dft_nonzero %>%
   filter(year %in% 2010:2015)
-dim(counts_early_years) #3156 #28013
+dim(counts_early_years) #3156 #28013 #33249
 
 # recalculate change in cycles
 counts_early_years = counts_early_years %>%
@@ -101,14 +102,14 @@ dft_early_years_repeats = counts_early_years %>%
 
 counts_early_years = counts_early_years %>%
   filter(count_point_id %in% dft_early_years_repeats$count_point_id)
-dim(counts_early_years) #2326 #22092
+dim(counts_early_years) #2326 #22092 #26727
 
 
 # DfT dataset for the years 2015-2019 -------------------------------------
 
 dft_late_years = dft_nonzero %>%
   filter(year %in% 2015:2019)
-dim(dft_late_years) #3077 #29424
+dim(dft_late_years) #3077 #29424 #34783
 
 # recalculate change in cycles
 dft_late_years = dft_late_years %>%
@@ -126,7 +127,7 @@ dft_late_years_repeats = dft_late_years %>%
 
 dft_late_years = dft_late_years %>%
   filter(count_point_id %in% dft_late_years_repeats$count_point_id)
-dim(dft_late_years) #1498 #15240
+dim(dft_late_years) #1498 #15240 #18567
 
 
 # Annual change comparisons
@@ -180,59 +181,59 @@ counts_early_years = counts_early_years %>%
   select(year, name, count_point_id, easting, northing, pedal_cycles = pedal_cycles_adj, change_cycles = change_cycles_early, mean_cycles = mean_cycles_early, sum_cycles = sum_cycles_early, data_source)
 counts_all_years = bind_rows(counts_early_years, counts_combined)
 
-# Explore data
-
-forplot = counts_early_years %>%
-  group_by(year) %>%
-  summarise(change_cycles_early = weighted.mean(change_cycles_early, w = sum_cycles_early))
-plot(change_cycles_early ~ year, data = forplot)
-
-ggplot(forplot) +
-  geom_line(aes(year, change_cycles_early, colour = "darkred")) +
-  xlab("Year") +
-  ylab("Mean change in peak cycle flows (DfT counts)") +
-  theme(legend.position = "none")
-
-counts_combined %>%
-  group_by(name, year) %>%
-  summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late)) %>%
-  View()
-
-tfl_nonzero %>%
-  group_by(name, year) %>%
-  summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late)) %>%
-  View()
-
-forplot = counts_combined %>%
-  group_by(year) %>%
-  summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late))
-plot(change_cycles_late ~ year, data = forplot)
-
-forplot = counts_combined %>%
-  group_by(year, data_source) %>%
-  summarise(change_cycles_late = weighted.mean(change_cycles_late, w = sum_cycles_late))
-plot(change_cycles_late ~ year, data = forplot)
-
-ggplot(forplot, aes(x = year, y = change_cycles_late)) +
-  geom_line(aes(color = data_source)) +
-  scale_color_manual(values = c("darkred", "steelblue")) +
-  xlab("Year") +
-  ylab("Mean change in peak cycle flows") +
-  labs(colour = "Data source")
-
+# # Explore data
+#
+# forplot = counts_early_years %>%
+#   group_by(year) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_early))
+# plot(change_cycles ~ year, data = forplot)
+#
 # ggplot(forplot) +
-#   geom_line(aes(year, change_cycles_late, colour = data_source))
-
-plot(counts_combined$year, counts_combined$change_cycles_late)
-
-# dd = tfl_nonzero %>%
-#   group_by(count_point_id) %>%
-#   tally()
-# unique(dd$n)
-
-#investigate response variables
-hist(counts_combined$change_cycles_late, breaks = 100)
-hist(counts_early_years$change_cycles_early, breaks = 50)
+#   geom_line(aes(year, change_cycles, colour = "darkred")) +
+#   xlab("Year") +
+#   ylab("Mean change in peak cycle flows (DfT counts)") +
+#   theme(legend.position = "none")
+#
+# counts_combined %>%
+#   group_by(name, year) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late)) %>%
+#   View()
+#
+# tfl_nonzero %>%
+#   group_by(name, year) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late)) %>%
+#   View()
+#
+# forplot = counts_combined %>%
+#   group_by(year) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late))
+# plot(change_cycles ~ year, data = forplot)
+#
+# forplot = counts_combined %>%
+#   group_by(year, data_source) %>%
+#   summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late))
+# plot(change_cycles ~ year, data = forplot)
+#
+# ggplot(forplot, aes(x = year, y = change_cycles)) +
+#   geom_line(aes(color = data_source)) +
+#   scale_color_manual(values = c("darkred", "steelblue")) +
+#   xlab("Year") +
+#   ylab("Mean change in peak cycle flows") +
+#   labs(colour = "Data source")
+#
+# # ggplot(forplot) +
+# #   geom_line(aes(year, change_cycles, colour = data_source))
+#
+# plot(counts_combined$year, counts_combined$change_cycles)
+#
+# # dd = tfl_nonzero %>%
+# #   group_by(count_point_id) %>%
+# #   tally()
+# # unique(dd$n)
+#
+# #investigate response variables
+# hist(counts_combined$change_cycles, breaks = 100)
+# hist(counts_early_years$change_cycles, breaks = 50)
 
 
 # GAM for all years -------------------------------------------------------
@@ -244,7 +245,7 @@ M = list(c(1, 0.5), NA)
 
 m = bam(change_cycles ~
           s(year, bs = "cr", k = 4)
-        + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
+        + s(easting, northing, k = 500, bs = 'ds', m = c(1, 0.5))
         + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
         ,
         weights = sum_cycles,
@@ -275,7 +276,8 @@ pred_all_points_year = cbind(pdata, Fitted = fitted)
 pred_all_points_year = pred_all_points_year %>%
   drop_na
 
-saveRDS(pred_all_points_year, "gam-all-year-peak-grid-national.Rds")
+# saveRDS(pred_all_points_year, "gam-all-year-peak-grid-national.Rds")
+saveRDS(pred_all_points_year, "gam-all-year-grid-national.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -297,7 +299,7 @@ borough_geom = lads %>%
 ## Assign to borough for predictions by year
 pred_sf = pred_all_points_year %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
-point_to_borough = st_join(x = pred_sf, y = borough_geom)
+point_to_borough = st_join(x = pred_sf, y = borough_geom) #SLOW
 ## Calculate mean annual predictions for each borough
 gam_with_lads = point_to_borough %>%
   drop_na() %>%
@@ -307,11 +309,13 @@ View(gam_with_lads)
 
 # saveRDS(gam_all_year, "gam-all-year.Rds")
 saveRDS(gam_with_lads, "gam-national-with-lads-peak.Rds")
+saveRDS(gam_with_lads, "gam-national-with-lads.Rds")
 
 
 # Adjustment factors for national grid --------------------------
 
-gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
+# gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
+gam_all_year = readRDS("gam-all-year-grid-national.Rds")
 
 # get change relative to 2011 for the early years
 gam_2011 = gam_all_year %>%
@@ -337,10 +341,11 @@ ggplot(forplot) +
   xlab("Year") +
   ylab("Mean change in predicted cycle count for London grid cells")
 
-saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
-piggyback::pb_upload("gam-full-results-peak-grid-national.Rds")
+# saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
+# piggyback::pb_upload("gam-full-results-peak-grid-national.Rds")
 
-
+saveRDS(gam_full_results, "gam-full-results-grid-national.Rds")
+piggyback::pb_upload("gam-full-results-grid-national.Rds", tag = "0.1.4")
 
 
 # GAM model for early years  ----------------------------------------------
