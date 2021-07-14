@@ -261,7 +261,7 @@ plot(m, pages = 4, scheme = 2, shade = TRUE)
 # assign the framework that will be used as a basis for predictions
 pdata = with(counts_all_years,
              expand.grid(year = seq(min(year), max(year), by = 1),
-                         easting = seq(0, 656000, by = 500), # changed this to make regular 1km grid squares
+                         easting = seq(0, 656000, by = 500), # changed this to make regular 1km grid squares. these include the tip of cornwall and lowestoft.
                          northing = seq(8000, 1215000, by = 500)))
 # make predictions according to the GAM model
 fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE) #SLOW
