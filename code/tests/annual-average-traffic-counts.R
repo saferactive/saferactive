@@ -57,14 +57,21 @@ traffic_renamed = traffic_aadf %>%
 # summary(sf::st_geometry_type(traffic_sf))
 # mapview::mapview(traffic_sf)
 
-# including estimated counts in year that were missed
+# excluding estimated counts in year that were missed
 traffic_cyclable = traffic_renamed %>%
   filter(road_category != "TM",
-         road_category != "PM") # %>%
-# filter(estimation_method == "Counted") # not needed
-# there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are included.
+         road_category != "PM") %>%
+# these next two lines could both be commented out to test what effect this has
+  filter(Estimation_method == "Counted") %>%
+  filter(Estimation_method_detailed != "Dependent on a neighbouring counted link")
+# there are some roads with estimation_method_detailed "dependent on a nearby count point". This is where a road crosses a county boundary and the same count has been applied to segments either side of this boundary. These points are excluded.
+
+# checks
 dim(traffic_cyclable)
-# [1] 465654     33
+# [1] 184038     32
+### [1] 465654     33
+unique(traffic_cyclable$Estimation_method)
+unique(traffic_cyclable$Estimation_method_detailed)
 
 # Fix points with location errors
 error1 = traffic_cyclable %>%
@@ -89,45 +96,77 @@ traffic_cyclable = rbind(traffic_cyclable, error1, error2, error3)
 
 
 
-# Make map of LAs ---------------------------------------------------------
+# Get LA boundary data (both detailed and ultra-generalised) ---------------------------------------------------------
 
-# download uas/counties - bfc
-u = "https://opendata.arcgis.com/datasets/43b324dc1da74f418261378a9a73227f_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-# ultra-generalised - not used
+# # download full resolution (bfc) uas/counties
+# u = "https://opendata.arcgis.com/datasets/43b324dc1da74f418261378a9a73227f_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
+# dir.create("counties-uas-2019-bfc")
+# setwd("counties-uas-2019-bfc/")
+# counties_gb = ukboundaries::duraz(u)
+# setwd("..")
+# getwd() # in the right directory again 🎉
+# counties_uas_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N")) # remove northern irish counties
+# saveRDS(counties_uas_gb, "counties_uas_gb_2019_bfc.Rds")
+# piggyback::pb_upload("counties_uas_gb_2019_bfc.Rds")
+# # "https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_bfc.Rds"
+
+# # ultra-generalised (buc) counties
 # u = "https://opendata.arcgis.com/datasets/b216b4c8a4e74f6fb692a1785255d777_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-dir.create("counties-uas-2019-bfc")
-setwd("counties-uas-2019-bfc/")
-counties_gb = ukboundaries::duraz(u)
-setwd("..")
-getwd() # in the right directory again 🎉
-counties_uas_gb = counties_gb %>% filter(!str_detect(string = ctyua19cd, "N"))
-saveRDS(counties_uas_gb, "counties_uas_gb_2019_bfc.Rds")
-piggyback::pb_upload("counties_uas_gb_2019_bfc.Rds")
-piggyback::pb_download_url("counties_uas_gb_2019_ubc.Rds")
-# "https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_bfc.Rds"
-# "https://github.com/saferactive/saferactive/releases/download/0.1.1/counties_uas_gb_2019_bfc.Rds"
+# dir.create("counties-uas-2019-buc")
+# setwd("counties-uas-2019-buc/")
+# counties_ultragen = ukboundaries::duraz(u)
+# setwd("..")
+# getwd() # in the right directory again 🎉
+# counties_ultragen = counties_ultragen %>% filter(!str_detect(string = ctyua19cd, "N")) # remove northern irish counties
+# saveRDS(counties_ultragen, "counties_uas_gb_2019_buc.Rds")
+# piggyback::pb_upload("counties_uas_gb_2019_buc.Rds")
 
-piggyback::pb_download_url("counties_uas_gb_2019_bfc.Rds")
-mapview::mapview(counties_uas_gb) # very detailed
+###
+
+piggyback::pb_download("counties_uas_gb_2019_bfc.Rds")
+piggyback::pb_download("counties_uas_gb_2019_buc.Rds")
+counties_uas_gb = readRDS("counties_uas_gb_2019_bfc.Rds")
+counties_simplified = readRDS("counties_uas_gb_2019_buc.Rds")
+
+# mapview::mapview(counties_uas_gb) # very detailed
 
 traffic_sf = traffic_cyclable %>%
   sf::st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
 traffic_joined = sf::st_join(traffic_sf, counties_uas_gb)
 nrow(traffic_joined)
-# [1] 465654
+# [1] 184038
 
-# spatial join didn't work for count points on bridges. need to find nearest LA for these
+# spatial join didn't work for count points on bridges. need to use ultra-generalised LA boundaries for these
 missing = traffic_joined %>% filter(
   is.na(ctyua19nm)
 )
-mapview(missing)
+mapview::mapview(missing)
 
 # need to use lapply or something similar. Not working yet.
 # then rejoin the results back into traffic_joined
-missing$la_name = lapply(missing, FUN = st_nearest_feature(x = missing, y = counties_uas_gb))
 
+# missing$la_name = lapply(missing, FUN = st_nearest_feature(x = missing, y = counties_uas_gb))
 
+missing_joined = traffic_sf %>%
+  filter(count_point_id %in% missing$count_point_id)
+missing_joined = sf::st_join(missing_joined, counties_simplified)
+nrow(missing_joined)
+# [1] 226
+
+# four count locations are still missing (bridges over the sea)
+still_missing = missing_joined %>%
+  filter(is.na(ctyua19nm))
+mapview(still_missing)
+
+# identical(names(traffic_joined), names(missing_joined))
+# [1] TRUE
+
+traffic_joined = rbind(traffic_joined, missing_joined)
+traffic_joined = traffic_joined %>%
+  filter(! is.na(ctyua19nm))
+dim(traffic_joined)
+# 184019
 
 saveRDS(traffic_joined, "traffic_joined.Rds")
 piggyback::pb_upload("traffic_joined.Rds")
