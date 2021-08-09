@@ -112,3 +112,4 @@ tmap_animation(map_facetted2, filename = "facetted_map_nts_bicycle.gif", delay =
 
 write_csv(d_region_clean, "d_region_clean.csv")
 
+saveRDS(regions_renamed, "regions_renamed.Rds")
