@@ -40,7 +40,6 @@ dft_national %>%
   geom_smooth(aes(year, dft_cycles)) +
   ylab("Mean cycle AADF")
 
-# regional
 dft_regional = st_join(dft_counts, regions)
 
 dft_regional = dft_regional %>%
@@ -55,7 +54,27 @@ dft_regional %>%
   geom_smooth(aes(year, dft_cycles)) +
   ylab("Mean cycle AADF")
 
+# Dft more reliable data
+
+dft_counts %>%
+  group_by(count_point_)
+
+# dft_national = dft_counts %>%
+#   filter()
+#   group_by(year) %>%
+#   summarise(dft_cycles = mean(pedal_cycles))
+#
+# dft_national %>%
+#   ggplot() +
+#   geom_line(aes(year, dft_cycles)) +
+#   geom_smooth(aes(year, dft_cycles)) +
+#   ylab("Mean cycle AADF")
+
+
 # NTS counts
+
+# convert this to % increase from 2011
+#normalise then run lm
 nts_national = nts_clean %>%
   group_by(year) %>%
   summarise(nts_cycles = mean(bicycle))
@@ -76,7 +95,7 @@ nts_regional %>%
   ggplot() +
   geom_line(aes(year, nts_cycles, colour = region)) +
   geom_smooth(aes(year, nts_cycles)) +
-  ylab("Mean cycle AADF")
+  ylab("Mean cycle journeys")
 
 # Collisions
 stats19_national = collision_data %>%
@@ -103,7 +122,7 @@ stats19_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_cycle, colour = region)) +
   geom_smooth(aes(year, ksi_cycle)) +
-  ylab("Mean cycle AADF")
+  ylab("Sum cycle ksi")
 
 
 # Plot trends together ----------------------------------------------------
