@@ -124,6 +124,23 @@ stats19_regional %>%
   geom_smooth(aes(year, ksi_cycle)) +
   ylab("Sum cycle ksi")
 
+# GAM results
+gam_national = gam_results %>%
+  st_as_sf(coords = c("easting", "northing"), crs = 27700)
+gam_regional = st_join(gam_national, regions) #doesnt work produces NAs
+
+# this doesn't weight for population so will be biased towards rural areas
+gam_national_trend = gam_national %>%
+  group_by(year) %>%
+  summarise(change_cycles = mean(change_cycles))
+
+gam_national_trend %>%
+  ggplot() +
+  geom_line(aes(year, change_cycles)) +
+  geom_smooth(aes(year, change_cycles)) +
+  ylab("Mean cycle count")
+
+saveRDS(gam_national_trend, "gam_national_trend.Rds")
 
 # Plot trends together ----------------------------------------------------
 
