@@ -20,16 +20,18 @@ collision_data = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.
   st_transform(27700)
 collision_data$year = lubridate::year(collision_data$date)
 
-# GAM model raw results for changes in traffic counts
+# GAM model raw results for changes in traffic counts 2010-2019
 gam_results = readRDS("gam-full-results-grid-national.Rds")
 
-# GAM results aggregated by lower tier LA
-gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
+# # GAM results aggregated by lower tier LA
+# gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
 
 
 # Single dataset trends ---------------------------------------------------
 
-# DfT AADF counts
+
+# DfT AADF counts ---------------------------------------------------------
+
 dft_national = dft_counts %>%
   group_by(year) %>%
   summarise(dft_cycles = mean(pedal_cycles))
@@ -54,24 +56,37 @@ dft_regional %>%
   geom_smooth(aes(year, dft_cycles)) +
   ylab("Mean cycle AADF")
 
-# Dft more reliable data
+# More reliable DfT data
 
-dft_counts %>%
-  group_by(count_point_)
+# points measured every single year 2010-2019
+dft_10yr = dft_counts %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  mutate(n = n()) %>%
+  filter(n > 9)
+length(unique(dft_10yr$count_point_id)) # 3045
 
-# dft_national = dft_counts %>%
-#   filter()
-#   group_by(year) %>%
-#   summarise(dft_cycles = mean(pedal_cycles))
-#
-# dft_national %>%
-#   ggplot() +
-#   geom_line(aes(year, dft_cycles)) +
-#   geom_smooth(aes(year, dft_cycles)) +
-#   ylab("Mean cycle AADF")
+dft_national_10yr = dft_counts %>%
+  filter(count_point_id %in% dft_10yr$count_point_id) %>%
+  group_by(year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
+
+# points measured at least 5 times 2010-2019
+dft_5yr = dft_counts %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  mutate(n = n()) %>%
+  filter(n > 4)
+length(unique(dft_5yr$count_point_id)) # 3045
+
+dft_national_5yr = dft_counts %>%
+  filter(count_point_id %in% dft_5yr$count_point_id) %>%
+  group_by(year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
 
 
-# NTS counts
+
+# NTS results -------------------------------------------------------------
 
 # convert this to % increase from 2011
 #normalise then run lm
@@ -97,7 +112,9 @@ nts_regional %>%
   geom_smooth(aes(year, nts_cycles)) +
   ylab("Mean cycle journeys")
 
-# Collisions
+
+# Collisions --------------------------------------------------------------
+
 stats19_national = collision_data %>%
   st_drop_geometry() %>%
   group_by(year) %>%
@@ -110,13 +127,16 @@ stats19_national %>%
   ylab("Cycle ksi casualties/yr")
 
 # regional
-stats19_regional = st_join(collision_data, regions)
-
-stats19_regional = stats19_regional %>%
-  st_drop_geometry() %>%
-  group_by(RGN20CD, region, year) %>%
-  summarise(ksi_cycle = sum(ksi_cycle))
-summary(stats19_regional)
+# stats19_regional = st_join(collision_data, regions)
+#
+# stats19_regional = stats19_regional %>%
+#   st_drop_geometry() %>%
+#   group_by(RGN20CD, region, year) %>%
+#   summarise(ksi_cycle = sum(ksi_cycle))
+# summary(stats19_regional)
+#
+# saveRDS(stats19_regional, "stats19_regional.Rds")
+stats19_regional = readRDS("stats19_regional.Rds")
 
 stats19_regional %>%
   ggplot() +
@@ -124,7 +144,9 @@ stats19_regional %>%
   geom_smooth(aes(year, ksi_cycle)) +
   ylab("Sum cycle ksi")
 
-# GAM results
+
+# GAM results -------------------------------------------------------------
+
 gam_national = gam_results %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 gam_regional = st_join(gam_national, regions) #doesnt work produces NAs
@@ -141,11 +163,13 @@ gam_national_trend %>%
   ylab("Mean cycle count")
 
 saveRDS(gam_national_trend, "gam_national_trend.Rds")
+gam_national_trend = readRDS("gam_national_trend.Rds")
 
 # Plot trends together ----------------------------------------------------
 
-all_trends = inner_join(stats19_national, dft_national, by = "year") %>%
-  inner_join(nts_national, by = "year")
+all_trends = left_join(stats19_national, dft_national_5yr, by = "year") %>%
+  left_join(nts_national, by = "year") %>%
+  left_join(gam_national_trend, by = "year")
 summary(all_trends)
 
 # Dual axis
@@ -160,6 +184,8 @@ ggplot(all_trends, aes(year, dft_cycles)) +
   geom_smooth(aes(year, dft_cycles), colour = "blue") +
   geom_line(aes(year, nts_cycles), colour = "green") +
   geom_smooth(aes(year, nts_cycles), colour = "green") +
+  geom_line(aes(year, change_cycles*100), colour = "yellow") +
+  geom_smooth(aes(year, change_cycles*100), colour = "yellow") +
   geom_line(aes(y = a + ksi_cycle*b), color = "red") +
   geom_smooth(aes(y = a + ksi_cycle*b), color = "red") +
   scale_y_continuous("Mean Cycle Count", sec.axis = sec_axis(~ (. - a)/b, name = "Sum Cycle KSI"))
@@ -178,8 +204,48 @@ all_trends %>%
   geom_smooth(aes(year, nts_cycles), colour = "green") +
   ylab("Count")
 
-# Data comparisons --------------------------------------------------------
+# Risk per bkm --------------------------------------------------------
 
+# National
+comparisons = all_trends %>%
+  mutate(
+    ksi_per_dft = ksi_cycle / dft_cycles,
+    ksi_per_gam = ksi_cycle / change_cycles,
+    ksi_per_nts = ksi_cycle / nts_cycles
+    )
+
+comparisons %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_dft)) +
+  geom_smooth(aes(year, ksi_per_dft)) +
+  geom_line(aes(year, ksi_per_gam/100)) +
+  geom_smooth(aes(year, ksi_per_gam/100), colour = "red") +
+  geom_line(aes(year, ksi_per_nts)) +
+  geom_smooth(aes(year, ksi_per_nts), colour = "green") +
+  ylab("KSI rate relative to 2011")
+
+# Regional
+all_regional = left_join(stats19_regional, dft_regional, by = c("year", "region")) %>%
+  left_join(nts_regional, by = c("year", "region")) %>%
+  left_join(gam_regional_trend, by = c("year", "region"))
+
+all_regional = all_regional %>%
+  mutate(
+    ksi_per_dft = ksi_cycle / dft_cycles,
+    # ksi_per_gam = ksi_cycle / change_cycles,
+    ksi_per_nts = ksi_cycle / nts_cycles
+  )
+
+# Regional risk - DfT
+
+# Regional risk - NTS
+all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_nts, colour = region)) +
+  geom_smooth(aes(year, ksi_per_nts)) +
+  ylab("Mean cycle journeys")
+
+# Regional risk - GAM
 
 
 # Compare NTS and DfT data at regional level
