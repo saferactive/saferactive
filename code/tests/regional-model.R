@@ -237,13 +237,18 @@ all_regional = all_regional %>%
   )
 
 # Regional risk - DfT
+all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_dft, colour = region)) +
+  geom_smooth(aes(year, ksi_per_dft, colour = region)) +
+  ylab("KSI risk")
 
 # Regional risk - NTS
 all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_nts, colour = region)) +
-  geom_smooth(aes(year, ksi_per_nts)) +
-  ylab("Mean cycle journeys")
+  geom_smooth(aes(year, ksi_per_nts, colour = region)) +
+  ylab("KSI risk per journey")
 
 # Regional risk - GAM
 
