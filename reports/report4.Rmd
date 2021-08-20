@@ -1,0 +1,43 @@
+---
+title: "Untitled"
+author: "Joey Talbot"
+date: "20/08/2021"
+output: bookdown::github_document2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(stats19)
+library(sf)
+```
+
+# Introduction
+
+The Saferactive project is funded by the Department for Transport. 
+It aims to investigate spatial and temporal patterns in road safety for active travel. 
+
+We have used a range of nationally available datasets to estimate and visualise road safety, including stats19 collision data, DfT and TfL traffic counts, NTS survey returns and 2011 Census commute data.  
+
+
+# National trends
+
+# Regional trends
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130223840-b976303f-aa59-48ad-9987-57c9947bf3cd.png")
+```
+
+
+
+# Low Traffic Neighbourhoods and rat-runs
+
+# Data visualisation
+
+# Web application
+
+# Discussion
+
+# Conclusion
+
+
