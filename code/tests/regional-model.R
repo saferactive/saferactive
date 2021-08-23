@@ -26,6 +26,9 @@ gam_results = readRDS("gam-full-results-grid-national.Rds")
 # # GAM results aggregated by lower tier LA
 # gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
 
+# Regional population time series
+region_populations = readRDS("region-populations.Rds")
+
 
 # Single dataset trends ---------------------------------------------------
 
@@ -129,29 +132,54 @@ dft_regional_10yr %>%
 
 # NTS results -------------------------------------------------------------
 
+# Multiply trips by regional population
+nts_pop = inner_join(nts_clean, region_populations, by = c("region" = "RGN21NM"))
+
+nts_weighted = nts_pop %>%
+  mutate(dist_cycled_per_yr = case_when(
+    year == 2003 ~ bicycle * population_2003,
+    year == 2004 ~ bicycle * population_2004,
+    year == 2005 ~ bicycle * population_2005,
+    year == 2006 ~ bicycle * population_2006,
+    year == 2007 ~ bicycle * population_2007,
+    year == 2008 ~ bicycle * population_2008,
+    year == 2009 ~ bicycle * population_2009,
+    year == 2010 ~ bicycle * population_2010,
+    year == 2011 ~ bicycle * population_2011,
+    year == 2012 ~ bicycle * population_2012,
+    year == 2013 ~ bicycle * population_2013,
+    year == 2014 ~ bicycle * population_2014,
+    year == 2015 ~ bicycle * population_2015,
+    year == 2016 ~ bicycle * population_2016,
+    year == 2017 ~ bicycle * population_2017,
+    year == 2018 ~ bicycle * population_2018,
+    year == 2019 ~ bicycle * population_2019
+  ))
+
 # convert this to % increase from 2011
 #normalise then run lm
-nts_national = nts_clean %>%
+nts_national = nts_weighted %>%
   group_by(year) %>%
-  summarise(nts_cycles = mean(bicycle))
+  summarise(nts_cycles = sum(dist_cycled_per_yr))
 
 nts_national %>%
   ggplot() +
   geom_line(aes(year, nts_cycles)) +
   geom_smooth(aes(year, nts_cycles)) +
-  ylab("Distance cycled/yr (km)")
+  ylab("Total distance cycled/yr (km)")
 
 # regional
-nts_regional = nts_clean %>%
+nts_regional = nts_weighted %>%
   group_by(region, year) %>%
-  summarise(nts_cycles = mean(bicycle))
+  summarise(nts_cycles = sum(dist_cycled_per_yr))
 summary(nts_regional)
 
 nts_regional %>%
   ggplot() +
   geom_line(aes(year, nts_cycles, colour = region)) +
-  geom_smooth(aes(year, nts_cycles)) +
-  ylab("Mean cycle journeys")
+  # geom_smooth(aes(year, nts_cycles)) +
+  ylab("Total distance cycled (km)") +
+  labs(x = "Year", colour = "Region")
 
 
 # Collisions --------------------------------------------------------------
@@ -311,7 +339,8 @@ comparisons2 %>%
   ggplot(aes(year, value, colour = cycle_volume_data)) +
   geom_line() +
   geom_smooth(alpha = 0.2) +
-  ylab("Cycle KSI rate relative to 2011") +
+  ylab("Cycle KSI risk relative to 2011") +
+  labs(x = "Year", colour = "Cycle volume data") +
   xlim(2010, 2020)
 
 # Absolute change in cycle flows
@@ -322,7 +351,9 @@ comparisons3 %>%
   ggplot(aes(year, value, colour = cycle_volume)) +
   geom_line() +
   # geom_smooth(alpha = 0.2) +
-  ylab("Cycle volume relative to 2011")
+  ylab("Cycle volume relative to 2011") +
+  labs(x= "Year", colour = "Cycle volume data") +
+  scale_colour_discrete(labels = c("DfT", "GAM", "NTS"))
 
 # comparisons %>%
 #   ggplot() +
@@ -352,21 +383,24 @@ all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_dft, colour = region)) +
   geom_smooth(aes(year, ksi_per_dft, colour = region)) +
-  ylab("KSI risk per mean cycle count")
+  ylab("KSI risk per mean cycle count") +
+  labs(x = "Year", colour = "Region")
 
 # Regional risk - NTS
 all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_nts, colour = region)) +
-  geom_smooth(aes(year, ksi_per_nts, colour = region)) +
-  ylab("KSI risk per journey")
+  # geom_smooth(aes(year, ksi_per_nts, colour = region), alpha = 0.2) +
+  ylab("KSI risk per km cycled") +
+  labs(x = "Year", colour = "Region")
 
 # Regional risk - GAM
 all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_gam, colour = region)) +
   geom_smooth(aes(year, ksi_per_gam, colour = region)) +
-  ylab("KSI risk per mean estimated cycle flow")
+  ylab("KSI risk per mean estimated cycle flow") +
+  labs(x = "Year", colour = "Region")
 
 # Compare NTS and DfT data at regional level
 

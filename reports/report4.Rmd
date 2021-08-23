@@ -27,18 +27,25 @@ The number of cyclists saw a small increase over the ten years prior to 2019, ac
 In 2020, the mean number of cyclists passing DfT traffic count points was three times higher than in previous years. 
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130417457-852ce037-b5e1-4847-aa87-ccf22f02d94f.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130480677-af7ea79d-94f8-4812-8ec6-9321a5b6b4e0.png")
 ```
 
 In the period 2010-2019, risk of cycle KSI has reduced. 
-This reduction has mainly occurred since 2014, and can be seen when casualty data are plotted against all three measures of cycle volume.
+This reduction has mainly occurred since 2014, and can be seen when casualty data are assessed using all three measures of cycle volume.
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130365099-c554c8ad-b612-4757-8adb-d7e2a6482b09.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130476560-7aabd05c-b540-4deb-b0a4-4d994c3c7a2f.png")
 ```
 
 
 # Regional trends
+
+Total distance cycled per year in each English region (based on NTS survey)
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130474948-819a6053-4edd-4be4-9620-e8adb681e5f6.png")
+```
+
 
 Trends in KSI risk per DfT mean cycle count 
 
@@ -46,10 +53,10 @@ Trends in KSI risk per DfT mean cycle count
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130438956-a123416e-0a97-4d55-866c-309cc425bb35.png")
 ```
 
-Trends in KSI risk per NTS journey 
+Trends in KSI risk per km cycled, using NTS journey data 
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130441814-83d344c8-77cf-493c-9e2a-f69fc9d87d81.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130482309-4889ca3e-f57e-4a28-b39f-e80778525725.png")
 ```
 
 Trends in KSI risk for GAM outputs
