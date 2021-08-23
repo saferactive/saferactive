@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Report 4: Trends in road safety and potential causal factors"
 author: "Joey Talbot"
 date: "20/08/2021"
 output: bookdown::github_document2
@@ -22,12 +22,41 @@ We have used a range of nationally available datasets to estimate and visualise 
 
 # National trends
 
-# Regional trends
+The number of cyclists saw a small increase over the ten years prior to 2019, according to three different data sources. 
+
+In 2020, the mean number of cyclists passing DfT traffic count points was three times higher than in previous years. 
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130223840-b976303f-aa59-48ad-9987-57c9947bf3cd.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130417457-852ce037-b5e1-4847-aa87-ccf22f02d94f.png")
 ```
 
+In the period 2010-2019, risk of cycle KSI has reduced. 
+This reduction has mainly occurred since 2014, and can be seen when casualty data are plotted against all three measures of cycle volume.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130365099-c554c8ad-b612-4757-8adb-d7e2a6482b09.png")
+```
+
+
+# Regional trends
+
+Trends in KSI risk per DfT mean cycle count 
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130438956-a123416e-0a97-4d55-866c-309cc425bb35.png")
+```
+
+Trends in KSI risk per NTS journey 
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130441814-83d344c8-77cf-493c-9e2a-f69fc9d87d81.png")
+```
+
+Trends in KSI risk for GAM outputs
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130441145-8a5edd19-6c34-4dda-8c78-4dd7bcb90ef7.png")
+```
 
 
 # Low Traffic Neighbourhoods and rat-runs

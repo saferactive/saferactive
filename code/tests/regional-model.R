@@ -32,31 +32,15 @@ gam_results = readRDS("gam-full-results-grid-national.Rds")
 
 # DfT AADF counts ---------------------------------------------------------
 
-dft_national = dft_counts %>%
-  group_by(year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+# Get more reliable DfT data
 
-dft_national %>%
-  ggplot() +
-  geom_line(aes(year, dft_cycles)) +
-  geom_smooth(aes(year, dft_cycles)) +
-  ylab("Mean cycle AADF")
-
-dft_regional = st_join(dft_counts, regions)
-
-dft_regional = dft_regional %>%
-  st_drop_geometry() %>%
-  group_by(RGN20CD, region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
-summary(dft_regional)
-
-dft_regional %>%
-  ggplot() +
-  geom_line(aes(year, dft_cycles, colour = region)) +
-  geom_smooth(aes(year, dft_cycles)) +
-  ylab("Mean cycle AADF")
-
-# More reliable DfT data
+# points measured at least 5 times 2010-2019
+dft_5yr = dft_counts %>%
+  filter(year %in% 2010:2019) %>%
+  group_by(count_point_id) %>%
+  mutate(n = n()) %>%
+  filter(n > 4)
+length(unique(dft_5yr$count_point_id)) # 5719
 
 # points measured every single year 2010-2019
 dft_10yr = dft_counts %>%
@@ -66,25 +50,82 @@ dft_10yr = dft_counts %>%
   filter(n > 9)
 length(unique(dft_10yr$count_point_id)) # 3045
 
-dft_national_10yr = dft_counts %>%
-  filter(count_point_id %in% dft_10yr$count_point_id) %>%
-  group_by(year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
-
-# points measured at least 5 times 2010-2019
-dft_5yr = dft_counts %>%
-  filter(year %in% 2010:2019) %>%
-  group_by(count_point_id) %>%
-  mutate(n = n()) %>%
-  filter(n > 4)
-length(unique(dft_5yr$count_point_id)) # 3045
+# National DfT data
 
 dft_national_5yr = dft_counts %>%
   filter(count_point_id %in% dft_5yr$count_point_id) %>%
   group_by(year) %>%
   summarise(dft_cycles = mean(pedal_cycles))
 
+# dft_national_10yr = dft_counts %>%
+#   filter(count_point_id %in% dft_10yr$count_point_id) %>%
+#   group_by(year) %>%
+#   summarise(dft_cycles = mean(pedal_cycles))
+#
+# dft_national = dft_counts %>%
+#   group_by(year) %>%
+#   summarise(dft_cycles = mean(pedal_cycles))
 
+# Plot national data
+
+dft_national_5yr %>%
+  ggplot() +
+  geom_line(aes(year, dft_cycles)) +
+  # geom_smooth(aes(year, dft_cycles)) + # trend line looks silly with 2020 data
+  ylab("Mean cycle AADF")
+
+# dft_national %>%
+#   ggplot() +
+#   geom_line(aes(year, dft_cycles)) +
+#   geom_smooth(aes(year, dft_cycles)) +
+#   ylab("Mean cycle AADF")
+
+# Regional DfT data
+
+dft_regional = st_join(dft_counts, regions)
+
+dft_regional_5yr = dft_regional %>%
+  st_drop_geometry() %>%
+  filter(count_point_id %in% dft_5yr$count_point_id) %>%
+  group_by(RGN20CD, region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
+summary(dft_regional)
+
+dft_regional_10yr = dft_regional %>%
+  st_drop_geometry() %>%
+  filter(count_point_id %in% dft_10yr$count_point_id) %>%
+  group_by(RGN20CD, region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
+summary(dft_regional)
+
+dft_regional_all = dft_regional %>%
+  st_drop_geometry() %>%
+  group_by(RGN20CD, region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
+summary(dft_regional_all)
+
+# Plot regional data
+
+dft_regional_5yr %>%
+  filter(region != "London") %>%
+  ggplot() +
+  geom_line(aes(year, dft_cycles, colour = region)) +
+  # geom_smooth(aes(year, dft_cycles)) +
+  ylab("Mean cycle AADF")
+
+dft_regional_all %>%
+  filter(region != "London") %>%
+  ggplot() +
+  geom_line(aes(year, dft_cycles, colour = region)) +
+  # geom_smooth(aes(year, dft_cycles)) +
+  ylab("Mean cycle AADF")
+
+dft_regional_10yr %>%
+  filter(region != "London") %>%
+  ggplot() +
+  geom_line(aes(year, dft_cycles, colour = region)) +
+  # geom_smooth(aes(year, dft_cycles)) +
+  ylab("Mean cycle AADF")
 
 # NTS results -------------------------------------------------------------
 
@@ -149,12 +190,20 @@ stats19_regional %>%
 
 gam_national = gam_results %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
-gam_regional = st_join(gam_national, regions) #doesnt work produces NAs
 
+gam_regional = st_join(gam_national, regions) #produces NAs - where are these points?
+
+saveRDS(gam_regional, "gam_regional.Rds")
+
+# GAM national
 # this doesn't weight for population so will be biased towards rural areas
-gam_national_trend = gam_national %>%
-  group_by(year) %>%
-  summarise(change_cycles = mean(change_cycles))
+
+# gam_national_trend = gam_national %>%
+#   group_by(year) %>%
+#   summarise(change_cycles = mean(change_cycles))
+#
+# saveRDS(gam_national_trend, "gam_national_trend.Rds")
+gam_national_trend = readRDS("gam_national_trend.Rds")
 
 gam_national_trend %>%
   ggplot() +
@@ -162,15 +211,50 @@ gam_national_trend %>%
   geom_smooth(aes(year, change_cycles)) +
   ylab("Mean cycle count")
 
-saveRDS(gam_national_trend, "gam_national_trend.Rds")
-gam_national_trend = readRDS("gam_national_trend.Rds")
+# GAM regional
+gam_regional_trend = gam_regional %>%
+  group_by(year, region) %>%
+  summarise(change_cycles = mean(change_cycles))
+
+saveRDS(gam_regional_trend, "gam_regional_trend.Rds")
+gam_regional_trend = readRDS("gam_regional_trend.Rds")
+
+gam_regional_trend %>%
+  ggplot() +
+  geom_line(aes(year, change_cycles, colour = region)) +
+  geom_smooth(aes(year, change_cycles)) +
+  ylab("Mean cycle count")
 
 # Plot trends together ----------------------------------------------------
 
-all_trends = left_join(stats19_national, dft_national_5yr, by = "year") %>%
+# Old version still the best
+all_trends = right_join(stats19_national, dft_national_5yr, by = "year") %>%
   left_join(nts_national, by = "year") %>%
   left_join(gam_national_trend, by = "year")
-summary(all_trends)
+summary
+
+# # New version
+# stats19_national2 = stats19_national %>%
+#   rename(values = ksi_cycle) %>%
+#   mutate(dataset = "stats19")
+# nts_national2 = nts_national %>%
+#   rename(values = nts_cycles) %>%
+#   mutate(dataset = "nts")
+# dft_national_5yr2 = dft_national_5yr %>%
+#   rename(values = dft_cycles) %>%
+#   st_drop_geometry() %>%
+#   mutate(dataset = "dft")
+# gam_national_trend2 = gam_national_trend %>%
+#   rename(values = change_cycles) %>%
+#   st_drop_geometry() %>%
+#   mutate(dataset = "gam")
+#
+# all_trends2 = rbind(stats19_national2, dft_national_5yr2, nts_national2, gam_national_trend2)
+# summary(all_trends)
+
+# New version graph
+# all_trends = all_trends %>%
+#   pivot_longer(cols = c(dft_cycles, change_cycles, nts_cycles, ksi_cycle), names_to = "cycle_data")
 
 # Dual axis
 ylim.prim = c(0, 120)   # for the DfT and NTS counts
@@ -181,7 +265,7 @@ a = ylim.prim[1] - b*ylim.sec[1]
 
 ggplot(all_trends, aes(year, dft_cycles)) +
   geom_line(colour = "blue") +
-  geom_smooth(aes(year, dft_cycles), colour = "blue") +
+  # geom_smooth(aes(year, dft_cycles), colour = "blue") +
   geom_line(aes(year, nts_cycles), colour = "green") +
   geom_smooth(aes(year, nts_cycles), colour = "green") +
   geom_line(aes(year, change_cycles*100), colour = "yellow") +
@@ -204,35 +288,62 @@ all_trends %>%
   geom_smooth(aes(year, nts_cycles), colour = "green") +
   ylab("Count")
 
-# Risk per bkm --------------------------------------------------------
+# Graphs with legends ---------------------------------------------
 
-# National
+# National risk per bkm
 comparisons = all_trends %>%
   mutate(
+    dft_norm = dft_cycles / dft_cycles[which(year == 2011)],
+    gam_norm = change_cycles / change_cycles[which(year == 2011)],
+    nts_norm = nts_cycles / nts_cycles[which(year == 2011)],
     ksi_per_dft = ksi_cycle / dft_cycles,
     ksi_per_gam = ksi_cycle / change_cycles,
-    ksi_per_nts = ksi_cycle / nts_cycles
+    ksi_per_nts = ksi_cycle / nts_cycles,
+    dft_risk_norm = ksi_per_dft / ksi_per_dft[which(year == 2011)],
+    gam_risk_norm = ksi_per_gam / ksi_per_gam[which(year == 2011)],
+    nts_risk_norm = ksi_per_nts / ksi_per_nts[which(year == 2011)]
     )
 
-comparisons %>%
-  ggplot() +
-  geom_line(aes(year, ksi_per_dft)) +
-  geom_smooth(aes(year, ksi_per_dft)) +
-  geom_line(aes(year, ksi_per_gam/100)) +
-  geom_smooth(aes(year, ksi_per_gam/100), colour = "red") +
-  geom_line(aes(year, ksi_per_nts)) +
-  geom_smooth(aes(year, ksi_per_nts), colour = "green") +
-  ylab("KSI rate relative to 2011")
+comparisons2 = comparisons %>%
+  pivot_longer(cols = c(dft_risk_norm, gam_risk_norm, nts_risk_norm), names_to = "cycle_volume_data")
+
+comparisons2 %>%
+  ggplot(aes(year, value, colour = cycle_volume_data)) +
+  geom_line() +
+  geom_smooth(alpha = 0.2) +
+  ylab("Cycle KSI rate relative to 2011") +
+  xlim(2010, 2020)
+
+# Absolute change in cycle flows
+comparisons3 = comparisons %>%
+  pivot_longer(cols = c(dft_norm, gam_norm, nts_norm), names_to = "cycle_volume")
+
+comparisons3 %>%
+  ggplot(aes(year, value, colour = cycle_volume)) +
+  geom_line() +
+  # geom_smooth(alpha = 0.2) +
+  ylab("Cycle volume relative to 2011")
+
+# comparisons %>%
+#   ggplot() +
+#   geom_line(aes(year, dft_risk_norm), colour = "blue") +
+#   geom_smooth(aes(year, dft_risk_norm), colour = "blue") +
+#   geom_line(aes(year, gam_risk_norm), colour = "red") +
+#   geom_smooth(aes(year, gam_risk_norm), colour = "red") +
+#   geom_line(aes(year, nts_risk_norm), colour = "green") +
+#   geom_smooth(aes(year, nts_risk_norm), colour = "green") +
+#   ylab("KSI rate relative to 2011") +
+#   xlim(2010, 2020)
 
 # Regional
-all_regional = left_join(stats19_regional, dft_regional, by = c("year", "region")) %>%
+all_regional = left_join(stats19_regional, dft_regional_5yr, by = c("year", "region")) %>%
   left_join(nts_regional, by = c("year", "region")) %>%
   left_join(gam_regional_trend, by = c("year", "region"))
 
 all_regional = all_regional %>%
   mutate(
     ksi_per_dft = ksi_cycle / dft_cycles,
-    # ksi_per_gam = ksi_cycle / change_cycles,
+    ksi_per_gam = ksi_cycle / change_cycles,
     ksi_per_nts = ksi_cycle / nts_cycles
   )
 
@@ -241,7 +352,7 @@ all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_dft, colour = region)) +
   geom_smooth(aes(year, ksi_per_dft, colour = region)) +
-  ylab("KSI risk")
+  ylab("KSI risk per mean cycle count")
 
 # Regional risk - NTS
 all_regional %>%
@@ -251,7 +362,11 @@ all_regional %>%
   ylab("KSI risk per journey")
 
 # Regional risk - GAM
-
+all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_gam, colour = region)) +
+  geom_smooth(aes(year, ksi_per_gam, colour = region)) +
+  ylab("KSI risk per mean estimated cycle flow")
 
 # Compare NTS and DfT data at regional level
 
