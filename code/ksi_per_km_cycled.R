@@ -36,7 +36,11 @@ crash_raw = st_drop_geometry(crash_raw)
 # saveRDS(crash_raw, "data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 # Get and apply LAD codes (joining using 2011 LAD names)
-names_lad = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom_updated.csv")
+# Notice slight change of file name () replaced with "."
+la.file = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom_updated.csv"
+# piggyback::pb_download(la.file, "0.1.4")
+stopifnot(file.exists(la.file))
+names_lad = read_csv(la.file)
 
 namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "LAD19NM"))
 
@@ -45,13 +49,18 @@ namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "
 xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) %>% summarise()
 
 # Standardise to 2019 LAD names
-new_names = read_csv("Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom.csv") %>%
+la.file.updated = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom.csv"
+# piggyback::pb_download(la.file.updated, "0.1.4")
+
+stopifnot(la.file.updated)
+new_names = read_csv(la.file.updated) %>%
   select(-LAD19NMW, -FID)
 
 nameagain = inner_join(new_names, namejoin, by = "LAD19CD")
 
 # Check no rows are mising codes
 xx = nameagain %>% filter(is.na(LAD19NM)) %>% group_by(local_authority_district) %>% summarise()
+# xx
 length(unique(nameagain$local_authority_district)) #380
 length(unique(nameagain$LAD19NM)) #367
 length(unique(nameagain$LAD19CD)) #367
