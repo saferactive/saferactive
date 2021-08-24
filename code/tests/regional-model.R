@@ -8,6 +8,12 @@ library(mapview)
 regions = readRDS("regions_renamed.Rds") %>%
   st_transform(27700)
 
+# Full resolution countries and English regions
+# BFC December 2020 full resolution clipped English regions. From https://geoportal.statistics.gov.uk/datasets/ons::regions-december-2020-en-bfc/about
+# BFC December 2020 full resolution clipped countries https://geoportal.statistics.gov.uk/datasets/ons::countries-december-2020-uk-bfc/about
+
+regions_bfc = read_sf("Regions_(December_2020)_EN_BFC.geojson")
+
 # DfT AADF traffic count data 2000-2020
 dft_counts = readRDS("traffic_joined.Rds")
 
@@ -39,19 +45,19 @@ region_populations = readRDS("region-populations.Rds")
 
 # points measured at least 5 times 2010-2019
 dft_5yr = dft_counts %>%
-  filter(year %in% 2010:2019) %>%
+  filter(year %in% 2010:2020) %>%
   group_by(count_point_id) %>%
   mutate(n = n()) %>%
   filter(n > 4)
-length(unique(dft_5yr$count_point_id)) # 5719
+length(unique(dft_5yr$count_point_id)) # 6015
 
 # points measured every single year 2010-2019
 dft_10yr = dft_counts %>%
-  filter(year %in% 2010:2019) %>%
+  filter(year %in% 2010:2020) %>%
   group_by(count_point_id) %>%
   mutate(n = n()) %>%
   filter(n > 9)
-length(unique(dft_10yr$count_point_id)) # 3045
+length(unique(dft_10yr$count_point_id)) # 3113
 
 # National DfT data
 
@@ -114,21 +120,21 @@ dft_regional_5yr %>%
   ggplot() +
   geom_line(aes(year, dft_cycles, colour = region)) +
   # geom_smooth(aes(year, dft_cycles)) +
-  ylab("Mean cycle AADF")
+  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
 
 dft_regional_all %>%
   filter(region != "London") %>%
   ggplot() +
   geom_line(aes(year, dft_cycles, colour = region)) +
   # geom_smooth(aes(year, dft_cycles)) +
-  ylab("Mean cycle AADF")
+  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
 
 dft_regional_10yr %>%
   filter(region != "London") %>%
   ggplot() +
   geom_line(aes(year, dft_cycles, colour = region)) +
   # geom_smooth(aes(year, dft_cycles)) +
-  ylab("Mean cycle AADF")
+  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
 
 # NTS results -------------------------------------------------------------
 
@@ -176,10 +182,11 @@ summary(nts_regional)
 
 nts_regional %>%
   ggplot() +
-  geom_line(aes(year, nts_cycles, colour = region)) +
+  geom_line(aes(year, nts_cycles / 1000000000, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, nts_cycles)) +
-  ylab("Total distance cycled (km)") +
-  labs(x = "Year", colour = "Region")
+  ylab("Total distance cycled (Bkm)") +
+  labs(x = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3)
 
 
 # Collisions --------------------------------------------------------------
@@ -210,8 +217,9 @@ stats19_regional = readRDS("stats19_regional.Rds")
 stats19_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_cycle, colour = region)) +
-  geom_smooth(aes(year, ksi_cycle)) +
-  ylab("Sum cycle ksi")
+  # geom_smooth(aes(year, ksi_cycle)) +
+  ylab("Sum cycle KSI") +
+  labs(x = "Year", colour = "Region")
 
 
 # GAM results -------------------------------------------------------------
@@ -219,9 +227,15 @@ stats19_regional %>%
 gam_national = gam_results %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
-gam_regional = st_join(gam_national, regions) #produces NAs - where are these points?
+gam_regional = st_join(gam_national, regions) #produces NAs - these are in scotland, wales, the sea, and in england due to the oversimplified regions map
 
 saveRDS(gam_regional, "gam_regional.Rds")
+
+gam_na = gam_regional %>%
+  filter(is.na(region))
+
+gam_na_slice = slice_sample(gam_na, prop = 0.001)
+mapview(gam_na_slice)
 
 # GAM national
 # this doesn't weight for population so will be biased towards rural areas
@@ -242,7 +256,7 @@ gam_national_trend %>%
 # GAM regional
 gam_regional_trend = gam_regional %>%
   group_by(year, region) %>%
-  summarise(change_cycles = mean(change_cycles))
+  summarise(change_cycles = sum(change_cycles))
 
 saveRDS(gam_regional_trend, "gam_regional_trend.Rds")
 gam_regional_trend = readRDS("gam_regional_trend.Rds")
@@ -326,7 +340,7 @@ comparisons = all_trends %>%
     nts_norm = nts_cycles / nts_cycles[which(year == 2011)],
     ksi_per_dft = ksi_cycle / dft_cycles,
     ksi_per_gam = ksi_cycle / change_cycles,
-    ksi_per_nts = ksi_cycle / nts_cycles,
+    ksi_per_nts = ksi_cycle / nts_cycles * 1000000000,
     dft_risk_norm = ksi_per_dft / ksi_per_dft[which(year == 2011)],
     gam_risk_norm = ksi_per_gam / ksi_per_gam[which(year == 2011)],
     nts_risk_norm = ksi_per_nts / ksi_per_nts[which(year == 2011)]
@@ -338,10 +352,12 @@ comparisons2 = comparisons %>%
 comparisons2 %>%
   ggplot(aes(year, value, colour = cycle_volume_data)) +
   geom_line() +
-  geom_smooth(alpha = 0.2) +
+  # geom_smooth(alpha = 0.2) +
   ylab("Cycle KSI risk relative to 2011") +
   labs(x = "Year", colour = "Cycle volume data") +
-  xlim(2010, 2020)
+  # xlim(2010, 2020) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020)) +
+  scale_colour_discrete(labels = c("DfT counters", "GAM", "NTS"))
 
 # Absolute change in cycle flows
 comparisons3 = comparisons %>%
@@ -353,7 +369,7 @@ comparisons3 %>%
   # geom_smooth(alpha = 0.2) +
   ylab("Cycle volume relative to 2011") +
   labs(x= "Year", colour = "Cycle volume data") +
-  scale_colour_discrete(labels = c("DfT", "GAM", "NTS"))
+  scale_colour_discrete(labels = c("DfT counters", "GAM", "NTS"))
 
 # comparisons %>%
 #   ggplot() +
@@ -375,7 +391,7 @@ all_regional = all_regional %>%
   mutate(
     ksi_per_dft = ksi_cycle / dft_cycles,
     ksi_per_gam = ksi_cycle / change_cycles,
-    ksi_per_nts = ksi_cycle / nts_cycles
+    ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
   )
 
 # Regional risk - DfT
@@ -384,15 +400,19 @@ all_regional %>%
   geom_line(aes(year, ksi_per_dft, colour = region)) +
   geom_smooth(aes(year, ksi_per_dft, colour = region)) +
   ylab("KSI risk per mean cycle count") +
-  labs(x = "Year", colour = "Region")
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  scale_color_brewer(type = "qual", palette = 3)
 
 # Regional risk - NTS
 all_regional %>%
   ggplot() +
-  geom_line(aes(year, ksi_per_nts, colour = region)) +
+  geom_line(aes(year, ksi_per_nts, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_per_nts, colour = region), alpha = 0.2) +
-  ylab("KSI risk per km cycled") +
-  labs(x = "Year", colour = "Region")
+  ylab("KSI per Bkm cycled") +
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  scale_color_brewer(type = "qual", palette = 3)
 
 # Regional risk - GAM
 all_regional %>%
@@ -400,7 +420,9 @@ all_regional %>%
   geom_line(aes(year, ksi_per_gam, colour = region)) +
   geom_smooth(aes(year, ksi_per_gam, colour = region)) +
   ylab("KSI risk per mean estimated cycle flow") +
-  labs(x = "Year", colour = "Region")
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  scale_color_brewer(type = "qual", palette = 3)
 
 # Compare NTS and DfT data at regional level
 
