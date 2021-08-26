@@ -76,7 +76,7 @@ nameagain = nameagain %>%
 # bfc = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BFC.shp")
 
 # Get LAD geometry
-piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
+# piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
 la = readRDS("la_lower.Rds")
 
 # # old method (which introduced geographical errors)
@@ -206,7 +206,7 @@ la_pf = ungroup(la_pf)
 #removes Scottish LAs which we don't have estimated cycle flows for
 la = la[!is.na(la$ksi_perBkm_2019),]
 la_pf = la_pf[!is.na(la_pf$ksi_perBkm_2019),]
-head(la)
+# head(la)
 
 
 # Get LAD populations -----------------------------------------------------
