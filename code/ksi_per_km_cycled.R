@@ -592,7 +592,10 @@ bounds = bounds[!is.na(bounds$ksi_perBkm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perBkm_2010),]
 
 # Police force geometry
-pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson") # todo: make reproducible
+# from https://data.gov.uk/dataset/41f748c0-48d6-48dd-a452-c73c2afae187/police-force-areas-december-2018-ew-buc
+## piggyback::pb_upload("Police_Force_Areas_December_2018_EW_BUC.geojson")
+# piggyback::pb_download("Police_Force_Areas_(December_2018)_EW_BUC.geojson", "1.4.0")
+pf_geom = read_sf("Police_Force_Areas_December_2018_EW_BUC.geojson") # todo: make reproducible
 pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
 pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
 pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
