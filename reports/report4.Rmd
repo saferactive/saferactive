@@ -36,6 +36,11 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1302
 
 # Web application
 
+Turing Geovisualization Engine (TGVE or eAtlas) is a web application to visualize spatio-temporal data. The application can be deployed on GitHub pages {{cite}} which is a free service from GitHub for public/open source projects. The TGVE is capable of processing large amounts of data with focus on network optimisation (data transfer) and making use of modern client (computers/smart devices) GPU (Graphics Processing Unit) to generate web (browser) based visualizations.
+
+State:
+* What data is used in the TGVE
+* How it can be used to draw insights/analyse the data
 # Discussion
 
 # Conclusion
