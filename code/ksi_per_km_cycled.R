@@ -76,7 +76,7 @@ nameagain = nameagain %>%
 # bfc = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BFC.shp")
 
 # Get LAD geometry
-# piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
+piggyback::pb_download("la_lower.Rds", tag = "0.1.3")
 la = readRDS("la_lower.Rds")
 
 # # old method (which introduced geographical errors)
@@ -206,7 +206,7 @@ la_pf = ungroup(la_pf)
 #removes Scottish LAs which we don't have estimated cycle flows for
 la = la[!is.na(la$ksi_perBkm_2019),]
 la_pf = la_pf[!is.na(la_pf$ksi_perBkm_2019),]
-# head(la)
+head(la)
 
 
 # Get LAD populations -----------------------------------------------------
@@ -366,7 +366,9 @@ la_pf$diff_cycle = (la_pf$late_km_percap / la_pf$early_km_percap - 1) * 100
 
 # Get urban rural classification (England only) ---------------------------
 # from https://www.gov.uk/government/statistics/2011-rural-urban-classification-of-local-authority-and-other-higher-level-geographies-for-statistical-purposes
-
+# donloaded the ODT file, converted to CSV and
+## piggyback::pb_upload("RUC11_LAD11_ENv2.csv")
+# piggyback::pb_download("RUC11_LAD11_ENv2.csv", "1.4.0")
 urban_rural = read_csv("RUC11_LAD11_ENv2.csv")
 
 urban_rural$RUC11[urban_rural$RUC11 == "Mainly Rural (rural including hub towns >=80%)"] = "Mainly Rural"
