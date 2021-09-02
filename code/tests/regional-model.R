@@ -98,6 +98,7 @@ dft_national_5yr %>%
 # Regional DfT data
 
 dft_regional = st_join(dft_counts, regions_bfc)
+saveRDS(dft_regional, "dft_regional.Rds")
 
 dft_regional_5yr = dft_regional %>%
   st_drop_geometry() %>%
