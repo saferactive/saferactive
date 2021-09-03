@@ -17,20 +17,20 @@ regions_bfc = read_sf("Regions_.December_2020._EN_BFC.geojson") %>%
   st_transform(27700) %>%
   mutate(region = RGN20NM)
 
-# DfT AADF traffic count data 2000-2020
+# DfT AADF traffic count data 2000-2020 (England, Wales, Scotland)
 # piggyback::pb_download("traffic_joined.Rds")
 dft_counts = readRDS("traffic_joined.Rds")
 
-# NTS travel data 2003-2019
+# NTS travel data 2003-2019 (England)
 nts_clean = read.csv("d_region_clean.csv")
 
-# Stats19 collision data 2010-2019
+# Stats19 collision data 2010-2019 (England, Wales, Scotland)
 collision_data = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds") %>%
   mutate(ksi_cycle = casualty_serious_cyclist + casualty_fatal_cyclist) %>%
   st_transform(27700)
 collision_data$year = lubridate::year(collision_data$date)
 
-# GAM model raw results for changes in traffic counts 2010-2019
+# GAM model raw results for changes in traffic counts 2010-2019 (bounding box - England, Wales, Scotland and ocean)
 # piggyback::pb_download("gam-full-results-grid-national.Rds")
 gam_results = readRDS("gam-full-results-grid-national.Rds")
 
