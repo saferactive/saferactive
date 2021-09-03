@@ -25,6 +25,7 @@ dft_counts = readRDS("traffic_joined.Rds")
 nts_clean = read.csv("d_region_clean.csv")
 
 # Stats19 collision data with severity adjustment 2010-2019 (England, Wales, Scotland)
+# piggyback::pb_download("stats19_2010_2019.Rds")
 collision_data = readRDS("stats19_2010_2019.Rds") %>%
   mutate(ksi_cycle = casualty_serious_cyclist + casualty_fatal_cyclist) %>%
   st_transform(27700)
@@ -117,21 +118,24 @@ saveRDS(dft_regional, "dft_regional.Rds")
 dft_regional_5yr = dft_regional %>%
   st_drop_geometry() %>%
   filter(count_point_id %in% dft_5yr$count_point_id) %>%
-  group_by(RGN20CD, region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+  group_by(region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
 summary(dft_regional)
 
 dft_regional_10yr = dft_regional %>%
   st_drop_geometry() %>%
   filter(count_point_id %in% dft_10yr$count_point_id) %>%
-  group_by(RGN20CD, region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+  group_by(region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
 summary(dft_regional)
 
 dft_regional_all = dft_regional %>%
   st_drop_geometry() %>%
-  group_by(RGN20CD, region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+  group_by(region, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
 summary(dft_regional_all)
 
 # Plot regional data
@@ -139,23 +143,29 @@ summary(dft_regional_all)
 dft_regional_5yr %>%
   filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles, colour = region)) +
+  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
-  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
+  labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 dft_regional_all %>%
   filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles, colour = region)) +
+  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
-  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
+  labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 dft_regional_10yr %>%
   filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles, colour = region)) +
+  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
-  labs(y = "Mean cycle AADF", x  = "Year", colour = "Region")
+  labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 # NTS results -------------------------------------------------------------
 
@@ -236,10 +246,12 @@ stats19_regional = readRDS("stats19_regional.Rds")
 
 stats19_regional %>%
   ggplot() +
-  geom_line(aes(year, ksi_cycle, colour = region)) +
+  geom_line(aes(year, ksi_cycle, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_cycle)) +
   ylab("Sum cycle KSI") +
-  labs(x = "Year", colour = "Region")
+  labs(x = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 
 # GAM results -------------------------------------------------------------

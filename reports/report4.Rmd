@@ -46,6 +46,18 @@ Total distance cycled per year in each English region (based on NTS survey)
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130474948-819a6053-4edd-4be4-9620-e8adb681e5f6.png")
 ```
 
+Sum of cycle KSI in each region (including Scotland and Wales)
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132044428-c6f9e57c-478f-47d9-9247-5d338b9e2137.png")
+```
+
+Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales)
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132047518-e2984e1b-b637-47f5-bc25-6cfdf12ce741.png")
+```
+
 
 Trends in KSI risk per DfT mean cycle count 
 
