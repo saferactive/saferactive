@@ -11,20 +11,13 @@ library(readr)
 # crash = readRDS("la_crash_summary_wideform.Rds")
 # piggyback::pb_download("la_crash_summary_longform.Rds", tag = "0.1.3")
 
-# piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties", tag = "0.1.4")
+piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties.Rds")
 # crash_raw = readRDS("crash_2010_2019_with_summary_adjusted_casualties.Rds")
-
-crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
-
-crash_raw = st_drop_geometry(crash_raw)
-
-
-
 
 # For 2019 LAD names ------------------------------------------------------
 
-
-crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
+# piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties.Rds")
+crash_raw = readRDS("crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 crash_raw = st_drop_geometry(crash_raw)
 
@@ -38,7 +31,7 @@ crash_raw = st_drop_geometry(crash_raw)
 # Get and apply LAD codes (joining using 2011 LAD names)
 # Notice slight change of file name () replaced with "."
 la.file = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom_updated.csv"
-# piggyback::pb_download(la.file, "0.1.4")
+# piggyback::pb_download(la.file)
 stopifnot(file.exists(la.file))
 names_lad = read_csv(la.file)
 
@@ -50,9 +43,9 @@ xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) 
 
 # Standardise to 2019 LAD names
 la.file.updated = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom.csv"
-# piggyback::pb_download(la.file.updated, "0.1.4")
+# piggyback::pb_download(la.file.updated)
 
-stopifnot(la.file.updated)
+stopifnot(file.exists(la.file.updated))
 new_names = read_csv(la.file.updated) %>%
   select(-LAD19NMW, -FID)
 
@@ -87,7 +80,7 @@ la = readRDS("la_lower.Rds")
 crash = right_join(la, nameagain, by = c("la_code" = "LAD19CD"))
 
 xx = crash %>% st_drop_geometry() %>% filter(is.na(la_name))
-unique(xx$LAD19NM)
+unique(xx$LAD19NM) # should be null
 
 crash$year = lubridate::year(crash$date)
 crash$hour = lubridate::hour(crash$datetime)
@@ -368,7 +361,7 @@ la_pf$diff_cycle = (la_pf$late_km_percap / la_pf$early_km_percap - 1) * 100
 # from https://www.gov.uk/government/statistics/2011-rural-urban-classification-of-local-authority-and-other-higher-level-geographies-for-statistical-purposes
 # donloaded the ODT file, converted to CSV and
 ## piggyback::pb_upload("RUC11_LAD11_ENv2.csv")
-# piggyback::pb_download("RUC11_LAD11_ENv2.csv", "1.4.0")
+piggyback::pb_download("RUC11_LAD11_ENv2.csv")
 urban_rural = read_csv("RUC11_LAD11_ENv2.csv")
 
 urban_rural$RUC11[urban_rural$RUC11 == "Mainly Rural (rural including hub towns >=80%)"] = "Mainly Rural"
@@ -402,9 +395,10 @@ la_urb %>%
   labs(x = "", y = "Mean cycle KSI per Bkm cycled") +
   ylim(0, 3000)
   # + geom_text(aes(label = outlier), na.rm = TRUE, hjust = -0.2, cex = 2.5)
+table(la_urb$RUC11)
 
 # boxplot of km per cap residential popn
-  b = la_urb %>%
+b = la_urb %>%
     filter(! LAD19NM == "City of London") %>%
     group_by(RUC11) %>%
     mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
@@ -412,10 +406,10 @@ la_urb %>%
     geom_boxplot(notch = TRUE) +
     theme(axis.text.x=element_text(angle=45,hjust=1)) +
     labs(x = "", y = "Km (1000s) per cap")
-  b + scale_y_continuous(trans="log10")
+b + scale_y_continuous(trans="log10")
 
   # boxplot of km per cap workday popn
-  b = la_urb %>%
+b = la_urb %>%
     filter(! LAD19NM == "City of London") %>%
     group_by(RUC11) %>%
     mutate(outlier = ifelse(is_outlier(mean_risk), LAD19NM, as.character(NA))) %>%
@@ -423,7 +417,7 @@ la_urb %>%
     geom_boxplot(notch = TRUE) +
     theme(axis.text.x=element_text(angle=45,hjust=1)) +
     labs(x = "", y = "Km (1000s) per cap")
-  b + scale_y_continuous(trans="log10")
+b + scale_y_continuous(trans="log10")
 
 # Look at major conurbations only
 
@@ -594,8 +588,8 @@ bounds = bounds[!is.na(bounds$ksi_perBkm_2019),]
 # Police force geometry
 # from https://data.gov.uk/dataset/41f748c0-48d6-48dd-a452-c73c2afae187/police-force-areas-december-2018-ew-buc
 ## piggyback::pb_upload("Police_Force_Areas_December_2018_EW_BUC.geojson")
-# piggyback::pb_download("Police_Force_Areas_(December_2018)_EW_BUC.geojson", "1.4.0")
-pf_geom = read_sf("Police_Force_Areas_December_2018_EW_BUC.geojson") # todo: make reproducible
+piggyback::pb_download("Police_Force_Areas_.December_2018._EW_BUC.geojson")
+pf_geom = read_sf("Police_Force_Areas_.December_2018._EW_BUC.geojson") # todo: make reproducible
 pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
 pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
 pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
@@ -606,6 +600,7 @@ tm_shape(bounds) +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
+tmap_options(check.and.fix = TRUE)
 tm_shape(pf_geom) +
   tm_fill("ksi_perBkm_2019", breaks = c(0, 400, 800, 1200, 1600, 2000)) +
   tm_borders(lwd = 0.1) +
@@ -631,7 +626,6 @@ t3 = tm_shape(bounds) +
 tmap_arrange(t1, t2, t3)
 
 ####
-tmap_options(check.and.fix = TRUE)
 t1 = tm_shape(pf_geom) +
   tm_fill("mean_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-19") +
   tm_borders(lwd = 0.1)
@@ -681,4 +675,13 @@ lowest_mean = arrange(top_n(la, 10, -mean_risk),mean_risk) # lowest mean casualt
 greatest_increase = arrange(top_n(la, 10, diff_risk),-diff_risk) # greatest increase in casualty rate
 
 greatest_decrease = arrange(top_n(la, 10, -diff_risk),diff_risk) # greatest decrease in casualty rate
+
+
+# Create clean object for TGVE
+bounds_clean = bounds %>%
+  select(lad_name, mean_risk, diff_risk, diff_cycle_wd, la_code) %>%
+  mutate_if(is.numeric, round, digits = 2) %>%
+  sf::st_drop_geometry()
+
+readr::write_csv(bounds_clean, "../tgve/ksi.csv")
 
