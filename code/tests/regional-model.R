@@ -13,7 +13,7 @@ regions = readRDS("regions_renamed.Rds") %>%
 # BFC December 2020 full resolution clipped English regions. From https://geoportal.statistics.gov.uk/datasets/ons::regions-december-2020-en-bfc/about
 # BFC December 2020 full resolution clipped countries https://geoportal.statistics.gov.uk/datasets/ons::countries-december-2020-uk-bfc/about
 
-regions_bfc = read_sf("Regions_.December_2020._EN_BFC.geojson") %>%
+regions_bfc = read_sf("Regions_(December_2020)_EN_BFC.geojson") %>%
   st_transform(27700) %>%
   mutate(region = RGN20NM)
 
@@ -21,11 +21,11 @@ regions_bfc = read_sf("Regions_.December_2020._EN_BFC.geojson") %>%
 # piggyback::pb_download("traffic_joined.Rds")
 dft_counts = readRDS("traffic_joined.Rds")
 
-# NTS travel data 2003-2019 (England)
+# NTS travel data 2003-2019 (England) - for all travel purposes
 nts_clean = read.csv("d_region_clean.csv")
 
-# Stats19 collision data 2010-2019 (England, Wales, Scotland)
-collision_data = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds") %>%
+# Stats19 collision data with severity adjustment 2010-2019 (England, Wales, Scotland)
+collision_data = readRDS("stats19_2010_2019.Rds") %>%
   mutate(ksi_cycle = casualty_serious_cyclist + casualty_fatal_cyclist) %>%
   st_transform(27700)
 collision_data$year = lubridate::year(collision_data$date)
@@ -97,7 +97,21 @@ dft_national_5yr %>%
 
 # Regional DfT data
 
-dft_regional = st_join(dft_counts, regions_bfc)
+# dft_regional = st_join(dft_counts, regions_bfc) # not needed since region is already specified
+dft_regional = dft_counts %>%
+  mutate(region = case_when(
+    Region == 1 ~ "South West",
+    Region == 2 ~ "East Midlands",
+    Region == 3 ~ "Scotland",
+    Region == 4 ~ "Wales",
+    Region == 5 ~ "North West",
+    Region == 6 ~ "London",
+    Region == 7 ~ "East of England",
+    Region == 8 ~ "Yorkshire and The Humber",
+    Region == 9 ~ "South East",
+    Region == 10 ~ "West Midlands",
+    Region == 11 ~ "North East"
+  ))
 saveRDS(dft_regional, "dft_regional.Rds")
 
 dft_regional_5yr = dft_regional %>%
@@ -210,11 +224,9 @@ stats19_national %>%
   ylab("Cycle ksi casualties/yr")
 
 # regional
-# stats19_regional = st_join(collision_data, regions_bfc)
-#
-# stats19_regional = stats19_regional %>%
+# stats19_regional = collision_data %>%
 #   st_drop_geometry() %>%
-#   group_by(RGN20CD, region, year) %>%
+#   group_by(region, year) %>%
 #   summarise(ksi_cycle = sum(ksi_cycle))
 # summary(stats19_regional)
 #
@@ -235,22 +247,20 @@ stats19_regional %>%
 gam_national = gam_results %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
-gam_regional = st_join(gam_national, regions) #produces NAs - these are in scotland, wales, the sea, and in england due to the oversimplified regions map
+gam_regional = st_join(gam_national, regions_bfc) #produces NAs - these are in scotland, wales, and the sea
 
 saveRDS(gam_regional, "gam_regional.Rds")
 
-gam_na = gam_regional %>%
-  filter(is.na(region))
-
-gam_na_slice = slice_sample(gam_na, prop = 0.001)
-mapview(gam_na_slice)
+# gam_na = gam_regional %>%
+#   filter(is.na(region))
+#
+# gam_na_slice = slice_sample(gam_na, prop = 0.001)
+# mapview::mapview(gam_na_slice)
 
 # GAM national
-# this doesn't weight for population so will be biased towards rural areas
-
 # gam_national_trend = gam_national %>%
 #   group_by(year) %>%
-#   summarise(change_cycles = mean(change_cycles))
+#   summarise(change_cycles = sum(change_cycles))
 #
 # saveRDS(gam_national_trend, "gam_national_trend.Rds")
 gam_national_trend = readRDS("gam_national_trend.Rds")
@@ -259,7 +269,7 @@ gam_national_trend %>%
   ggplot() +
   geom_line(aes(year, change_cycles)) +
   geom_smooth(aes(year, change_cycles)) +
-  ylab("Mean cycle count")
+  ylab("Sum estimated daily gridded cycle flows")
 
 # GAM regional
 gam_regional_trend = gam_regional %>%
@@ -273,7 +283,7 @@ gam_regional_trend %>%
   ggplot() +
   geom_line(aes(year, change_cycles, colour = region)) +
   geom_smooth(aes(year, change_cycles)) +
-  ylab("Mean cycle count")
+  ylab("Sum estimated daily gridded cycle flows")
 
 # Plot trends together ----------------------------------------------------
 

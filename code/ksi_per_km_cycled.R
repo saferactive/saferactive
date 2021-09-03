@@ -1,3 +1,5 @@
+# The stats in this script are based on peak hour cycle flows and peak hour collisions only, with the aim of approximating commuter cycling. This is because PCT results are for commuting only.
+
 library(tidyr)
 library(ggplot2)
 library(dplyr)
