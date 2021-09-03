@@ -5,6 +5,7 @@ library(mapview)
 # Input data --------------------------------------------------------------
 
 # Simplified English regions
+# piggyback::pb_download("regions_renamed.Rds")
 regions = readRDS("regions_renamed.Rds") %>%
   st_transform(27700)
 
@@ -12,27 +13,32 @@ regions = readRDS("regions_renamed.Rds") %>%
 # BFC December 2020 full resolution clipped English regions. From https://geoportal.statistics.gov.uk/datasets/ons::regions-december-2020-en-bfc/about
 # BFC December 2020 full resolution clipped countries https://geoportal.statistics.gov.uk/datasets/ons::countries-december-2020-uk-bfc/about
 
-regions_bfc = read_sf("Regions_(December_2020)_EN_BFC.geojson")
+regions_bfc = read_sf("Regions_.December_2020._EN_BFC.geojson") %>%
+  st_transform(27700) %>%
+  mutate(region = RGN20NM)
 
-# DfT AADF traffic count data 2000-2020
+# DfT AADF traffic count data 2000-2020 (England, Wales, Scotland)
+# piggyback::pb_download("traffic_joined.Rds")
 dft_counts = readRDS("traffic_joined.Rds")
 
-# NTS travel data 2003-2019
+# NTS travel data 2003-2019 (England)
 nts_clean = read.csv("d_region_clean.csv")
 
-# Stats19 collision data 2010-2019
+# Stats19 collision data 2010-2019 (England, Wales, Scotland)
 collision_data = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds") %>%
   mutate(ksi_cycle = casualty_serious_cyclist + casualty_fatal_cyclist) %>%
   st_transform(27700)
 collision_data$year = lubridate::year(collision_data$date)
 
-# GAM model raw results for changes in traffic counts 2010-2019
+# GAM model raw results for changes in traffic counts 2010-2019 (bounding box - England, Wales, Scotland and ocean)
+# piggyback::pb_download("gam-full-results-grid-national.Rds")
 gam_results = readRDS("gam-full-results-grid-national.Rds")
 
 # # GAM results aggregated by lower tier LA
 # gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
 
 # Regional population time series
+# piggyback::pb_download("region-populations.Rds")
 region_populations = readRDS("region-populations.Rds")
 
 
@@ -91,7 +97,8 @@ dft_national_5yr %>%
 
 # Regional DfT data
 
-dft_regional = st_join(dft_counts, regions)
+dft_regional = st_join(dft_counts, regions_bfc)
+saveRDS(dft_regional, "dft_regional.Rds")
 
 dft_regional_5yr = dft_regional %>%
   st_drop_geometry() %>%
@@ -203,7 +210,7 @@ stats19_national %>%
   ylab("Cycle ksi casualties/yr")
 
 # regional
-# stats19_regional = st_join(collision_data, regions)
+# stats19_regional = st_join(collision_data, regions_bfc)
 #
 # stats19_regional = stats19_regional %>%
 #   st_drop_geometry() %>%
@@ -212,6 +219,7 @@ stats19_national %>%
 # summary(stats19_regional)
 #
 # saveRDS(stats19_regional, "stats19_regional.Rds")
+# piggyback::pb_upload("stats19_regional.Rds")
 stats19_regional = readRDS("stats19_regional.Rds")
 
 stats19_regional %>%
@@ -273,7 +281,6 @@ gam_regional_trend %>%
 all_trends = right_join(stats19_national, dft_national_5yr, by = "year") %>%
   left_join(nts_national, by = "year") %>%
   left_join(gam_national_trend, by = "year")
-summary
 
 # # New version
 # stats19_national2 = stats19_national %>%
