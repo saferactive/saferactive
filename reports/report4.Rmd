@@ -55,14 +55,14 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1320
 Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales)
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132047518-e2984e1b-b637-47f5-bc25-6cfdf12ce741.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132316899-1bbc1cc9-687e-4df3-9c7a-3074778dd107.png")
 ```
 
 
 Trends in KSI risk per DfT mean cycle count 
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130438956-a123416e-0a97-4d55-866c-309cc425bb35.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132327377-8daceacf-2de6-4513-b776-b5593ec2d11a.png")
 ```
 
 Trends in KSI risk per km cycled, using NTS journey data 

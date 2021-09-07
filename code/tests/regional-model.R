@@ -78,9 +78,9 @@ dft_national_5yr = dft_counts %>%
 #   group_by(year) %>%
 #   summarise(dft_cycles = mean(pedal_cycles))
 #
-# dft_national = dft_counts %>%
-#   group_by(year) %>%
-#   summarise(dft_cycles = mean(pedal_cycles))
+dft_national = dft_counts %>%
+  group_by(year) %>%
+  summarise(dft_cycles = mean(pedal_cycles))
 
 # Plot national data
 
@@ -90,11 +90,11 @@ dft_national_5yr %>%
   # geom_smooth(aes(year, dft_cycles)) + # trend line looks silly with 2020 data
   ylab("Mean cycle AADF")
 
-# dft_national %>%
-#   ggplot() +
-#   geom_line(aes(year, dft_cycles)) +
-#   geom_smooth(aes(year, dft_cycles)) +
-#   ylab("Mean cycle AADF")
+dft_national %>%
+  ggplot() +
+  geom_line(aes(year, dft_cycles)) +
+  geom_smooth(aes(year, dft_cycles)) +
+  ylab("Mean cycle AADF")
 
 # Regional DfT data
 
@@ -141,7 +141,7 @@ summary(dft_regional_all)
 # Plot regional data
 
 dft_regional_5yr %>%
-  filter(region != "London") %>%
+  # filter(region != "London") %>%
   ggplot() +
   geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
@@ -150,7 +150,7 @@ dft_regional_5yr %>%
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 dft_regional_all %>%
-  filter(region != "London") %>%
+  # filter(region != "London") %>%
   ggplot() +
   geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
@@ -159,7 +159,7 @@ dft_regional_all %>%
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 dft_regional_10yr %>%
-  filter(region != "London") %>%
+  # filter(region != "London") %>%
   ggplot() +
   geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
@@ -300,7 +300,7 @@ gam_regional_trend %>%
 # Plot trends together ----------------------------------------------------
 
 # Old version still the best
-all_trends = right_join(stats19_national, dft_national_5yr, by = "year") %>%
+all_trends = right_join(stats19_national, dft_national, by = "year") %>%
   left_join(nts_national, by = "year") %>%
   left_join(gam_national_trend, by = "year")
 
@@ -412,22 +412,22 @@ comparisons3 %>%
 #   xlim(2010, 2020)
 
 # Regional
-all_regional = left_join(stats19_regional, dft_regional_5yr, by = c("year", "region")) %>%
+all_regional = left_join(stats19_regional, dft_regional_all, by = c("year", "region")) %>%
   left_join(nts_regional, by = c("year", "region")) %>%
   left_join(gam_regional_trend, by = c("year", "region"))
 
 all_regional = all_regional %>%
   mutate(
     ksi_per_dft = ksi_cycle / dft_cycles,
-    ksi_per_gam = ksi_cycle / change_cycles,
+    # ksi_per_gam = ksi_cycle / change_cycles,
     ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
   )
 
 # Regional risk - DfT
 all_regional %>%
   ggplot() +
-  geom_line(aes(year, ksi_per_dft, colour = region)) +
-  geom_smooth(aes(year, ksi_per_dft, colour = region)) +
+  geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
+  # geom_smooth(aes(year, ksi_per_dft, colour = region)) +
   ylab("KSI risk per mean cycle count") +
   labs(x = "Year", colour = "Region") +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
