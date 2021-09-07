@@ -7,45 +7,46 @@
 # get raw counter data ----------------------------------------------------
 
 # base_url = "https://cycling.data.tfl.gov.uk/"
-# central_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Central%20London%20(area).xlsx"
-# inner_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Inner%20London%20(area).xlsx"
-# outer_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Outer%20London%20(area).xlsx"
+central_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Central%20London%20(area).xlsx"
+inner_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Inner%20London%20(area).xlsx"
+outer_url = "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/Outer%20London%20(area).xlsx"
+
 #
-# dir.create("raw-tfl-cycle-counter-data")
-# cycle_counter_urls = c(central_url, inner_url, outer_url)
-# cycle_counter_names = file.path("raw-tfl-cycle-counter-data", basename(cycle_counter_urls))
-# download.file(url = cycle_counter_urls, destfile = cycle_counter_names)
-# counter_df = purrr::map_df(cycle_counter_names, readxl::read_excel, sheet = 2)
-# nrow(counter_df) # 1.3m counts!
-# counter_df
-# summary(counter_df$`Survey date`)
-# readr::write_csv(counter_df, "raw-tfl-cycle-counter-data-2014-2019.csv")
-# piggyback::pb_upload("raw-tfl-cycle-counter-data-2014-2019.csv", repo = "itsleeds/saferroadsmap") # 174 MB
+dir.create("raw-tfl-cycle-counter-data-2020")
+cycle_counter_urls = c(central_url, inner_url, outer_url)
+cycle_counter_names = file.path("raw-tfl-cycle-counter-data-2020", basename(cycle_counter_urls))
+download.file(url = cycle_counter_urls, destfile = cycle_counter_names)
+counter_df = purrr::map_df(cycle_counter_names, readxl::read_excel, sheet = 2)
+nrow(counter_df) # 1.4m counts!
+counter_df
+summary(counter_df$`Survey date`)
+readr::write_csv(counter_df, "raw-tfl-cycle-counter-data-2014-2020.csv")
+piggyback::pb_upload("raw-tfl-cycle-counter-data-2014-2020.csv", repo = "itsleeds/saferroadsmap") # 174 MB
 
 # get counter locations ---------------------------------------------------
 
-# download.file(
-#   "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/X%20-%20Count%20sites%20list.xlsx",
-#   "raw-tfl-cycle-counter-data/X%20-%20Count%20sites%20list.xlsx"
-#   )
-# cycle_counter_locations = readxl::read_excel("raw-tfl-cycle-counter-data/X%20-%20Count%20sites%20list.xlsx")
-# summary(cycle_counter_locations)
-# counter_locations = sf::st_as_sf(
-#   cycle_counter_locations %>% select(UnqID, ProgID, SurveyDescription, Easting, Northing, Borough),
-#   coords = c("Easting", "Northing"),
-#   crs = 27700
-#   )
-# counter_locations = sf::st_transform(counter_locations, 4326)
-# plot(counter_locations)
-# sf::write_sf(counter_locations, "tfl-cycle-counter-locations.geojson")
-# piggyback::pb_upload("tfl-cycle-counter-locations.geojson", repo = "itsleeds/saferroadsmap")
+download.file(
+  "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/X%20-%20Count%20sites%20list.xlsx",
+  "raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx"
+  )
+cycle_counter_locations = readxl::read_excel("raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx")
+summary(cycle_counter_locations)
+counter_locations = sf::st_as_sf(
+  cycle_counter_locations %>% select(UnqID, ProgID, SurveyDescription, Easting, Northing, Borough),
+  coords = c("Easting", "Northing"),
+  crs = 27700
+  )
+counter_locations = sf::st_transform(counter_locations, 4326)
+plot(counter_locations)
+sf::write_sf(counter_locations, "tfl-cycle-counter-locations.geojson")
+piggyback::pb_upload("tfl-cycle-counter-locations.geojson", repo = "itsleeds/saferroadsmap")
 
 # exploratory data analysis -----------------------------------------------
 
 library(tidyverse)
 counter_locations = sf::read_sf("tfl-cycle-counter-locations.geojson")
 counter_locations = counter_locations %>% rename(`Site ID` = UnqID)
-counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2019.csv")
+counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2020.csv")
 counter_totals = counter_df %>%
   group_by(`Site ID`) %>%
   summarise(total = sum(`Total cycles`, na.rm = TRUE))
@@ -113,19 +114,18 @@ counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
 ggplot(counter_la_results) +
   geom_line(aes(year, relative_to_2015, colour = Borough))
 
-readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019.csv")
-piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019.csv", repo = "itsleeds/saferroadsmap")
+readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2020.csv")
+piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2020.csv", repo = "itsleeds/saferroadsmap")
 
 lads = spData::lnd %>% rename(Borough = NAME) %>%
   mutate(Borough = as.character(Borough)) %>%
   mutate(Name = abbreviate(Borough, minlength = 2))
 lads$Borough[!lads$Borough %in% counter_la_results$Borough]
 counter_means_2015$Borough[!counter_means_2015$Borough %in% lads$Borough]
-lads = lads %>%
-  mutate(Borough = str_replace(string = Borough, pattern = " and", replacement = " &"))
 lads$Borough[!lads$Borough %in% counter_la_results$Borough]
 lads_data = inner_join(lads, counter_la_results)
 
+# use version in tfl-verification.R instead, to include clean data with seasonal adjustments
 library(tmap)
 tm_shape(lads_data) +
   tm_polygons("relative_to_2015", palette = "BrBG", n = 6) +

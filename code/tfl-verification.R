@@ -1,9 +1,9 @@
 library(tidyverse)
 library(sf)
 
-counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2019.csv")
+counter_df = readr::read_csv("raw-tfl-cycle-counter-data-2014-2020.csv")
 counter_df = counter_df %>% rename(Survey_wave = `Survey wave (calendar quarter)`)
-dim(counter_df) #1264064
+dim(counter_df) #1264064 #1433900
 
 # saveRDS(counter_df, "counter_df.Rds")
 
@@ -25,7 +25,7 @@ counter_peak = counter_df
 counter_peak$year = case_when(is.na(counter_peak$Survey_wave) ~ lubridate::year(counter_peak$`Survey date`), TRUE ~ as.numeric(substr(counter_peak$Survey_wave, 1, 4)))
 counter_peak = counter_peak %>%
   filter(! is.na(year))
-dim(counter_peak) #945728 #472856 peak #1260912
+dim(counter_peak) #945728 #472856 peak #1260912 #1429980
 
 
 # Select the correct survey wave only
@@ -58,7 +58,7 @@ remove4 = counter_peak %>%
 counter_peak = counter_peak %>%
   filter(! id %in% remove4$id)
 
-dim(counter_peak) #929008 #464694 peak #1238644
+dim(counter_peak) #929008 #464694 peak #1238644 #1407202
 
 ############# Weather
 doubles = counter_peak %>%
@@ -75,7 +75,7 @@ remove5 = weather_repeats %>%
 
 counter_peak = counter_peak %>%
   filter(! id %in% remove5$id)
-dim(counter_peak) #928816 #464598 peak #1238388
+dim(counter_peak) #928816 #464598 peak #1238388 #1406588
 
 ###################
 
@@ -98,7 +98,7 @@ counter_clean = left_join(counter_peak, counter_daily, by = c("Site ID", "Direct
   filter(n_periods == 64) #for whole day
   # filter(n_periods == 48) #for daytime
   # filter(n_periods == 24) #for peak hours
-dim(counter_clean) #919440 #460824 #1224640
+dim(counter_clean) #919440 #460824 #1224640 #1387968
 
 # CENCY201 Tooley Street Survey wave changes while Survey date stays the same
 # not enough hours only covers 7am - 2pm
@@ -134,14 +134,14 @@ View(counter_clean %>%
 # Full 2014 data is available for Central London (all 4 survey waves) but no 2014 data is available for the Inner or Outer London locations
 counter_clean = counter_clean %>%
   filter(year != 2014)
-dim(counter_clean) #846528 #424320 peak #1127808
+dim(counter_clean) #846528 #424320 peak #1127808 #1291136
 
-# saveRDS(counter_clean, "counter_clean.Rds")
-saveRDS(counter_clean, "counter_clean_peak.Rds")
+saveRDS(counter_clean, "counter_clean_2020.Rds")
+# saveRDS(counter_clean, "counter_clean_peak.Rds")
 
 # Get location data and create sf object ----------------------------------
 
-counter_clean = readRDS("counter_clean.Rds")
+counter_clean = readRDS("counter_clean_2020.Rds")
 
 counter_locations = sf::read_sf("tfl-cycle-counter-locations.geojson")
 counter_locations = counter_locations %>% rename(`Site ID` = UnqID)
@@ -163,10 +163,10 @@ counter_bng = counter_sf %>%
 counter_days = counter_nogeo %>%
   select(year, Survey_wave, Borough, `Site ID`, Direction, ProgID, Location, total_daily, mean_daily) %>%
   unique()
-dim(counter_days) #17636 #17680 peak
+dim(counter_days) #17636 #17680 peak #20174
 
 # Use annual equivalent adjustment factors taken from TfL Central London grid survey data to account for seasonal variation
-# Also helps to correct central london counts for varying numbers in each survey wave (Corrects for missing survey wave 4 in 2019)
+# Also helps to correct central london counts for varying numbers in each survey wave (Corrects for missing survey waves 2 and 4 in 2020)
 season_adjust = counter_days %>%
   mutate(wave_number = substr(Survey_wave, 6, 7),
          adjusted_total = case_when(wave_number == "Q1" ~ total_daily * 1.14,
@@ -203,13 +203,13 @@ sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
 #   mutate(main_weather =
 
 
-dim(counter_change %>% filter(ProgID == "CENCY")) #3609
-dim(counter_change %>% filter(ProgID == "INNCY")) #2962
-dim(counter_change %>% filter(ProgID == "OUTCY")) #2247
+dim(counter_change %>% filter(ProgID == "CENCY")) #3609 #4266
+dim(counter_change %>% filter(ProgID == "INNCY")) #2962 #3347
+dim(counter_change %>% filter(ProgID == "OUTCY")) #2247 #2474
 
-dim(counter_change %>% filter(ProgID == "CENCY") %>% select(`Site ID`) %>% unique()) #209
-dim(counter_change %>% filter(ProgID == "INNCY") %>% select(`Site ID`) %>% unique()) #597
-dim(counter_change %>% filter(ProgID == "OUTCY") %>% select(`Site ID`) %>% unique()) #451
+dim(counter_change %>% filter(ProgID == "CENCY") %>% select(`Site ID`) %>% unique()) #209 #210
+dim(counter_change %>% filter(ProgID == "INNCY") %>% select(`Site ID`) %>% unique()) #597 #597
+dim(counter_change %>% filter(ProgID == "OUTCY") %>% select(`Site ID`) %>% unique()) #451 #451
 
 # Survey wave corrections -------------------------------------------------
 # Group by `Site ID` and year so Central London counts that have been surveyed 4 times a year don't have 4 times more influence than Inner/Outer London counts
@@ -223,16 +223,16 @@ counter_year = counter_change %>%
     change_cycles = mean(change_cycles)
   ) %>%
   ungroup()
-dim(counter_year) #6221
+dim(counter_year) #6221 #7093
 
 
-dim(counter_year %>% filter(ProgID == "CENCY")) #1012
-dim(counter_year %>% filter(ProgID == "INNCY")) #2962
-dim(counter_year %>% filter(ProgID == "OUTCY")) #2247
+dim(counter_year %>% filter(ProgID == "CENCY")) #1012 #1272
+dim(counter_year %>% filter(ProgID == "INNCY")) #2962 #3347
+dim(counter_year %>% filter(ProgID == "OUTCY")) #2247 #2474
 
 
 
-saveRDS(counter_year, "tfl-counts-by-site.Rds")
+saveRDS(counter_year, "tfl-counts-by-site-2020.Rds")
 # saveRDS(counter_year, "tfl-counts-by-site-peak.Rds")
 
 
@@ -261,12 +261,12 @@ counter_la_results = inner_join(counter_means_year, counter_means_2015) %>%
 # counter_la_results$Borough = gsub("&", "and", counter_la_results$Borough)
 
 ggplot(counter_la_results) +
-  geom_line(aes(year, change_tfl_cycles, colour = Borough))
+  geom_line(aes(year, count_relative_to_2015, colour = Borough))
 
-readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019.csv")
-piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019.csv", repo = "itsleeds/saferroadsmap")
-readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019-peak.csv")
-piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019-peak.csv", repo = "itsleeds/saferroadsmap")
+readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2020.csv")
+piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2020.csv", repo = "itsleeds/saferroadsmap")
+# readr::write_csv(counter_la_results, "tfl-counter-results-london-boroughs-2015-2019-peak.csv")
+# piggyback::pb_upload("tfl-counter-results-london-boroughs-2015-2019-peak.csv", repo = "itsleeds/saferroadsmap")
 
 lads = spData::lnd %>% rename(Borough = NAME) %>%
   mutate(Borough = as.character(Borough)) %>%
@@ -289,14 +289,13 @@ tm_shape(lads_data) +
 # Average across the 5 years
 counter_multiyear = lads_data %>%
   group_by(Name) %>%
-  summarise(borough_mean = mean(borough_mean))
+  summarise(`Borough Mean` = mean(borough_mean))
 
 tm_shape(counter_multiyear) +
-  tm_polygons("borough_mean", palette = "BrBG", n = 6, style = "jenks") +
-  tm_text(text = "Name", size = 0.7)
+  tm_polygons("Borough Mean", palette = "BrBG", n = 6, breaks = c(0, 200, 400, 600, 1000, 1600, 3200))
 
 counter_earlyyear = lads_data %>%
-  filter(year %in% 2015:2016) %>%
+  filter(year %in% 2015:2017) %>%
   group_by(Borough, Name) %>%
   summarise(borough_mean = mean(borough_mean),
             change_tfl_cycles = mean(change_tfl_cycles)) %>%
@@ -307,7 +306,7 @@ tm_shape(counter_earlyyear) +
   tm_text(text = "Name", size = 0.7)
 
 counter_lateyear = lads_data %>%
-  filter(year %in% 2017:2019) %>%
+  filter(year %in% 2018:2020) %>%
   group_by(Borough, Name) %>%
   summarise(borough_mean = mean(borough_mean),
             change_tfl_cycles = mean(change_tfl_cycles)) %>%
