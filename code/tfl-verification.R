@@ -193,7 +193,7 @@ counter_change = season_adjust %>%
   mutate(mean_site = mean(adjusted_total)) %>%
   ungroup() %>%
   filter(mean_site > 0) %>% # remove counts where there has never been a cyclist
-  mutate(change_cycles = adjusted_total/mean_site)
+  mutate(change_cycles = adjusted_total - mean_site)
 sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
 
 

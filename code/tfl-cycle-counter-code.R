@@ -25,21 +25,21 @@ piggyback::pb_upload("raw-tfl-cycle-counter-data-2014-2020.csv", repo = "itsleed
 
 # get counter locations ---------------------------------------------------
 
-download.file(
-  "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/X%20-%20Count%20sites%20list.xlsx",
-  "raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx"
-  )
-cycle_counter_locations = readxl::read_excel("raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx")
-summary(cycle_counter_locations)
-counter_locations = sf::st_as_sf(
-  cycle_counter_locations %>% select(UnqID, ProgID, SurveyDescription, Easting, Northing, Borough),
-  coords = c("Easting", "Northing"),
-  crs = 27700
-  )
-counter_locations = sf::st_transform(counter_locations, 4326)
-plot(counter_locations)
-sf::write_sf(counter_locations, "tfl-cycle-counter-locations.geojson")
-piggyback::pb_upload("tfl-cycle-counter-locations.geojson", repo = "itsleeds/saferroadsmap")
+# download.file(
+#   "https://cycling.data.tfl.gov.uk/CycleCountsProgramme/X%20-%20Count%20sites%20list.xlsx",
+#   "raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx"
+#   )
+# cycle_counter_locations = readxl::read_excel("raw-tfl-cycle-counter-data-2020/X%20-%20Count%20sites%20list.xlsx")
+# summary(cycle_counter_locations)
+# counter_locations = sf::st_as_sf(
+#   cycle_counter_locations %>% select(UnqID, ProgID, SurveyDescription, Easting, Northing, Borough),
+#   coords = c("Easting", "Northing"),
+#   crs = 27700
+#   )
+# counter_locations = sf::st_transform(counter_locations, 4326)
+# plot(counter_locations)
+# sf::write_sf(counter_locations, "tfl-cycle-counter-locations.geojson")
+# piggyback::pb_upload("tfl-cycle-counter-locations.geojson", repo = "itsleeds/saferroadsmap")
 
 # exploratory data analysis -----------------------------------------------
 
