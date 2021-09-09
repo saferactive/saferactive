@@ -45,6 +45,37 @@ region_populations = readRDS("region-populations.Rds")
 
 # Single dataset trends ---------------------------------------------------
 
+# mean count per year
+dft_counts = dft_counts %>%
+  group_by(year) %>%
+  mutate(annual_mean = mean(pedal_cycles)) %>%
+  ungroup()
+mean_2011 = dft_counts$annual_mean[which(dft_counts$year == 2011)][1]
+year_means = dft_counts %>%
+  st_drop_geometry() %>%
+  group_by(year, annual_mean) %>%
+  summarise() %>%
+  mutate(annual_mean_norm = annual_mean - mean_2011)
+
+# get mean count per site and change in counts
+dft_counts = dft_counts %>%
+  group_by(count_point_id) %>%
+  mutate(mean_cycles = mean(pedal_cycles),
+         min_cycles = min(pedal_cycles),
+         sum_cycles = sum(pedal_cycles),
+         min_year = year[which(pedal_cycles == min_cycles)[1]]) %>% #the year in which min_cycles was recorded (or one of those years, if the same value occurred twice)
+  ungroup() %>%
+  mutate(change_cycles = pedal_cycles - mean_cycles,
+         change_min_cycles = pedal_cycles - min_cycles)
+
+for(i in 1:length(dft_counts)){
+  dft_counts$annual_mean_norm = year_means$annual_mean_norm
+}
+
+dft_counts$change_min_cycles2 = dft_counts$change_min_cycles +
+
+
+
 
 # DfT AADF counts ---------------------------------------------------------
 
@@ -71,29 +102,40 @@ length(unique(dft_10yr$count_point_id)) # 3113
 dft_national_5yr = dft_counts %>%
   filter(count_point_id %in% dft_5yr$count_point_id) %>%
   group_by(year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+  summarise(
+    dft_cycles = mean(pedal_cycles),
+    dft_change_cycles = mean(change_min_cycles)
+    )
 
 # dft_national_10yr = dft_counts %>%
 #   filter(count_point_id %in% dft_10yr$count_point_id) %>%
 #   group_by(year) %>%
-#   summarise(dft_cycles = mean(pedal_cycles))
-#
+#   summarise(
+#     dft_cycles = mean(pedal_cycles),
+#     dft_change_cycles = mean(change_cycles)
+#   )
+
 dft_national = dft_counts %>%
   group_by(year) %>%
-  summarise(dft_cycles = mean(pedal_cycles))
+  summarise(
+    dft_cycles = mean(pedal_cycles),
+    dft_change_cycles = mean(change_min_cycles),
+    annual_mean_norm = mean(annual_mean_norm),
+    change_norm = dft_change_cycles + annual_mean_norm
+  )
 
 # Plot national data
 
 dft_national_5yr %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles)) +
-  # geom_smooth(aes(year, dft_cycles)) + # trend line looks silly with 2020 data
+  geom_line(aes(year, dft_change_cycles)) +
+  # geom_smooth(aes(year, dft_change_cycles)) + # trend line looks silly with 2020 data
   ylab("Mean cycle AADF")
 
 dft_national %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles)) +
-  geom_smooth(aes(year, dft_cycles)) +
+  geom_line(aes(year, change_norm)) +
+  # geom_smooth(aes(year, dft_cycles)) +
   ylab("Mean cycle AADF")
 
 # Regional DfT data
@@ -119,24 +161,30 @@ dft_regional_5yr = dft_regional %>%
   st_drop_geometry() %>%
   filter(count_point_id %in% dft_5yr$count_point_id) %>%
   group_by(region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles)) %>%
-  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
-summary(dft_regional)
+  summarise(dft_cycles = mean(pedal_cycles),
+            dft_change_cycles = mean(change_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)])
+# summary(dft_regional)
 
 dft_regional_10yr = dft_regional %>%
   st_drop_geometry() %>%
   filter(count_point_id %in% dft_10yr$count_point_id) %>%
   group_by(region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles)) %>%
-  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
-summary(dft_regional)
+  summarise(dft_cycles = mean(pedal_cycles),
+            dft_change_cycles = mean(change_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)])
+# summary(dft_regional)
 
 dft_regional_all = dft_regional %>%
   st_drop_geometry() %>%
   group_by(region, year) %>%
-  summarise(dft_cycles = mean(pedal_cycles)) %>%
-  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)])
-summary(dft_regional_all)
+  summarise(dft_cycles = mean(pedal_cycles),
+            dft_change_cycles = mean(change_min_cycles)) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
+         dft_change_cycles_norm = dft_change_cycles - dft_change_cycles[which(year == 2011)])
+# summary(dft_regional_all)
 
 # Plot regional data
 
@@ -152,7 +200,7 @@ dft_regional_5yr %>%
 dft_regional_all %>%
   # filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
+  geom_line(aes(year, dft_change_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
   labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +
