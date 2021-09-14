@@ -68,13 +68,16 @@ dft_counts = dft_counts %>%
   mutate(change_cycles = pedal_cycles - mean_cycles,
          change_min_cycles = pedal_cycles - min_cycles)
 
-for(i in 1:length(dft_counts)){
-  dft_counts$annual_mean_norm = year_means$annual_mean_norm
+ym = NULL
+ymm = NULL
+for(i in 1:dim(dft_counts)[1]){
+  ym = year_means$annual_mean_norm[which(year_means$year == dft_counts$min_year[i])]
+  ymm = c(ymm, ym)
 }
+dft_counts$annual_mean_norm = ymm
 
-dft_counts$change_min_cycles2 = dft_counts$change_min_cycles +
-
-
+dft_counts = dft_counts %>%
+  mutate(change_min_cycles_norm = change_min_cycles + annual_mean_norm)
 
 
 # DfT AADF counts ---------------------------------------------------------
@@ -121,7 +124,7 @@ dft_national = dft_counts %>%
     dft_cycles = mean(pedal_cycles),
     dft_change_cycles = mean(change_min_cycles),
     annual_mean_norm = mean(annual_mean_norm),
-    change_norm = dft_change_cycles + annual_mean_norm
+    change_norm = mean(change_min_cycles_norm)
   )
 
 # Plot national data
@@ -134,7 +137,7 @@ dft_national_5yr %>%
 
 dft_national %>%
   ggplot() +
-  geom_line(aes(year, change_norm)) +
+  geom_line(aes(year, dft_change_cycles)) +
   # geom_smooth(aes(year, dft_cycles)) +
   ylab("Mean cycle AADF")
 
