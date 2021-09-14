@@ -47,7 +47,8 @@ dim(tfl_nonzero) #6173 #5605 #6113 #7057
 
 tfl_nonzero = tfl_nonzero %>%
   group_by(`Site ID`) %>%
-  mutate(sum_cycles = sum(adjusted_total)) %>%
+  mutate(sum_cycles = sum(adjusted_total),
+         n_years = n()) %>%
   ungroup()
 
 # DfT dataset for the years 2010-2015 -------------------------------------
@@ -62,9 +63,11 @@ dim(dft_all) #91359
 dft_all = dft_all %>%
   group_by(count_point_id) %>%
   mutate(mean_cycles = mean(pedal_cycles),
-         sum_cycles = sum(pedal_cycles)) %>%
+         sum_cycles = sum(pedal_cycles),
+         min_cycles = min(pedal_cycles),
+         n_years = n()) %>%
   ungroup() %>%
-  mutate(change_cycles = pedal_cycles - mean_cycles)
+  mutate(change_cycles = pedal_cycles - min_cycles)
 
 # remove very low counts
 dft_0 = dft_all %>%
@@ -83,9 +86,11 @@ dim(counts_early_years) #33896
 counts_early_years = counts_early_years %>%
   group_by(count_point_id) %>%
   mutate(mean_cycles_early = mean(pedal_cycles),
-         sum_cycles_early = sum(pedal_cycles)) %>%
+         sum_cycles_early = sum(pedal_cycles),
+         min_cycles_early = min(pedal_cycles),
+         n_years = n()) %>%
   ungroup() %>%
-  mutate(change_cycles_early = pedal_cycles - mean_cycles_early)
+  mutate(change_cycles_early = pedal_cycles - min_cycles_early)
 
 # remove count points not repeated in the years 2010
 dft_early_years_repeats = counts_early_years %>%
@@ -115,9 +120,11 @@ dim(dft_late_years) #42341
 dft_late_years = dft_late_years %>%
   group_by(count_point_id) %>%
   mutate(mean_cycles_late = mean(pedal_cycles),
-         sum_cycles_late = sum(pedal_cycles)) %>%
+         sum_cycles_late = sum(pedal_cycles),
+         min_cycles_late = min(pedal_cycles),
+         n_years = n()) %>%
   ungroup() %>%
-  mutate(change_cycles_late = pedal_cycles - mean_cycles_late)
+  mutate(change_cycles_late = pedal_cycles - min_cycles_late)
 
 # remove count points not repeated in the years 2015-2019
 dft_late_years_repeats = dft_late_years %>%
@@ -137,11 +144,11 @@ dft_late_years$northing = st_coordinates(dft_late_years)[,2]
 # Combine DfT and TfL counts for late years -------------------------------
 
 dft_late_years = dft_late_years %>%
-  select(year, name = ctyua19nm, count_point_id, easting, northing, pedal_cycles, change_cycles_late, mean_cycles_late, sum_cycles_late) %>%
+  select(year, name = ctyua19nm, count_point_id, easting, northing, pedal_cycles, change_cycles_late, mean_cycles_late, sum_cycles_late, n_years) %>%
   st_drop_geometry()
 
 tfl_nonzero = tfl_nonzero %>%
-  select(year, name = Borough, count_point_id = `Site ID`, easting, northing, pedal_cycles = adjusted_total, change_cycles_late = change_cycles, mean_cycles_late = mean_site, sum_cycles_late = sum_cycles) %>%
+  select(year, name = Borough, count_point_id = `Site ID`, easting, northing, pedal_cycles = adjusted_total, change_cycles_late = change_cycles, mean_cycles_late = mean_site, sum_cycles_late = sum_cycles, n_years) %>%
   st_drop_geometry()
 
 dft_late_years$data_source = "DfT"
@@ -155,10 +162,10 @@ counts_combined = bind_rows(dft_late_years, tfl_nonzero)
 
 # intersect(counts_combined, counts_early_years)
 counts_combined = counts_combined %>%
-  select(year, name, count_point_id, easting, northing, pedal_cycles, change_cycles = change_cycles_late, mean_cycles = mean_cycles_late, sum_cycles = sum_cycles_late, data_source)
+  select(year, name, count_point_id, easting, northing, pedal_cycles, change_cycles = change_cycles_late, mean_cycles = mean_cycles_late, sum_cycles = sum_cycles_late, n_years, data_source)
 counts_early_years = counts_early_years %>%
   mutate(data_source = "DfT") %>%
-  select(year, name = ctyua19nm, count_point_id, easting, northing, pedal_cycles, change_cycles = change_cycles_early, mean_cycles = mean_cycles_early, sum_cycles = sum_cycles_early, data_source)
+  select(year, name = ctyua19nm, count_point_id, easting, northing, pedal_cycles, change_cycles = change_cycles_early, mean_cycles = mean_cycles_early, sum_cycles = sum_cycles_early, n_years, data_source)
 counts_early_years$count_point_id = as.character(counts_early_years$count_point_id)
 counts_all_years = bind_rows(counts_early_years, counts_combined)
 
@@ -167,12 +174,17 @@ counts_all_years = bind_rows(counts_early_years, counts_combined)
 
 forplot = counts_all_years %>%
   group_by(year) %>%
+  summarise(change_cycles = weighted.mean(change_cycles, w = n_years))
+plot(change_cycles ~ year, data = forplot)
+
+forplot = counts_all_years %>%
+  group_by(year) %>%
   summarise(change_cycles = mean(change_cycles))
 plot(change_cycles ~ year, data = forplot)
 
 forplot = counts_all_years %>%
   group_by(year) %>%
-  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = sum_cycles))
+  summarise(pedal_cycles = weighted.mean(pedal_cycles, w = n_years))
 plot(pedal_cycles ~ year, data = forplot)
 
 forplot = counts_early_years %>%
@@ -187,7 +199,7 @@ plot(change_cycles ~ year, data = forplot)
 
 forplot = tfl_nonzero %>%
   group_by(year) %>%
-  summarise(change_cycles = weighted.mean(change_cycles_late, w = sum_cycles_late))
+  summarise(change_cycles = weighted.mean(change_cycles_late, w = n_years))
 plot(change_cycles ~ year, data = forplot)
 
 ggplot(forplot) +
@@ -198,7 +210,7 @@ ggplot(forplot) +
 
 counts_combined %>%
   group_by(name, year) %>%
-  summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late)) %>%
+  summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles)) %>%
   View()
 
 tfl_nonzero %>%
@@ -208,7 +220,7 @@ tfl_nonzero %>%
 
 forplot = counts_combined %>%
   group_by(year) %>%
-  summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles_late))
+  summarise(change_cycles = weighted.mean(change_cycles, w = sum_cycles))
 plot(change_cycles ~ year, data = forplot)
 
 forplot = counts_combined %>%
@@ -250,7 +262,7 @@ m = bam(change_cycles ~
         + s(easting, northing, k = 500, bs = 'ds', m = c(1, 0.5))
         + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
         ,
-        # weights = sum_cycles,
+        weights = n_years,
         family = scat,
         data = counts_all_years, method = 'fREML',
         nthreads = 4, discrete = TRUE)

@@ -50,12 +50,15 @@ dft_counts = dft_counts %>%
   group_by(year) %>%
   mutate(annual_mean = mean(pedal_cycles)) %>%
   ungroup()
-mean_2011 = dft_counts$annual_mean[which(dft_counts$year == 2011)][1]
+
+# mean_2011 = dft_counts$annual_mean[which(dft_counts$year == 2011)][1]
+lowest_year = min(dft_counts$annual_mean)
+
 year_means = dft_counts %>%
   st_drop_geometry() %>%
   group_by(year, annual_mean) %>%
   summarise() %>%
-  mutate(annual_mean_norm = annual_mean - mean_2011)
+  mutate(annual_mean_norm = annual_mean - lowest_year)
 
 # get mean count per site and change in counts
 dft_counts = dft_counts %>%
@@ -165,9 +168,11 @@ dft_regional_5yr = dft_regional %>%
   filter(count_point_id %in% dft_5yr$count_point_id) %>%
   group_by(region, year) %>%
   summarise(dft_cycles = mean(pedal_cycles),
-            dft_change_cycles = mean(change_cycles)) %>%
+            dft_change_cycles = mean(change_min_cycles),
+            change_min_cycles_norm = mean(change_min_cycles_norm)) %>%
   mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
-         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)])
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)],
+         change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)])
 # summary(dft_regional)
 
 dft_regional_10yr = dft_regional %>%
@@ -184,9 +189,11 @@ dft_regional_all = dft_regional %>%
   st_drop_geometry() %>%
   group_by(region, year) %>%
   summarise(dft_cycles = mean(pedal_cycles),
-            dft_change_cycles = mean(change_min_cycles)) %>%
+            dft_change_cycles = mean(change_min_cycles),
+            change_min_cycles_norm = mean(change_min_cycles_norm)) %>%
   mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
-         dft_change_cycles_norm = dft_change_cycles - dft_change_cycles[which(year == 2011)])
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)],
+         change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)])
 # summary(dft_regional_all)
 
 # Plot regional data
@@ -194,7 +201,7 @@ dft_regional_all = dft_regional %>%
 dft_regional_5yr %>%
   # filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
+  geom_line(aes(year, dft_change_cycles, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
   labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +

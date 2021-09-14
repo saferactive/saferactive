@@ -190,10 +190,11 @@ dim(season_adjust) #8818 #8840 peak
 
 counter_change = season_adjust %>%
   group_by(`Site ID`) %>%
-  mutate(mean_site = mean(adjusted_total)) %>%
+  mutate(mean_site = mean(adjusted_total),
+         min_site = min(adjusted_total)) %>%
   ungroup() %>%
   filter(mean_site > 0) %>% # remove counts where there has never been a cyclist
-  mutate(change_cycles = adjusted_total - mean_site)
+  mutate(change_cycles = adjusted_total - min_site)
 sum(is.na(counter_change$change_cycles))/nrow(counter_change) #0
 
 
