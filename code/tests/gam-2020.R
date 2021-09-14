@@ -246,8 +246,8 @@ plot(counts_combined$year, counts_combined$change_cycles)
 # unique(dd$n)
 
 #investigate response variables
-hist(counts_combined$change_cycles, breaks = 100)
-hist(counts_early_years$change_cycles, breaks = 50)
+hist(counts_combined$pedal_cycles, breaks = 100)
+hist(counts_early_years$pedal_cycles, breaks = 50)
 
 
 # GAM for all years -------------------------------------------------------
@@ -257,10 +257,10 @@ library(mgcv)
 
 M = list(c(1, 0.5), NA)
 
-m = bam(change_cycles ~
-          s(year, bs = "cr", k = 4)
+m = bam(pedal_cycles ~
+          s(year, bs = "cr", k = 6)
         + s(easting, northing, k = 500, bs = 'ds', m = c(1, 0.5))
-        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
+        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 6))
         ,
         weights = n_years,
         family = scat,
@@ -275,7 +275,7 @@ plot(m, pages = 4, scheme = 2, shade = TRUE)
 # assign the framework that will be used as a basis for predictions
 pdata = with(counts_all_years,
              expand.grid(year = seq(min(year), max(year), by = 1),
-                         easting = seq(0, 656000, by = 500), # changed this to make regular 1km grid squares. these include the tip of cornwall and lowestoft.
+                         easting = seq(0, 656000, by = 500), # changed this to make regular 500m grid squares. these include the tip of cornwall and lowestoft.
                          northing = seq(8000, 1215000, by = 500)))
 # make predictions according to the GAM model
 fitted = predict(m, newdata = pdata, type = "response", newdata.guaranteed = TRUE) #SLOW
@@ -291,7 +291,8 @@ pred_all_points_year = pred_all_points_year %>%
   drop_na
 
 # saveRDS(pred_all_points_year, "gam-all-year-peak-grid-national.Rds")
-saveRDS(pred_all_points_year, "gam-all-year-grid-national.Rds")
+# saveRDS(pred_all_points_year, "gam-all-year-grid-national.Rds")
+saveRDS(pred_all_points_year, "gam-2020-grid-national.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -369,12 +370,12 @@ library(mgcv)
 
 M = list(c(1, 0.5), NA)
 
-m = bam(change_cycles_early ~
+m = bam(change_cycles ~
           s(year, bs = "cr", k = 4)
         + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
         + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 4))
         ,
-        weights = sum_cycles_early,
+        weights = n_years,
         family = scat,
         data = counts_early_years, method = 'fREML',
         nthreads = 4, discrete = TRUE)
@@ -442,14 +443,14 @@ saveRDS(gam_early_year, "gam-early-year-peak.Rds")
 
 M = list(c(1, 0.5), NA)
 
-m2 = bam(change_cycles_late ~
+m2 = bam(change_cycles ~
            s(year, bs = "cr", k = 3)
          + s(easting, northing, k = 100, bs = 'ds', m = c(1, 0.5))
          + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 3))
          ,
-         weights = sum_cycles_late,
+         weights = n_years,
          family = scat,
-         data = counts_combined, method = 'fREML',
+         data = dft_late_years, method = 'fREML',
          nthreads = 4, discrete = TRUE)
 
 summary(m2)
