@@ -150,4 +150,20 @@ counters_of_interest_year %>%
 
 ## Automatic count data
 
+```{r}
+f_south = list.files("~/hd/data/project-data/cyclecounters/Cycling_DataShare_Robin/Southampton/", pattern = "csv", full.names = TRUE)
+d_south = purrr::map_dfr(f_south, read_csv)
+head(d_south$Sdate[1:5])
+lubridate::dmy(d_south$Sdate[1:5])
+d_south
+d_south_clean = d_south %>% 
+  mutate(date = lubridate::dmy_hm(Sdate), month = lubridate::round_date(date, unit = "month"))
+d_south_monthly = d_south_clean %>% 
+  group_by(month) %>% 
+  summarise(percent = mean(cyclepercent, na.rm = TRUE), cycle_count = sum(cycle002 + cycle003, na.rm = T))
+d_south_monthly %>% 
+  # ggplot(aes(month, percent)) +
+  ggplot(aes(month, cycle_count)) +
+  geom_point()
+```
 
