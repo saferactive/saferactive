@@ -330,7 +330,7 @@ saveRDS(gam_with_lads, "gam-national-with-lads.Rds")
 # Adjustment factors for national grid --------------------------
 
 # gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
-gam_all_year = readRDS("gam-all-year-grid-national.Rds")
+gam_all_year = readRDS("gam-2020-grid-national.Rds")
 
 # get change relative to 2011 for the early years
 gam_2011 = gam_all_year %>%
@@ -354,14 +354,14 @@ forplot = gam_full_results %>% group_by(year) %>%
 ggplot(forplot) +
   geom_line(aes(year, change_cycles)) +
   xlab("Year") +
-  ylab("Mean change in predicted cycle count for London grid cells")
+  ylab("Mean predicted cycle count (relative to 2011 value)")
 
 # saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
 # piggyback::pb_upload("gam-full-results-peak-grid-national.Rds")
 
-saveRDS(gam_full_results, "gam-full-results-grid-national.Rds")
-piggyback::pb_upload("gam-full-results-grid-national.Rds", tag = "0.1.4")
-
+saveRDS(gam_full_results, "gam-full-results-grid-national-2020.Rds")
+# piggyback::pb_upload("gam-full-results-grid-national.Rds", tag = "0.1.4")
+piggyback::pb_upload("gam-full-results-grid-national-2020.Rds")
 
 # GAM model for early years  ----------------------------------------------
 

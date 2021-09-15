@@ -33,7 +33,7 @@ collision_data$year = lubridate::year(collision_data$date)
 
 # GAM model raw results for changes in traffic counts 2010-2019 (bounding box - England, Wales, Scotland and ocean)
 # piggyback::pb_download("gam-full-results-grid-national.Rds")
-gam_results = readRDS("gam-full-results-grid-national.Rds")
+gam_results = readRDS("gam-full-results-grid-national-2020.Rds")
 
 # # GAM results aggregated by lower tier LA
 # gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
@@ -328,17 +328,17 @@ saveRDS(gam_regional, "gam_regional.Rds")
 # mapview::mapview(gam_na_slice)
 
 # GAM national
-# gam_national_trend = gam_national %>%
-#   group_by(year) %>%
-#   summarise(change_cycles = sum(change_cycles))
-#
-# saveRDS(gam_national_trend, "gam_national_trend.Rds")
+gam_national_trend = gam_national %>%
+  group_by(year) %>%
+  summarise(change_cycles = sum(change_cycles))
+
+saveRDS(gam_national_trend, "gam_national_trend.Rds")
 gam_national_trend = readRDS("gam_national_trend.Rds")
 
 gam_national_trend %>%
   ggplot() +
   geom_line(aes(year, change_cycles)) +
-  geom_smooth(aes(year, change_cycles)) +
+  # geom_smooth(aes(year, change_cycles)) +
   ylab("Sum estimated daily gridded cycle flows")
 
 # GAM regional
