@@ -4,13 +4,9 @@ vulnerable road users
 Institute for Transport Studies, University of Leeds
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- Plan: apply to this call: https://roadsafetytrust.org.uk/wp-content/uploads/2019/03/Final-GT01-Grants-Policy-February-2019.pdf -->
 
-<!-- *Information on the following should be provided and uploaded in a separate document (****no more than four sides of A4 with Appendices****):* -->
-
-
-# Knowledge of the relevant literature or practice
+# 1 Background
 
 <!-- *Please refer to relevant research and literature (where available) and any gaps in knowledge and explain how the proposal develops or adds to learning. Please also describe the extent of current provision or implementation of the measures the proposal seeks to develop and current evidence (if any) for their effectiveness.* -->
 
@@ -59,9 +55,9 @@ from the perspective of active travel (Mulvaney et al. 2015), and
 because data on their spatial (and in some cases date of implementation)
 is relatively abundant:
 
-  - 20 mph zones, which are well documented in a recent study by Maher
-    (2018), and local case studies published for Bristol (Bornioli et
-    al. 2018) and Greater London (Sarkar, Webster, and Kumari 2018).
+-   20 mph zones, which are well documented in a recent study by
+    Maher (2018), and local case studies published for Bristol (Bornioli
+    et al. 2018) and Greater London (Sarkar, Webster, and Kumari 2018).
     <!-- Geographic data has been made available on the distribrution of Glasgow's extensive 20 mph zones.^[ -->
     <!-- See http://www.gosafeglasgow.com/news/20-mph-zones. -->
     <!-- ] --> Data on the spatial extent, attributes and time of
@@ -74,10 +70,10 @@ is relatively abundant:
     <!-- ] -->
     <!-- - 20 mph limits, which are often single roads with 20 mph signs. OpenStreetMap, which is increasingly complete for roads [@barrington-leigh_worlds_2017], will be used to identify these, with appropriate care taken to assess the reliability of the data. -->
 
-  - Physical traffic calming measures, including the location of speed
+-   Physical traffic calming measures, including the location of speed
     cameras and speed hump data from local authorities OpenStreetMap.
 
-  - Filtered permeability, which will be measured on a sliding scale
+-   Filtered permeability, which will be measured on a sliding scale
     reporting connectivity for pedestrians and cyclists, relative to
     motorised modes.
 
@@ -88,30 +84,12 @@ to access and process historic road calming intervention data, filling
 an important gap in current knowledge, and providing a robust evidence
 base on which future interventions can be prioritised and monitored.
 
-<div class="figure">
-
-<img src="README_files/figure-gfm/unnamed-chunk-4-1.png" alt="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, 2013 to 2018. Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303)." width="100%" />
-
-<p class="caption">
-
-Active transport casualties have flatlined. Monthly casualty rates by
-mode and severity (top) and distance travelled by active modes across
-Great Britain, 2013 to 2018. Credit: ITS Leeds, using the stats19 R
-package, ONS population estimates, and the National Travel Survey
-summary statistics (NTS0303).
-
-</p>
-
-</div>
+<img src="README_files/figure-gfm/trend-1.png" title="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, start of 2013 to end of 2019 (crash data) and start of 2013 to end of 2017 (travel data). Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303)." alt="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, start of 2013 to end of 2019 (crash data) and start of 2013 to end of 2017 (travel data). Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303)." width="100%" />
 
 <!-- There has been various efforts from different perspectives into crash data and STATS19 dataset itself. We are not aware of a comprehensive national scale data science and analytics driven effort that could be used by stakholders. -->
-
 <!-- In terms of identifying hotspots of crash data, there is an affort by [@colacino2017] in Italy. However, the results were released in Linked Open Data (LOD) for linked data developers. The use of Linked Open Data and relevant family of technologies including RDF (Resource Description Framework), LinkedGeoData, SPARQL and GeoSPARQL are all familar to us and we have used them in previous work. -->
-
 <!-- There are various types of work based on vulnerable roard users. One of the pieces of work focused on cyclists is identifying hotspots for cyclistst in London [@collins2019use].  -->
-
 <!-- In terms of spatial analysis of crashes, there is a considerable body of work. However, according to [@loo2015spatial] whose focus on the methods of spatial analysis of road collisions: "There has been little work on the subject of HRL definitions".  -->
-
 <!-- ## Exposure data -->
 
 Exposure estimates of pedestrians and cyclists to road danger has long
@@ -130,7 +108,7 @@ developed for the Propensity to Cycle Tool, but using higher resolution
 data, walking routing algorithms to estimate overall active transport
 levels, to create ‘heatmap’ estimates of exposure.
 
-# Knowledge of the relevant regulations and guidance
+# 2 Knowledge of the relevant regulations and guidance
 
 <!-- *Please refer to the relevant regulations for the traffic calming measures or provision that the proposal relates to and any available published guidance. If guidance is lacking or patchy then please explain how the proposal will address this issue. Provide details of any necessary consents or permissions needed to carry out the project.* -->
 
@@ -150,7 +128,7 @@ Note 01/07 (Department for Transport 2007), the Design Manual for Roads
 and Bridges (DMRB) and guidance on 20 mph zones in the House of Commons
 Briefing paper CBP00468.
 
-# Ethical and Privacy Issues
+# 3 Ethical and Privacy Issues
 
 <!-- *Please describe any potential issues regarding the privacy of participants and information provided by or concerning them, as well as of any other information sources used. Any risks and mitigation management plans for these should be fully discussed. Please ensure you have a policy in line with the current GDPR.* -->
 
@@ -166,7 +144,7 @@ we would solicit advice from the Data Owner, the Data Protection Officer
 in University of Leeds’ Faculty of Environment and the funder before
 proceeding.
 
-# Project Structure and Timetable
+# 4 Project Structure and Timetable
 
 <!-- *Please provide a project timetable (perhaps in a table or Gantt chart) including milestones for the completion of different stages (where appropriate). A table should also be provided for any potential risks to the completion of the project together with proposed mitigations.* -->
 
@@ -179,17 +157,7 @@ Key milestones will be the completion of the data processing stage
 release of a publicly available web application (month 12), and the
 workshops scheduled for months 10 and 17.
 
-<div class="figure">
-
-<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" alt="Project timeline." width="80%" />
-
-<p class="caption">
-
-Project timeline.
-
-</p>
-
-</div>
+<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" title="Project timeline." alt="Project timeline." width="80%" />
 
 As a digital technology project delivered by an experienced team, the
 risks involved in funding this proposal are relatively small. Three main
@@ -198,14 +166,14 @@ risks, and mitigating actions, are outlined in the table below.
 <!-- If it still proves difficult to find a suitable researcher we will look hire researchers in ITS and LIDA to work on the project. -->
 
 | Risk              | Mitigating action                                                                 |
-| :---------------- | :-------------------------------------------------------------------------------- |
+|:------------------|:----------------------------------------------------------------------------------|
 | Recruiting issues | Promotion to ensure role is well known in the data science research community.    |
 | Data access       | Availability of key datasets have been checked.                                   |
 | Model approach    | If the TensorFlow library does not work we will shift technology e.g. to xgboost. |
 
 <!-- \newpage -->
 
-# Experience of the Project Team
+# 5 Experience of the Project Team
 
 <!-- *Please describe the relevant experience and expertise of key team members. One-page CVs, including any relevant publications as an appendix, will be useful for more complex applications (please ensure you have permission from them). Please explain key roles and the expected input and involvement of each team member. It will be helpful to see how quality control of the outputs will be handled, and who will be responsible for day to day project arrangements. Any internal and/or external oversight arrangements should be mentioned, especially for more complex projects. For some projects, the establishment of stakeholder groups to inform the project should also be identified.* -->
 
@@ -255,11 +223,11 @@ application.
 
 A recent conference paper by three of the team members shows we have a
 track record of collaboration on data science for road safety
-research.\[1\] We have also collaborated on writing a peer-reviewed R
+research.[1] We have also collaborated on writing a peer-reviewed R
 package called **stats19** for increasing public access to reproducible
 road safety research (Lovelace et al. 2019).
 
-# Innovation
+# 6 Innovation
 
 <!-- *Innovative ideas with much potential road safety benefit are particularly sought by the Trust. Plans to roll out or scale up innovative approaches which have been successfully trialled and tested are also encouraged. The programme is not designed to cover the delivery costs of existing schemes but could cover the costs of evaluating an existing programme.* -->
 
@@ -291,49 +259,27 @@ in the policy, practice and public debate of road safety for vulnerable
 road users.
 
 <!-- - Scenarios of change -->
-
 <!-- - Open source software -->
-
 <!-- - Publicly accessible -->
-
 <!-- - Combines new datasets -->
-
 <!-- - Allows people to envision scenarios of change -->
-
 <!-- Innovative ideas with much potential road safety benefit are particularly sought by the Trust. Plans to roll out or scale up innovative approaches which have been successfully trialled and tested are also encouraged. The programme is not designed to cover the delivery costs of existing schemes but could cover the costs of evaluating an existing programme. -->
-
 <!-- The main innovative approach of this project will be in the processing, analysis and visualization of the road safety data at a national scale. The work accomplished in development of the R package stats19 will be extended in a unique way by providing stakeholders and the wider public with a data-driven approach to road safety. We hope to democratise and effect a cohesive agenda for road safety research and for public understanding of risk. -->
-
 <!-- A particularly innovative aspect of the project will be in developing an online tool for flexible exploration of the STATS19 data. Road safety campaigners and members of the public will be able to pursue their own lines of inquiry. We will develop dynamic, tightly coupled map and summary views that allow users to to explore data subsets and comparisons of their own through mouse touch interaction. Designing-in such flexibility has consequences and crucial to our approach here will be incorporating features that support correct and judicious use of data -- for example using new techniques from the Information Visualization domain to represent uncertainty information and presenting accompanying analysis vignettes demonstrating statistical issues associated with comparison reporting. We believe this approach -- developing flexible interfaces that also build statistical literacy -- to be both prescient and necessary. -->
-
 <!-- Finally, the outputs of the project will be ready to be used in further research. It is envisaged that one of the ways the data would be used is training of machine learning models of predicting crashes or generating alerts to prevent them. -->
 
-<div class="figure" style="text-align: center">
-
-<img src="prototype-app2.png" alt="Prototype web application developed for this bid. See stats19.geoplumber.com for interactive version." width="60%" />
-
-<p class="caption">
-
-Prototype web application developed for this bid. See
-stats19.geoplumber.com for interactive version.
-
-</p>
-
-</div>
+<img src="prototype-app2.png" title="Prototype web application developed for this bid. See stats19.geoplumber.com for interactive version." alt="Prototype web application developed for this bid. See stats19.geoplumber.com for interactive version." width="60%" style="display: block; margin: auto;" />
 
 <!-- # Useful sources -->
-
 <!-- Manual for Streets https://www.gov.uk/government/publications/manual-for-streetsManual for Streets 2 -->
-
 <!-- https://www.gov.uk/government/publications/manual-for-streets-2CIHT –Review of Shared  Space -->
-
 <!-- https://www.ciht.org.uk/media/4463/ciht_shared_streets_a4_v6_all_combined_1.pdf -->
 
-# References
+# 7 References
 
-<div id="refs" class="references hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-barrington-leigh_world_2017">
+<div id="ref-barrington-leigh_world_2017" class="csl-entry">
 
 Barrington-Leigh, Christopher, and Adam Millard-Ball. 2017. “The World’s
 User-Generated Road Map Is More Than 80% Complete.” *PLOS ONE* 12 (8):
@@ -341,7 +287,7 @@ e0180698. <https://doi.org/10.1371/journal.pone.0180698>.
 
 </div>
 
-<div id="ref-bornioli_effectiveness_2018">
+<div id="ref-bornioli_effectiveness_2018" class="csl-entry">
 
 Bornioli, Anna, Isabelle Bray, Paul Pilkington, and Emma L. Bird. 2018.
 “The Effectiveness of a 20 Mph Speed Limit Intervention on Vehicle
@@ -351,28 +297,28 @@ of Transport & Health* 11: 47–55.
 
 </div>
 
-<div id="ref-departmentfortransport_traffic_2007">
+<div id="ref-departmentfortransport_traffic_2007" class="csl-entry">
 
-Department for Transport. 2007. *Traffic Calming*. Local Transport Note,
+Department for Transport. 2007. *Traffic Calming*. Local Transport Note
 1/07. London: TSO.
 
 </div>
 
-<div id="ref-departmentfortransport_cycling_2017">
+<div id="ref-departmentfortransport_cycling_2017" class="csl-entry">
 
 ———. 2017. “Cycling and Walking Investment Strategy.” London: Department
 for Transport.
 
 </div>
 
-<div id="ref-horton_fear_2016">
+<div id="ref-horton_fear_2016" class="csl-entry">
 
 Horton, Dave. 2016. “Fear of Cycling.” In *Cycling and Society*, 149–68.
 Routledge.
 
 </div>
 
-<div id="ref-jacobsen_who_2009">
+<div id="ref-jacobsen_who_2009" class="csl-entry">
 
 Jacobsen, Peter L., Francesca Racioppi, and Harry Rutter. 2009. “Who
 Owns the Roads? How Motorised Traffic Discourages Walking and
@@ -381,18 +327,18 @@ Bicycling.” *Injury Prevention* 15 (6): 369–73.
 
 </div>
 
-<div id="ref-johansson_impacts_2017">
+<div id="ref-johansson_impacts_2017" class="csl-entry">
 
 Johansson, Christer, Boel Lövenheim, Peter Schantz, Lina Wahlgren, Peter
 Almström, Anders Markstedt, Magnus Strömgren, Bertil Forsberg, and Johan
 Nilsson Sommar. 2017. “Impacts on Air Pollution and Health by Changing
-Commuting from Car to Bicycle.” *Science of the Total Environment*
+Commuting from Car to Bicycle.” *Science of The Total Environment*
 584-585 (April): 55–63.
 <https://doi.org/10.1016/j.scitotenv.2017.01.145>.
 
 </div>
 
-<div id="ref-lahart_design_2013">
+<div id="ref-lahart_design_2013" class="csl-entry">
 
 Lahart, J., E. Conroy, R. Curley, P. Hogan, S. McGrath, D. Molony, J.
 Stapleton, D. Taylor, and J. Taylor. 2013. “Design Manual for Urban
@@ -401,7 +347,7 @@ and Sport of Ireland, Dublin, Ireland*.
 
 </div>
 
-<div id="ref-lovelace_propensity_2017">
+<div id="ref-lovelace_propensity_2017" class="csl-entry">
 
 Lovelace, Robin, Anna Goodman, Rachel Aldred, Nikolai Berkoff, Ali
 Abbas, and James Woodcock. 2017. “The Propensity to Cycle Tool: An Open
@@ -410,15 +356,15 @@ Transport and Land Use* 10 (1). <https://doi.org/10.5198/jtlu.2016.862>.
 
 </div>
 
-<div id="ref-lovelace_stats19_2019">
+<div id="ref-lovelace_stats19_2019" class="csl-entry">
 
 Lovelace, Robin, Malcolm Morgan, Layik Hama, and Mark Padgham. 2019.
-“Stats19: A Package for Working with Open Road Crash Data.” *Journal
-of Open Source Software*. <https://doi.org/10.21105/joss.01181>.
+“Stats19: A Package for Working with Open Road Crash Data.” *Journal of
+Open Source Software*. <https://doi.org/10.21105/joss.01181>.
 
 </div>
 
-<div id="ref-lovelace_who_2016">
+<div id="ref-lovelace_who_2016" class="csl-entry">
 
 Lovelace, Robin, Hannah Roberts, and Ian Kellar. 2016. “Who, Where,
 When: The Demographic and Geographic Distribution of Bicycle Crashes in
@@ -428,20 +374,20 @@ Behaviour*, Bicycling and bicycle safety, 41, Part B.
 
 </div>
 
-<div id="ref-lucas_running_2004">
+<div id="ref-lucas_running_2004" class="csl-entry">
 
 Lucas, Karen, ed. 2004. *Running on Empty: Transport, Social Exclusion
 and Environmental Justice*. Bristol, UK: Policy.
 
 </div>
 
-<div id="ref-maher_20mph_2018">
+<div id="ref-maher_20mph_2018" class="csl-entry">
 
 Maher, Mike. 2018. “20mph Research Study.” Department for Transport.
 
 </div>
 
-<div id="ref-mulvaney_cycling_2015">
+<div id="ref-mulvaney_cycling_2015" class="csl-entry">
 
 Mulvaney, Caroline A., Sherie Smith, Michael C. Watson, John Parkin,
 Carol Coupland, Philip Miller, Denise Kendrick, and Hugh McClintock.
@@ -451,35 +397,35 @@ Cyclists.” *Cochrane Database of Systematic Reviews*, no. 12.
 
 </div>
 
-<div id="ref-nathan_cycling_2019">
+<div id="ref-nathan_cycling_2019" class="csl-entry">
 
 Nathan, Jai. 2019. “The Cycling and Walking Investment Strategy (CWIS)
 Safety Review.” Department for Transport.
 
 </div>
 
-<div id="ref-parkin_designing_2018">
+<div id="ref-parkin_designing_2018" class="csl-entry">
 
 Parkin, John. 2018. *Designing for Cycle Traffic: International
 Principles and Practice*. ICE Publishing.
 
 </div>
 
-<div id="ref-roadsafetygb_government_2019">
+<div id="ref-roadsafetygb_government_2019" class="csl-entry">
 
 Road Safety GB. 2019. “Government Urged to Increase Funding for Walking
 and Cycling.”
 
 </div>
 
-<div id="ref-rospa_guide_2019">
+<div id="ref-rospa_guide_2019" class="csl-entry">
 
 ROSPA. 2019. “A Guide to 20mph Limits.” The Royal Society for the
 Prevention of Accidents.
 
 </div>
 
-<div id="ref-sarkar_street_2018">
+<div id="ref-sarkar_street_2018" class="csl-entry">
 
 Sarkar, Chinmoy, Chris Webster, and Sarika Kumari. 2018. “Street
 Morphology and Severity of Road Casualties: A 5-Year Study of Greater
@@ -488,7 +434,7 @@ London.” *International Journal of Sustainable Transportation* 12 (7):
 
 </div>
 
-<div id="ref-saunders_what_2013">
+<div id="ref-saunders_what_2013" class="csl-entry">
 
 Saunders, Lucinda E, Judith M Green, Mark P Petticrew, Rebecca
 Steinbach, and Helen Roberts. 2013. “What Are the Health Benefits of
@@ -498,7 +444,7 @@ by Jonatan R. Ruiz. *PloS One* 8 (8): e69912.
 
 </div>
 
-<div id="ref-ward_pedestrian_1994">
+<div id="ref-ward_pedestrian_1994" class="csl-entry">
 
 Ward, Heather, Carin Kuiper, Luis Willumsen, and Steer Davies Gleave.
 1994. *Pedestrian Activity and Accident Risk*. AA Foundation for Road
@@ -508,4 +454,4 @@ Safety Research.
 
 </div>
 
-1.   See <https://github.com/Robinlovelace/stats19-gisruk>.
+[1]  See <https://github.com/Robinlovelace/stats19-gisruk>.

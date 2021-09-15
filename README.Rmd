@@ -1,5 +1,6 @@
 ---
-output: github_document
+output: bookdown::github_document2
+# output: bookdown::pdf_document2
 # output: pdf_document
 # output: word_document
 title: "SaferActive: prioritising investment in traffic calming measures for vulnerable road users"
@@ -24,25 +25,7 @@ f = list.files(path = ".", pattern = "lovelace|jamson|beech|hama", ignore.case =
 piggyback::pb_upload(f)
 ```
 
-```{r, eval=FALSE}
-# build combined pdf
-# install.packages("pdftools")
-pdftools::pdf_combine(input = c(
-  "roadsafetytrust-application-p2.pdf",
-  "CV_Lovelace.pdf",
-  "SamJamsonRoadSafetyTrust.pdf",
-  "cv_Layik_Hama_one_page.pdf",
-  "roger_beecham_cv.pdf",
-  "CA LoS.pdf",
-  "Birkin-LoS.pdf"
-), output = "saferactive-part2.pdf")
-```
-
-
-
-<!-- *Information on the following should be provided and uploaded in a separate document (****no more than four sides of A4 with Appendices****):* -->
-
-# Knowledge of the relevant literature or practice
+# Background
 
 <!-- *Please refer to relevant research and literature (where available) and any gaps in knowledge and explain how the proposal develops or adds to learning. Please also describe the extent of current provision or implementation of the measures the proposal seeks to develop and current evidence (if any) for their effectiveness.* -->
 
@@ -88,8 +71,8 @@ devtools::install_github("thomasp85/patchwork")
 # install.packages("ggthemes")
 # ggthemes::theme_igray()
 devtools::install_github("cttobin/ggthemr")
-accidents = map_dfr(2013:2017, get_stats19, "ac", ask = FALSE)
-casualties = map_dfr(2013:2017, get_stats19, "cas", ask = FALSE)
+accidents = map_dfr(2013:2019, get_stats19, "ac", ask = FALSE)
+casualties = map_dfr(2013:2019, get_stats19, "cas", ask = FALSE)
 cas = left_join(accidents, casualties)
 saveRDS(cas, "cas.Rds") # 31 MB
 cas$month = lubridate::round_date(cas$date, unit = "month")
@@ -114,7 +97,7 @@ saveRDS(cas_long, "cas_long.Rds")
 piggyback::pb_upload("cas_long.Rds")
 ```
 
-```{r, warning=FALSE, fig.height=3.5, fig.cap="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, 2013 to 2018. Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303).", echo=FALSE, message=FALSE}
+```{r trend, warning=FALSE, fig.height=3.5, fig.cap="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, start of 2013 to end of 2019 (crash data) and start of 2013 to end of 2017 (travel data). Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303).", echo=FALSE, message=FALSE}
 ggthemr::ggthemr(palette = "flat")
 cas_long = readRDS("cas_long.Rds")
 # ggplot(cas_long) +
@@ -147,8 +130,8 @@ p2 = ggplot(active_long) +
   ylab("Distance (bkm)")
 library(patchwork)
 p1 + p2 + plot_layout(ncol = 1, heights = c(3, 1.6))
-ggsave(filename = "figures/casualties-2013-2018.png", width = 8, height = 6, dpi = 100)
-magick::image_read("figures/casualties-2013-2018.png")
+# ggsave(filename = "figures/casualties-2013-2018.png", width = 8, height = 6, dpi = 100)
+# magick::image_read("figures/casualties-2013-2018.png")
 ```
 
 ```{r}
