@@ -36,8 +36,15 @@ Change since 2015 in each Borough.
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132371640-a9eedf6c-ce3e-41c5-97eb-5b97d9c6b6b3.png")
 ```
 
+DfT counter data
 
-# National trends
+Mean count per LAD, over the period 2010 - 2020. 
+
+# ```{r}
+# knitr::include_graphics("")
+# ```
+
+# National trends in cycle volume
 
 The number of cyclists saw a small increase over the ten years prior to 2019, according to three different data sources. 
 
@@ -47,6 +54,20 @@ In 2020, the mean number of cyclists passing DfT traffic count points was three 
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130480677-af7ea79d-94f8-4812-8ec6-9321a5b6b4e0.png")
 ```
 
+Estimated change since 2011 in cycle flows at a national level, based on a GAM generated using the DfT and TfL counter data
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133419356-5d57135f-29c8-4eb5-8237-95969387c352.png")
+```
+
+# National trends in collisions and collision risk
+
+Change in cycle KSI 2010 - 2019
+
+# ```{r}
+# knitr::include_graphics("")
+# ```
+
 In the period 2010-2019, risk of cycle KSI has reduced. 
 This reduction has mainly occurred since 2014, and can be seen when casualty data are assessed using all three measures of cycle volume.
 
@@ -55,7 +76,7 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1304
 ```
 
 
-# Regional trends
+# Regional trends in cycle volume
 
 Total distance cycled per year in each English region (based on NTS survey)
 
@@ -63,18 +84,39 @@ Total distance cycled per year in each English region (based on NTS survey)
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130474948-819a6053-4edd-4be4-9620-e8adb681e5f6.png")
 ```
 
+Change in mean AADF cycle flow per DfT counter in each region (including Scotland and Wales)
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132316899-1bbc1cc9-687e-4df3-9c7a-3074778dd107.png")
+```
+
+Mean AADF cycle flow per TfL counter
+
+# ```{r}
+# knitr::include_graphics("")
+# ```
+
+Estimated mean change in cycle flows, according to GAM model based on the DfT and TfL cycle counters
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133447294-0143da9d-5d66-47ce-ab14-741cdbb04147.png")
+```
+
+
+# Regional trends in collisions and collision risk
+
 Sum of cycle KSI in each region (including Scotland and Wales)
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132044428-c6f9e57c-478f-47d9-9247-5d338b9e2137.png")
 ```
 
-Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales)
+Trends in KSI risk per km cycled, using NTS journey data 
+## change to per Bkm ##
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132316899-1bbc1cc9-687e-4df3-9c7a-3074778dd107.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130482309-4889ca3e-f57e-4a28-b39f-e80778525725.png")
 ```
-
 
 Trends in KSI risk per DfT mean cycle count 
 
@@ -82,11 +124,11 @@ Trends in KSI risk per DfT mean cycle count
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132327377-8daceacf-2de6-4513-b776-b5593ec2d11a.png")
 ```
 
-Trends in KSI risk per km cycled, using NTS journey data 
+Trends in KSI risk per TfL mean cycle count 
 
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130482309-4889ca3e-f57e-4a28-b39f-e80778525725.png")
-```
+# ```{r}
+# knitr::include_graphics("")
+# ```
 
 Trends in KSI risk for GAM outputs
 

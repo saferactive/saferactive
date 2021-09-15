@@ -318,9 +318,11 @@ gam_national = gam_results %>%
   st_as_sf(coords = c("easting", "northing"), crs = 27700)
 
 gam_regional = st_join(gam_national, regions_bfc) #produces NAs - these are in scotland, wales, and the sea
+# need to add in map of wales (and maybe scotland)
 
 saveRDS(gam_regional, "gam_regional.Rds")
 
+gam_keep = gam_regional %>% filter(! is.na(gam_regional$region))
 # gam_na = gam_regional %>%
 #   filter(is.na(region))
 #
@@ -330,7 +332,7 @@ saveRDS(gam_regional, "gam_regional.Rds")
 # GAM national
 gam_national_trend = gam_national %>%
   group_by(year) %>%
-  summarise(change_cycles = sum(change_cycles))
+  summarise(change_cycles = sum(change_cycles)) # change to mean for raw gam outputs (but should be sum for gam-adjusted pct rnet)
 
 saveRDS(gam_national_trend, "gam_national_trend.Rds")
 gam_national_trend = readRDS("gam_national_trend.Rds")
@@ -342,18 +344,21 @@ gam_national_trend %>%
   ylab("Sum estimated daily gridded cycle flows")
 
 # GAM regional
-gam_regional_trend = gam_regional %>%
+gam_regional_trend = gam_keep %>%
   group_by(year, region) %>%
-  summarise(change_cycles = sum(change_cycles))
+  summarise(change_cycles = mean(change_cycles)) # change to sum for gam-adjusted pct rnet
 
 saveRDS(gam_regional_trend, "gam_regional_trend.Rds")
 gam_regional_trend = readRDS("gam_regional_trend.Rds")
 
 gam_regional_trend %>%
   ggplot() +
-  geom_line(aes(year, change_cycles, colour = region)) +
-  geom_smooth(aes(year, change_cycles)) +
-  ylab("Sum estimated daily gridded cycle flows")
+  geom_line(aes(year, change_cycles, colour = region), lwd = 0.8) +
+  # geom_smooth(aes(year, change_cycles)) +
+  labs(x = "Year", colour = "Region") +
+  ylab("Mean estimated change in cycle flows") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 # Plot trends together ----------------------------------------------------
 
