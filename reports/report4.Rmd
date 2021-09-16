@@ -81,13 +81,19 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1304
 Total distance cycled per year in each English region (based on NTS survey)
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130474948-819a6053-4edd-4be4-9620-e8adb681e5f6.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133634243-6449b3c1-61dd-429c-bc41-562841968ff4.png")
 ```
 
-Change in mean AADF cycle flow per DfT counter in each region (including Scotland and Wales)
+Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales). This is based on the raw flows per counter.
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132316899-1bbc1cc9-687e-4df3-9c7a-3074778dd107.png")
+```
+
+Mean change in AADF cycle flow per DfT counter in each region (including Scotland and Wales). This is based on the change in flow at each counter, calculated as the raw flow minus the minimum flow for the given counter.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133624726-227a7114-0fb1-4f62-bd06-a139f7245b60.png")
 ```
 
 Mean AADF cycle flow per TfL counter
@@ -112,10 +118,9 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1320
 ```
 
 Trends in KSI risk per km cycled, using NTS journey data 
-## change to per Bkm ##
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130482309-4889ca3e-f57e-4a28-b39f-e80778525725.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133631183-2f5e6454-f34b-4aa3-bcac-fad88503e896.png")
 ```
 
 Trends in KSI risk per DfT mean cycle count 
