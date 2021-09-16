@@ -33,7 +33,7 @@ collision_data$year = lubridate::year(collision_data$date)
 
 # GAM model raw results for changes in traffic counts 2010-2019 (bounding box - England, Wales, Scotland and ocean)
 # piggyback::pb_download("gam-full-results-grid-national.Rds")
-gam_results = readRDS("gam-full-results-grid-national-2020.Rds")
+gam_results = readRDS("gam-full-results-grid-national-2020-2.Rds")
 
 # # GAM results aggregated by lower tier LA
 # gam_by_la = read.csv("la_lower_km_cycled_2010_2019.csv")
@@ -126,8 +126,8 @@ dft_national = dft_counts %>%
   summarise(
     dft_cycles = mean(pedal_cycles),
     dft_change_cycles = mean(change_min_cycles),
-    annual_mean_norm = mean(annual_mean_norm),
-    change_norm = mean(change_min_cycles_norm)
+    # annual_mean_norm = mean(annual_mean_norm),
+    # change_norm = mean(change_min_cycles_norm)
   )
 
 # Plot national data
@@ -189,11 +189,13 @@ dft_regional_all = dft_regional %>%
   st_drop_geometry() %>%
   group_by(region, year) %>%
   summarise(dft_cycles = mean(pedal_cycles),
-            dft_change_cycles = mean(change_min_cycles),
-            change_min_cycles_norm = mean(change_min_cycles_norm)) %>%
+            dft_change_cycles = mean(change_min_cycles)
+            # , change_min_cycles_norm = mean(change_min_cycles_norm)
+            ) %>%
   mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
-         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)],
-         change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)])
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)]
+         # , change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)]
+         )
 # summary(dft_regional_all)
 
 # Plot regional data
@@ -212,7 +214,7 @@ dft_regional_all %>%
   ggplot() +
   geom_line(aes(year, dft_change_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
-  labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
+  labs(y = "Mean change in cycle AADF (relative to 2011)", x  = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
@@ -269,13 +271,17 @@ nts_regional = nts_weighted %>%
   summarise(nts_cycles = sum(dist_cycled_per_yr))
 summary(nts_regional)
 
+# select colour palette (to include all of the colours in brewer_pal "qual" palette 3, except for the ones that are used for scotland and wales in the other graphs)
+# show_col(brewer_pal("qual", palette = 3)(11))
+my_palette = c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#FDBF6F", "#FF7F00", "#6A3D9A", "#FFFF99")
+
 nts_regional %>%
   ggplot() +
   geom_line(aes(year, nts_cycles / 1000000000, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, nts_cycles)) +
   ylab("Total distance cycled (Bkm)") +
   labs(x = "Year", colour = "Region") +
-  scale_color_brewer(type = "qual", palette = 3)
+  scale_color_manual(values = my_palette)
 
 
 # Collisions --------------------------------------------------------------
@@ -428,13 +434,13 @@ all_trends %>%
 comparisons = all_trends %>%
   mutate(
     dft_norm = dft_cycles / dft_cycles[which(year == 2011)],
-    gam_norm = change_cycles / change_cycles[which(year == 2011)],
+    # gam_norm = change_cycles / change_cycles[which(year == 2011)],
     nts_norm = nts_cycles / nts_cycles[which(year == 2011)],
     ksi_per_dft = ksi_cycle / dft_cycles,
-    ksi_per_gam = ksi_cycle / change_cycles,
+    # ksi_per_gam = ksi_cycle / change_cycles,
     ksi_per_nts = ksi_cycle / nts_cycles * 1000000000,
     dft_risk_norm = ksi_per_dft / ksi_per_dft[which(year == 2011)],
-    gam_risk_norm = ksi_per_gam / ksi_per_gam[which(year == 2011)],
+    # gam_risk_norm = ksi_per_gam / ksi_per_gam[which(year == 2011)],
     nts_risk_norm = ksi_per_nts / ksi_per_nts[which(year == 2011)]
     )
 
@@ -453,7 +459,9 @@ comparisons2 %>%
 
 # Absolute change in cycle flows
 comparisons3 = comparisons %>%
-  pivot_longer(cols = c(dft_norm, gam_norm, nts_norm), names_to = "cycle_volume")
+  pivot_longer(cols = c(dft_norm,
+                        # gam_norm,
+                        nts_norm), names_to = "cycle_volume")
 
 comparisons3 %>%
   ggplot(aes(year, value, colour = cycle_volume)) +
@@ -461,7 +469,9 @@ comparisons3 %>%
   # geom_smooth(alpha = 0.2) +
   ylab("Cycle volume relative to 2011") +
   labs(x= "Year", colour = "Cycle volume data") +
-  scale_colour_discrete(labels = c("DfT counters", "GAM", "NTS"))
+  scale_colour_discrete(labels = c("DfT counters",
+                                   # "GAM",
+                                   "NTS"))
 
 # comparisons %>%
 #   ggplot() +
@@ -498,13 +508,14 @@ all_regional %>%
 
 # Regional risk - NTS
 all_regional %>%
+  filter(region != "Scotland", region != "Wales") %>%
   ggplot() +
   geom_line(aes(year, ksi_per_nts, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_per_nts, colour = region), alpha = 0.2) +
   ylab("KSI per Bkm cycled") +
   labs(x = "Year", colour = "Region") +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
-  scale_color_brewer(type = "qual", palette = 3)
+  scale_color_manual(values = my_palette)
 
 # Regional risk - GAM
 all_regional %>%

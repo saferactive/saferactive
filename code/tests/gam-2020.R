@@ -258,9 +258,9 @@ library(mgcv)
 M = list(c(1, 0.5), NA)
 
 m = bam(pedal_cycles ~
-          s(year, bs = "cr", k = 6)
-        + s(easting, northing, k = 500, bs = 'ds', m = c(1, 0.5))
-        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(25, 6))
+          s(year, bs = "cr", k = 8)
+        + s(easting, northing, k = 200, bs = 'ds', m = c(1, 0.5))
+        + ti(easting, northing, year, d = c(2,1), bs = c('ds','cr'), m = M, k = c(100, 6))
         ,
         weights = n_years,
         family = scat,
@@ -268,8 +268,10 @@ m = bam(pedal_cycles ~
         nthreads = 4, discrete = TRUE)
 
 summary(m)
-plot(m, pages = 4, scheme = 2, shade = TRUE)
+obj = plot(m, pages = 4, scheme = 2, shade = TRUE, seWithMean = TRUE)
+obj
 
+saveRDS(obj, "model_plot.Rds")
 
 
 # assign the framework that will be used as a basis for predictions
@@ -292,7 +294,7 @@ pred_all_points_year = pred_all_points_year %>%
 
 # saveRDS(pred_all_points_year, "gam-all-year-peak-grid-national.Rds")
 # saveRDS(pred_all_points_year, "gam-all-year-grid-national.Rds")
-saveRDS(pred_all_points_year, "gam-2020-grid-national.Rds")
+saveRDS(pred_all_points_year, "gam-2020-grid-national2.Rds")
 
 ggplot(pred_all_points_year, aes(x = easting, y = northing)) +
   geom_raster(aes(fill = Fitted)) + facet_wrap(~ year, ncol = 5) +
@@ -330,7 +332,7 @@ saveRDS(gam_with_lads, "gam-national-with-lads.Rds")
 # Adjustment factors for national grid --------------------------
 
 # gam_all_year = readRDS("gam-all-year-peak-grid-national.Rds")
-gam_all_year = readRDS("gam-2020-grid-national.Rds")
+gam_all_year = readRDS("gam-2020-grid-national2.Rds")
 
 # get change relative to 2011 for the early years
 gam_2011 = gam_all_year %>%
@@ -359,7 +361,7 @@ ggplot(forplot) +
 # saveRDS(gam_full_results, "gam-full-results-peak-grid-national.Rds")
 # piggyback::pb_upload("gam-full-results-peak-grid-national.Rds")
 
-saveRDS(gam_full_results, "gam-full-results-grid-national-2020.Rds")
+saveRDS(gam_full_results, "gam-full-results-grid-national-2020-2.Rds")
 # piggyback::pb_upload("gam-full-results-grid-national.Rds", tag = "0.1.4")
 piggyback::pb_upload("gam-full-results-grid-national-2020.Rds")
 
