@@ -34,9 +34,11 @@ library(tidyverse)
 ## Longer term trends
 
 ```{r, fig.height=3}
-readRDS("../p1_ggplot_1979_2019.Rds") +
-  geom_vline(xintercept = as.Date("2010-01-01"))
+# readRDS("../p1_ggplot_1979_2019.Rds") +
+#   geom_vline(xintercept = as.Date("2010-01-01"))
 ```
+
+![](https://user-images.githubusercontent.com/1825120/133630087-863f4f4b-c5ab-4e6a-995e-f1f1c6a11dca.png)
 
 - Numbers of people killed/injured while walking and cycling have 'flatlined' since around 2010
 - But what about the rate of casualties per unit time/population/distance?
@@ -72,15 +74,50 @@ All counter values (black lines) and average counter values in sample of local a
 
 ---
 
+#### Approaches
+
+.pull-left[
+
+- Exploratory data analysis
+
+![](https://saferactive.github.io/trafficalmr/articles/spine_aspatial_who_hit_who.png)
+
+- Geographic analysis
+
+![](https://raw.githubusercontent.com/saferactive/saferactive/master/LA_trends_files/figure-gfm/crash_la_plot2-1.png)
+
+]
+
+.pull-right[
+
+- New visualisation techniques
+
+![](https://saferactive.github.io/trafficalmr/articles/rr_cots.png)
+
+- Interactive mapping
+
+![](https://user-images.githubusercontent.com/1825120/133634068-38623752-fc0a-4aab-925e-4b43ab746f73.png)
+
+]
+
+--
+
+- Modelling - more needed in this area - relies on strong explanatory variables
+
 
 ---
 
 ## Key project outputs
 
 - Datasets
-  - New datasets with relative level change in active travel (just cycling) over time
-  - New dataset
+  - New geo datasets with change in active travel (currently cycling) over time
+  - New geographic datasets on adjusted collision rates over time
 - Research findings
   - Substantial regional differences in trends for active travel levels (cycling), casualty numbers, and the rate of casualties per distance walked and cycled
 
 - New methods
+  - Framework for exploratory analysis of complex datasets for informing policy
+  - Route network processing
+  
+- Software development
+  - Development of the trafficalmr package
