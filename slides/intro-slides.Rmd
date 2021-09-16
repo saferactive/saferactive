@@ -1,7 +1,7 @@
 ---
 title: "SaferActive"
 subtitle: "📉🚂🚅🚎🛴🚲🚶📈<br/>Exploring trends in and links between active travel uptake and road safety"
-author: "Robin Lovelace"
+author: "The SaferActive Team"
 institute: "University of Leeds, [Institute for Transport Studies](https://environment.leeds.ac.uk/transport)"
 date: "University of Leeds, 2021-10-15 (updated: `r Sys.Date()`)\nReproducible source code: [github.com/saferactive/saferactive](https://github.com/saferactive/saferactive)"
 output:
@@ -15,3 +15,72 @@ output:
       countIncrementalSlides: false
 ---
 
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+
+## Background
+
+![](https://raw.githubusercontent.com/saferactive/saferactive/master/README_files/figure-gfm/trend-1.png)
+
+- Some evidence that policies to enable more walking and cycling have been effective
+- Little evidence that walking and cycling has become safer
+  - Where have active travels levels increased, while casualty rates have continued to fall?
+  - What are the characteristics of these places and can we learn from these places?
+
+---
+
+## Longer term trends
+
+```{r, fig.height=3}
+readRDS("../p1_ggplot_1979_2019.Rds") +
+  geom_vline(xintercept = as.Date("2010-01-01"))
+```
+
+- Numbers of people killed/injured while walking and cycling have 'flatlined' since around 2010
+- But what about the rate of casualties per unit time/population/distance?
+
+---
+
+## The pandemic
+
+![](https://user-images.githubusercontent.com/1825120/133615184-e1782729-9660-4508-8107-2e17ddb49904.png)
+
+---
+
+## Safety during the pandemic
+
+![](https://user-images.githubusercontent.com/1825120/133615412-bc3f3717-5512-4eef-aca2-d08822734b0f.png)
+
+> The DfT thus calculated that the overall casualty rate for cyclists, the number of deaths or injuries per mile travelled, fell by 34% in 2020 against the year before, the biggest drop for any road user type.
+
+- But this change in safety levels was not uniform
+
+---
+
+#### Data on cycling levels
+
+![](https://raw.githubusercontent.com/saferactive/saferactive/master/code/tests/bradford-and-beyond_files/figure-gfm/unnamed-chunk-7-1.png)
+
+All counter values (black lines) and average counter values in sample of local authorities: Bradford, Derby, Leeds, Southampton 
+
+<!-- Reproducible code:  -->
+<!-- See https://github.com/saferactive/saferactive/blob/master/code/tests/bradford-and-beyond.md -->
+
+<!-- Todo: update this plot -->
+
+---
+
+
+---
+
+## Key project outputs
+
+- Datasets
+  - New datasets with relative level change in active travel (just cycling) over time
+  - New dataset
+- Research findings
+  - Substantial regional differences in trends for active travel levels (cycling), casualty numbers, and the rate of casualties per distance walked and cycled
+
+- New methods

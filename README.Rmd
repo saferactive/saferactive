@@ -71,10 +71,10 @@ devtools::install_github("thomasp85/patchwork")
 # install.packages("ggthemes")
 # ggthemes::theme_igray()
 devtools::install_github("cttobin/ggthemr")
-accidents = map_dfr(2013:2019, get_stats19, "ac", ask = FALSE)
-casualties = map_dfr(2013:2019, get_stats19, "cas", ask = FALSE)
+accidents = get_stats19(1990:2019, "ac", ask = FALSE)
+casualties = get_stats19(1990:2019, "cas", ask = FALSE)
 cas = left_join(accidents, casualties)
-saveRDS(cas, "cas.Rds") # 31 MB
+saveRDS(cas, "cas_1990.Rds") # 31 MB
 cas$month = lubridate::round_date(cas$date, unit = "month")
 cas_monthly = cas %>%
   group_by(month) %>%
@@ -93,13 +93,13 @@ cas_monthly = cas_monthly[-1, ]
 cas_monthly = cas_monthly[-nrow(cas_monthly), ]
 cas_long = gather(cas_monthly, Collision_type, Number, -month)
 cas_long = cas_long %>% separate(data = ., col = Collision_type, into = c("Mode", "Severity"), sep = "_")
-saveRDS(cas_long, "cas_long.Rds")
-piggyback::pb_upload("cas_long.Rds")
+saveRDS(cas_long, "cas_long_1990.Rds")
+piggyback::pb_upload("cas_long_1990.Rds")
 ```
 
 ```{r trend, warning=FALSE, fig.height=3.5, fig.cap="Active transport casualties have flatlined. Monthly casualty rates by mode and severity (top) and distance travelled by active modes across Great Britain, start of 2013 to end of 2019 (crash data) and start of 2013 to end of 2017 (travel data). Credit: ITS Leeds, using the stats19 R package, ONS population estimates, and the National Travel Survey summary statistics (NTS0303).", echo=FALSE, message=FALSE}
 ggthemr::ggthemr(palette = "flat")
-cas_long = readRDS("cas_long.Rds")
+cas_long = readRDS("cas_long_1990.Rds")
 # ggplot(cas_long) +
 #   geom_line(aes(month, Number)) +
 #   facet_grid(Severity ~ Mode) +
@@ -116,9 +116,11 @@ p1 = ggplot(cas_long) +
   scale_y_log10() +
   ylab("Casualties/month") +
   xlab("")
+p1
+saveRDS(p1, "p1_ggplot_1979_2019.Rds")
 active_distance_km = readr::read_csv("gb-cycled-long.csv")
 active_distance_km = active_distance_km %>% 
-  filter(Year > 2012)
+  filter(Year > 1989)
 names(active_distance_km) = c("Cyclist", "Pedestrian", "Date")
 active_long = gather(active_distance_km, Mode, Distance, -Date)
 active_long$Date = active_long$Date + 0.5
