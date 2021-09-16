@@ -25,9 +25,9 @@ library(tidyverse)
 ![](https://raw.githubusercontent.com/saferactive/saferactive/master/README_files/figure-gfm/trend-1.png)
 
 - Some evidence that policies to enable more walking and cycling have been effective
-- Little evidence that walking and cycling has become safer
-  - Where have active travels levels increased, while casualty rates have continued to fall?
-  - What are the characteristics of these places and can we learn from these places?
+- But have walking and cycling become safer?
+  - Where have active travels levels increased and casualty rates fallen?
+  - What are the characteristics of these places and can we learn from them?
 
 ---
 
@@ -40,7 +40,7 @@ library(tidyverse)
 
 ![](https://user-images.githubusercontent.com/1825120/133630087-863f4f4b-c5ab-4e6a-995e-f1f1c6a11dca.png)
 
-- Numbers of people killed/injured while walking and cycling have 'flatlined' since around 2010
+- Numbers of people killed/injured while walking and cycling have mostly 'flatlined' since around 2010
 - But what about the rate of casualties per unit time/population/distance?
 
 ---
@@ -48,6 +48,9 @@ library(tidyverse)
 ## The pandemic
 
 ![](https://user-images.githubusercontent.com/1825120/133615184-e1782729-9660-4508-8107-2e17ddb49904.png)
+
+- Major changes to travel behaviour, with cycling increasing while other modes of travel are reduced
+- Longer term impacts remain uncertain
 
 ---
 
@@ -113,7 +116,7 @@ All counter values (black lines) and average counter values in sample of local a
   - New geo datasets with change in active travel (currently cycling) over time
   - New geographic datasets on adjusted collision rates over time
 - Research findings
-  - Substantial regional differences in trends for active travel levels (cycling), casualty numbers, and the rate of casualties per distance walked and cycled
+  - Substantial regional differences in trends for active travel levels, casualty numbers, and the rate of casualties per distance walked and cycled
 
 - New methods
   - Framework for exploratory analysis of complex datasets for informing policy
