@@ -77,6 +77,19 @@ All counter values (black lines) and average counter values in sample of local a
 
 ---
 
+#### Road safety and inequality
+
+![](https://user-images.githubusercontent.com/1825120/134364522-e18b9140-5bbf-43ff-85b0-8374e7088694.png)
+
+Slight, serious, and fatal cycling injury rates by residential IMD quintile and year,
+2014-2019. The error bars show 95% confidence intervals. Source: *Socioeconomic inequalities in cycling safety*, Transport and Health, Vidal Tortosa et al. (2021).
+
+???
+
+This relates to the levelling up agenda
+
+---
+
 #### Approaches
 
 .pull-left[
