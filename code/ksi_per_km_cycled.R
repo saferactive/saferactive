@@ -92,6 +92,7 @@ crash$la_name = NULL
 # piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
 cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv") %>% select(-la_name)
 cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
+cycle_km = cycle_km %>% filter(! is.na(la_code))
 
 # New code to join with estimates of km cycled (from raw DfT counters) ----------------
 
@@ -119,13 +120,25 @@ lookup_la_lad = crash %>%
   group_by(la_code, LAD19NM, ctyua19nm) %>%
   summarise()
 
-# Group cycle_km to upper tier LA
+# Match cycle_km to upper tier LA
 cycle_km_uppertier = inner_join(cycle_km, lookup_la_lad, by = "la_code")
 
-# Ensure there are no duplicates
+# Ensure there are no duplicates and that cycle_km and cycle_km_uppertier have the same number of rows
 cycle_km_uppertier[which(duplicated(cycle_km_uppertier$la_code)),]
+dim(cycle_km)
+dim(cycle_km_uppertier)
+a = unique(cycle_km$la_code)
+b = unique(cycle_km_uppertier$la_code)
+a[! a %in% b]
 
-# Join cycle_km with DfT count data group by upper tier LA
+# Group by upper tier LA and keep 2011 data only
+cycle_km_uppertier = cycle_km_uppertier %>%
+  group_by(ctyua19nm) %>%
+  summarise(
+    km_cycle_2011 = sum(km_cycle_2011)
+  )
+
+# Join cycle_km with DfT count data grouped by upper tier LA
 dft_uppertier = readRDS("dft_uppertier.Rds")
 
 
