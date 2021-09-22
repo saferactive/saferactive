@@ -141,20 +141,27 @@ cycle_km_uppertier = cycle_km_uppertier %>%
 # Join cycle_km with DfT count data grouped by upper tier LA
 dft_uppertier = readRDS("dft_uppertier.Rds")
 
+dft_wide = dft_uppertier %>%
+  pivot_wider(id_cols = c("ctyua19nm"),
+              names_from = c("year"),
+              values_from = c("dft_cycles"),
+              names_prefix = "dft_count_")
 
+annual_changes = inner_join(dft_wide, cycle_km_uppertier, by = "ctyua19nm")
 
-# Match police force areas with LADs --------------------------------------
-
-# Police forces and LAD names now match up
-pf_lookup = crash %>%
-  st_drop_geometry() %>%
-  select(la_code, LAD19NM, police_force) %>%
-  group_by(la_code, LAD19NM, police_force) %>%
-  filter(n() > 3) %>%
-  summarise()
-# pf_lookup[duplicated(pf_lookup$LAD19NM),]
-
-saveRDS(pf_lookup, "pf_lookup.Rds")
+# Calculate adjustments to other years based on 2011 cycling levels and DfT counts
+annual_changes = annual_changes %>%
+  mutate(
+    km_cycle_2010 = km_cycle_2011 * (dft_count_2010 / dft_count_2011),
+    km_cycle_2012 = km_cycle_2011 * (dft_count_2012 / dft_count_2011),
+    km_cycle_2013 = km_cycle_2011 * (dft_count_2013 / dft_count_2011),
+    km_cycle_2014 = km_cycle_2011 * (dft_count_2014 / dft_count_2011),
+    km_cycle_2015 = km_cycle_2011 * (dft_count_2015 / dft_count_2011),
+    km_cycle_2016 = km_cycle_2011 * (dft_count_2016 / dft_count_2011),
+    km_cycle_2017 = km_cycle_2011 * (dft_count_2017 / dft_count_2011),
+    km_cycle_2018 = km_cycle_2011 * (dft_count_2018 / dft_count_2011),
+    km_cycle_2019 = km_cycle_2011 * (dft_count_2019 / dft_count_2011),
+  )
 
 # Filter to peak hours only and group by LA --------------------------------------------------
 
@@ -197,7 +204,7 @@ crash_wide = crash %>%
               names_prefix = "ksi_")
 
 # Join with estimates of km cycled
-la_test = left_join(crash_wide, cycle_km, by = "ctyua19nm")
+la = left_join(crash_wide, annual_changes, by = "ctyua19nm")
 
 la$ksi_perBkm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000000
 la$ksi_perBkm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000000
@@ -210,7 +217,7 @@ la$ksi_perBkm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000000
 la$ksi_perBkm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000000
 la$ksi_perBkm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000000
 
-saveRDS(la, "cycle-collision-risk.Rds")
+saveRDS(la, "cycle-collision-risk-dft-counters.Rds")
 
 
 # Group by police force ---------------------------------------------------
@@ -231,7 +238,21 @@ crash_pf = crash %>%
               values_from = c("ksi_cycle"),
               names_prefix = "ksi_")
 
-cycle_km_pf = inner_join(cycle_km, pf_lookup, by = "la_code")
+# Match police force areas with LADs --------------------------------------
+
+# Police forces and LA names now match up
+pf_lookup = crash %>%
+  st_drop_geometry() %>%
+  select(ctyua19nm, police_force) %>%
+  group_by(ctyua19nm, police_force) %>%
+  filter(n() > 3) %>%
+  summarise()
+# pf_lookup[duplicated(pf_lookup$LAD19NM),]
+
+saveRDS(pf_lookup, "pf_lookup.Rds")
+
+
+cycle_km_pf = inner_join(annual_changes, pf_lookup, by = "ctyua19nm")
 cycle_km_pf = cycle_km_pf %>%
   group_by(police_force) %>%
   summarise(
@@ -260,12 +281,12 @@ la_pf$ksi_perBkm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000000
 la_pf$ksi_perBkm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000000
 la_pf$ksi_perBkm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000000
 
-saveRDS(la_pf, "cycle-collision-risk-pf.Rds")
+saveRDS(la_pf, "cycle-collision-risk-pf-dft.Rds")
 
 # Read in results ---------------------------------------------------------
 
-la = readRDS("cycle-collision-risk.Rds")
-la_pf = readRDS("cycle-collision-risk-pf.Rds")
+la = readRDS("cycle-collision-risk_dft-counters.Rds")
+la_pf = readRDS("cycle-collision-risk-pf-dft.Rds")
 
 # remove extra columns
 # la_cut = la[,c("LAD19NM",names(la)[grepl("ksi_perBkm_",names(la))])]
@@ -640,10 +661,12 @@ ggplot(la_urb%>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = 
   # + geom_text(label = la$LAD19NM, nudge_y = -0.1, cex = 3)
 
 # change in absolute KSI
-ggplot(la %>% filter(! LAD19NM == "City of London"), aes(x = diff_cycle, y = diff_ksi)) +
+ggplot(la
+       # %>% filter(! ctyua19nm == "City of London")
+       , aes(x = diff_km_cycled, y = diff_ksi)) +
   geom_point() +
   theme(legend.title = element_blank()) +
-  labs(x = "Modelled % change in cycling uptake", y = "% change in absolute cycle KSI") +
+  labs(x = "% change in km cycled", y = "% change in absolute cycle KSI") +
   geom_smooth(method = lm, alpha = 0.2)
 
 # ggplot(crash_yr,
@@ -673,8 +696,8 @@ bounds = bounds[!is.na(bounds$ksi_perBkm_2019),]
 # Police force geometry
 # from https://data.gov.uk/dataset/41f748c0-48d6-48dd-a452-c73c2afae187/police-force-areas-december-2018-ew-buc
 ## piggyback::pb_upload("Police_Force_Areas_December_2018_EW_BUC.geojson")
-piggyback::pb_download("Police_Force_Areas_.December_2018._EW_BUC.geojson")
-pf_geom = read_sf("Police_Force_Areas_.December_2018._EW_BUC.geojson") # todo: make reproducible
+piggyback::pb_download("Police_Force_Areas_(December_2018)_EW_BUC.geojson")
+pf_geom = read_sf("Police_Force_Areas_(December_2018)_EW_BUC.geojson") # todo: make reproducible
 pf_geom$pfa18nm[pf_geom$pfa18nm == "Devon & Cornwall"] = "Devon and Cornwall"
 pf_geom$pfa18nm[pf_geom$pfa18nm == "London, City of"] = "City of London"
 pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
@@ -687,7 +710,7 @@ tm_shape(bounds) +
 
 tmap_options(check.and.fix = TRUE)
 tm_shape(pf_geom) +
-  tm_fill("ksi_perBkm_2019", breaks = c(0, 400, 800, 1200, 1600, 2000)) +
+  tm_fill("ksi_perBkm_2019", breaks = c(0, 500, 1000, 1500, 2000, 2500)) +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
