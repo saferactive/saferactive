@@ -86,18 +86,16 @@ crash$hour = lubridate::hour(crash$datetime)
 crash$la_name = NULL
 
 
-# Join with estimates of km cycled (from original GAM) -----------------------------
+# Get estimates of km cycled (from PCT rnet and original GAM) -----------------------------
 
 # these use LAD19NM. I will need to regenerate the data using LAD11NM to make it compatible with the rural_urban LAD classifications
 # piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
 cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv") %>% select(-la_name)
 cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
 
+# New code to join with estimates of km cycled (from raw DfT counters) ----------------
 
-# Join with estimates of km cycled (from raw DfT counters) ----------------
-
-# Get 2019 Upper Tier LAs
-crash$ctyua19nm = crash$local_authority_highway
+# Assign crash data to 2019 Upper Tier LAs
 crash$ctyua19nm = case_when(
   crash$LAD11NM %in% c("Bournemouth", "Christchurch", "Poole") ~ "Bournemouth, Christchurch and Poole",
   crash$local_authority_highway == "Argyll & Bute" ~ "Argyll and Bute",
@@ -107,9 +105,28 @@ crash$ctyua19nm = case_when(
   crash$local_authority_highway == "Na h-Eileanan an Iar (Western Isles)" ~ "Na h-Eileanan Siar",
   crash$local_authority_highway == "Rhondda, Cynon, Taff" ~ "Rhondda Cynon Taf",
   crash$local_authority_highway == "The Vale of Glamorgan" ~ "Vale of Glamorgan",
+  crash$local_authority_highway == "Isles of Scilly" ~ "Cornwall",
+  crash$LAD19NM == "Blackburn with Darwen" ~ "Blackburn with Darwen",
+  crash$LAD19NM == "Blackpool" ~ "Blackpool",
+  crash$LAD19NM == "Preston" ~ "Lancashire",
   TRUE ~ crash$local_authority_highway
   )
 
+# Get lookup to use with PCT rnet data
+lookup_la_lad = crash %>%
+  st_drop_geometry() %>%
+  select(la_code, LAD19NM, ctyua19nm) %>%
+  group_by(la_code, LAD19NM, ctyua19nm) %>%
+  summarise()
+
+# Group cycle_km to upper tier LA
+cycle_km_uppertier = inner_join(cycle_km, lookup_la_lad, by = "la_code")
+
+# Ensure there are no duplicates
+cycle_km_uppertier[which(duplicated(cycle_km_uppertier$la_code)),]
+
+# Join cycle_km with DfT count data group by upper tier LA
+dft_uppertier = readRDS("dft_uppertier.Rds")
 
 
 
@@ -130,25 +147,24 @@ saveRDS(pf_lookup, "pf_lookup.Rds")
 
 # # Group by lower tier LAD19NM
 # # use KSI from peak hours on weekdays only (to match the PCT travel to work flows as closely as possible)
-crash_wide2 = crash %>%
-  st_drop_geometry() %>%
-  filter(
-    hour %in% c(7, 8, 9, 16, 17, 18),
-    ! day_of_week %in% c("Saturday", "Sunday")
-    ) %>%
-  group_by(LAD19NM,
-           la_code,
-           ctyua19nm,
-           year) %>%
-  summarise(ksi_cycle = sum(casualty_serious_cyclist) +
-              sum(casualty_fatal_cyclist)) %>%
-  pivot_wider(id_cols = c("LAD19NM","la_code"),
-              names_from = c("year"),
-              values_from = c("ksi_cycle"),
-              names_prefix = "ksi_")
+# crash_wide2 = crash %>%
+#   st_drop_geometry() %>%
+#   filter(
+#     hour %in% c(7, 8, 9, 16, 17, 18),
+#     ! day_of_week %in% c("Saturday", "Sunday")
+#     ) %>%
+#   group_by(LAD19NM,
+#            la_code,
+#            ctyua19nm,
+#            year) %>%
+#   summarise(ksi_cycle = sum(casualty_serious_cyclist) +
+#               sum(casualty_fatal_cyclist)) %>%
+#   pivot_wider(id_cols = c("LAD19NM","la_code"),
+#               names_from = c("year"),
+#               values_from = c("ksi_cycle"),
+#               names_prefix = "ksi_")
 
-# Join with estimates of km cycled
-la_test = left_join(crash_wide, cycle_km, by = "la_code")
+
 
 # Group by upper tier ctyua19nm
 # use KSI from peak hours on weekdays only (to match the PCT travel to work flows as closely as possible)
@@ -167,7 +183,8 @@ crash_wide = crash %>%
               values_from = c("ksi_cycle"),
               names_prefix = "ksi_")
 
-
+# Join with estimates of km cycled
+la_test = left_join(crash_wide, cycle_km, by = "ctyua19nm")
 
 la$ksi_perBkm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000000
 la$ksi_perBkm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000000

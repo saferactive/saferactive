@@ -227,6 +227,22 @@ dft_regional_10yr %>%
   scale_color_brewer(type = "qual", palette = 3) +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
+# Upper tier LA
+
+dft_uppertier = dft_counts %>%
+  st_drop_geometry() %>%
+  group_by(ctyua19nm, year) %>%
+  summarise(dft_cycles = mean(pedal_cycles),
+            dft_change_cycles = mean(change_min_cycles)
+            # , change_min_cycles_norm = mean(change_min_cycles_norm)
+  ) %>%
+  mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
+         dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)]
+         # , change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)]
+  )
+
+saveRDS(dft_uppertier, "dft_uppertier.Rds")
+
 # NTS results -------------------------------------------------------------
 
 # Multiply trips by regional population
