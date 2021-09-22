@@ -688,8 +688,11 @@ ggplot(la
 
 # get the geometry again
 # piggyback::pb_download("la_lower_for_plots.Rds", tag = "0.1.3")
-bounds = readRDS("la_lower_for_plots.Rds")
-bounds = left_join(bounds %>% select(-la_name), la, by = "la_code")
+# piggyback::pb_download("la_upper_for_plots.gpkg", tag = "0.1.3")
+
+## LA boundaries
+bounds = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp")
+bounds = left_join(bounds, la, by = "ctyua19nm")
 bounds = bounds[!is.na(bounds$ksi_perBkm_2019),]
 # bounds10 = bounds[is.na(bounds$ksi_perBkm_2010),]
 
@@ -704,7 +707,7 @@ pf_geom = left_join(pf_geom, la_pf, by = c("pfa18nm" = "police_force"))
 # pf_geom = pf_geom[!is.na(pf_geom$ksi_perBkm_2019),]
 
 tm_shape(bounds) +
-  tm_fill("ksi_perBkm_2019") +
+  tm_fill("ksi_perBkm_2011") +
   tm_borders(lwd = 0.1) +
   tm_layout(legend.outside = TRUE)
 
@@ -787,7 +790,7 @@ greatest_decrease = arrange(top_n(la, 10, -diff_risk),diff_risk) # greatest decr
 
 # Create clean object for TGVE
 bounds_clean = bounds %>%
-  select(lad_name, mean_risk, diff_risk, diff_cycle_wd, la_code) %>%
+  select(ctyua19nm, ksi_perBkm_2011, diff_risk, km_cycle_2011, diff_km_cycled, ksi_2011, diff_ksi, ctyua19cd) %>%
   mutate_if(is.numeric, round, digits = 2) %>%
   sf::st_drop_geometry()
 
