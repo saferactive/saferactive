@@ -13,13 +13,10 @@ library(readr)
 # crash = readRDS("la_crash_summary_wideform.Rds")
 # piggyback::pb_download("la_crash_summary_longform.Rds", tag = "0.1.3")
 
-piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties.Rds")
-# crash_raw = readRDS("crash_2010_2019_with_summary_adjusted_casualties.Rds")
-
 # For 2019 LAD names ------------------------------------------------------
 
 # piggyback::pb_download("crash_2010_2019_with_summary_adjusted_casualties.Rds")
-crash_raw = readRDS("crash_2010_2019_with_summary_adjusted_casualties.Rds")
+crash_raw = readRDS("data/crash_2010_2019_with_summary_adjusted_casualties.Rds")
 
 crash_raw = st_drop_geometry(crash_raw)
 
@@ -32,7 +29,7 @@ crash_raw = st_drop_geometry(crash_raw)
 
 # Get and apply LAD codes (joining using 2011 LAD names)
 # Notice slight change of file name () replaced with "."
-la.file = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom_updated.csv"
+la.file = "Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom_updated.csv"
 # piggyback::pb_download(la.file)
 stopifnot(file.exists(la.file))
 names_lad = read_csv(la.file)
@@ -44,7 +41,7 @@ namejoin = left_join(crash_raw, names_lad, by = c("local_authority_district" = "
 xx = namejoin %>% filter(is.na(LAD19CD)) %>% group_by(local_authority_district) %>% summarise()
 
 # Standardise to 2019 LAD names
-la.file.updated = "Local_Authority_Districts_.December_2019._Names_and_Codes_in_the_United_Kingdom.csv"
+la.file.updated = "Local_Authority_Districts_(December_2019)_Names_and_Codes_in_the_United_Kingdom.csv"
 # piggyback::pb_download(la.file.updated)
 
 stopifnot(file.exists(la.file.updated))
@@ -88,12 +85,37 @@ crash$year = lubridate::year(crash$date)
 crash$hour = lubridate::hour(crash$datetime)
 crash$la_name = NULL
 
+
+# Join with estimates of km cycled (from original GAM) -----------------------------
+
 # these use LAD19NM. I will need to regenerate the data using LAD11NM to make it compatible with the rural_urban LAD classifications
 # piggyback::pb_download("la_lower_km_cycled_2010_2019.csv", tag = "0.1.3")
 cycle_km = read.csv("la_lower_km_cycled_2010_2019.csv") %>% select(-la_name)
 cycle_km = cycle_km[,c("la_code",names(cycle_km)[grepl("km_cycle_20",names(cycle_km))])]
 
-# Police forces and LA names now match up
+
+# Join with estimates of km cycled (from raw DfT counters) ----------------
+
+# Get 2019 Upper Tier LAs
+crash$ctyua19nm = crash$local_authority_highway
+crash$ctyua19nm = case_when(
+  crash$LAD11NM %in% c("Bournemouth", "Christchurch", "Poole") ~ "Bournemouth, Christchurch and Poole",
+  crash$local_authority_highway == "Argyll & Bute" ~ "Argyll and Bute",
+  crash$local_authority_highway == "Dumfries & Galloway" ~ "Dumfries and Galloway",
+  crash$local_authority_highway == "Edinburgh, City of" ~ "City of Edinburgh",
+  crash$local_authority_highway == "London Airport (Heathrow)" ~ "Hillingdon",
+  crash$local_authority_highway == "Na h-Eileanan an Iar (Western Isles)" ~ "Na h-Eileanan Siar",
+  crash$local_authority_highway == "Rhondda, Cynon, Taff" ~ "Rhondda Cynon Taf",
+  crash$local_authority_highway == "The Vale of Glamorgan" ~ "Vale of Glamorgan",
+  TRUE ~ crash$local_authority_highway
+  )
+
+
+
+
+# Match police force areas with LADs --------------------------------------
+
+# Police forces and LAD names now match up
 pf_lookup = crash %>%
   st_drop_geometry() %>%
   select(la_code, LAD19NM, police_force) %>%
@@ -104,10 +126,11 @@ pf_lookup = crash %>%
 
 saveRDS(pf_lookup, "pf_lookup.Rds")
 
-# Group by lower tier LA --------------------------------------------------
+# Filter to peak hours only and group by LA --------------------------------------------------
 
-# use peak hours on weekdays only
-crash_wide = crash %>%
+# # Group by lower tier LAD19NM
+# # use KSI from peak hours on weekdays only (to match the PCT travel to work flows as closely as possible)
+crash_wide2 = crash %>%
   st_drop_geometry() %>%
   filter(
     hour %in% c(7, 8, 9, 16, 17, 18),
@@ -115,6 +138,7 @@ crash_wide = crash %>%
     ) %>%
   group_by(LAD19NM,
            la_code,
+           ctyua19nm,
            year) %>%
   summarise(ksi_cycle = sum(casualty_serious_cyclist) +
               sum(casualty_fatal_cyclist)) %>%
@@ -123,7 +147,27 @@ crash_wide = crash %>%
               values_from = c("ksi_cycle"),
               names_prefix = "ksi_")
 
-la = left_join(crash_wide, cycle_km, by = "la_code")
+# Join with estimates of km cycled
+la_test = left_join(crash_wide, cycle_km, by = "la_code")
+
+# Group by upper tier ctyua19nm
+# use KSI from peak hours on weekdays only (to match the PCT travel to work flows as closely as possible)
+crash_wide = crash %>%
+  st_drop_geometry() %>%
+  filter(
+    hour %in% c(7, 8, 9, 16, 17, 18),
+    ! day_of_week %in% c("Saturday", "Sunday")
+  ) %>%
+  group_by(ctyua19nm,
+           year) %>%
+  summarise(ksi_cycle = sum(casualty_serious_cyclist) +
+              sum(casualty_fatal_cyclist)) %>%
+  pivot_wider(id_cols = c("ctyua19nm"),
+              names_from = c("year"),
+              values_from = c("ksi_cycle"),
+              names_prefix = "ksi_")
+
+
 
 la$ksi_perBkm_2010 = la$ksi_2010 / la$km_cycle_2010 * 1000000
 la$ksi_perBkm_2011 = la$ksi_2011 / la$km_cycle_2011 * 1000000
@@ -329,7 +373,11 @@ la$mean_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]], 1, mean, na
 la$early_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_risk = (la$late_risk / la$early_risk -1) * 100
+
 la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
+la$early_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
+la$late_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
+la$diff_km_cycled = (la$late_km_cycled / la$early_km_cycled -1) * 100
 
 la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
 la$early_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,1:5], 1, mean, na.rm = TRUE)
@@ -351,7 +399,12 @@ la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]],
 la_pf$early_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diff_risk = la_pf$late_risk - la_pf$early_risk
+
 la_pf$mean_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$early_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
+la_pf$late_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
+la_pf$diff_km_cycled = (la_pf$late_km_cycled / la_pf$early_km_cycled -1) * 100
+
 la_pf$mean_cycle_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]], 1, mean, na.rm = TRUE)
 
 la_pf$mean_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]], 1, mean, na.rm = TRUE)
