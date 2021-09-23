@@ -141,6 +141,18 @@ Trends in KSI risk for GAM outputs
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130441145-8a5edd19-6c34-4dda-8c78-4dd7bcb90ef7.png")
 ```
 
+# Data downloads
+
+KSI and risk data are estimated based on cyclists killed and seriously injured during weekday peak hours (07:00 - 10:00 and 16:00 - 19:00), and estimates of km cycled derived from Census 2011 travel to work by bicycle. 
+
+For other years, the 2011 commute flows are adjusted using the DfT counter data, based on mean AADF counts within the relevant geographical zone, e.g: 
+
+km_cycled_2019 = km_cycled_2011 * (mean_count_2019 / ( mean( mean_count_2010, mean_count_2011, mean_count_2012)))
+
+The Upper Tier Local Authority level trends in peak hour cycling and risk can be found at https://github.com/saferactive/saferactive/releases/download/0.1.4/ksi.csv
+
+The police force level trends in peak hour cycling can be found at 
+https://github.com/saferactive/saferactive/releases/download/0.1.4/ksi-pf.csv
 
 # Low Traffic Neighbourhoods and rat-runs
 

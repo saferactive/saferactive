@@ -325,6 +325,8 @@ pop2 = pop1 %>%
     population_2019 = sum(population_2019),
   )
 
+lookup_la_lad = readRDS("lookup_la_lad.Rds")
+
 pop3 = inner_join(lookup_la_lad, pop2, by = c("la_code" = "ladcode20"))
 pop3 = pop3 %>%
   group_by(ctyua19nm) %>%
@@ -475,6 +477,9 @@ la_pf$late_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))
 la_pf$diff_km_cycled = (la_pf$late_km_cycled / la_pf$early_km_cycled -1) * 100
 
 la_pf$mean_cycle_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$early_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
+la_pf$late_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
+la_pf$diff_ksi = (la_pf$late_ksi / la_pf$early_ksi -1) * 100
 
 la_pf$mean_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]], 1, mean, na.rm = TRUE)
 la_pf$early_km_percap = apply(la_pf[,names(la_pf)[grepl("km_percap_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
@@ -813,4 +818,15 @@ bounds_clean = bounds %>%
   sf::st_drop_geometry()
 
 readr::write_csv(bounds_clean, "../tgve/ksi.csv")
+write_csv(bounds_clean, "ksi.csv")
+piggyback::pb_upload("ksi.csv")
 
+# Create clean object for TGVE
+pf_clean = pf_geom %>%
+  select(pfa18nm, ksi_perBkm_2011, diff_risk, km_cycle_2011, diff_km_cycled, ksi_2011, diff_ksi, pfa18cd) %>%
+  mutate_if(is.numeric, round, digits = 2) %>%
+  sf::st_drop_geometry()
+
+readr::write_csv(pf_geom, "../tgve/ksi-pf.csv")
+write_csv(pf_geom, "ksi-pf.csv")
+piggyback::pb_upload("ksi-pf.csv")
