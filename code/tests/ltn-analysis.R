@@ -1,4 +1,6 @@
 library(cyclestreets)
+library(tidyverse)
+library(sf)
 
 u = paste0("https://api.cyclestreets.net/v2/advocacydata.ltns?key=",
            Sys.getenv("CYCLESTREETS"),
@@ -14,12 +16,11 @@ ltn_data = ltn_data %>%
   mutate(length = st_length(ltn_data))
 
 # Split segments that are longer than 500m
-
+# Not needed for now
 
 
 # Find centroid of each segment
-ltn_data = ltn_data %>%
-  mutate(centroid = st_centroid(ltn_data))
+ltn_centroid = st_centroid(ltn_data)
 
 # Assign segments to a spatial grid
 grid = st_make_grid(ltn_data,
@@ -29,23 +30,23 @@ grid = st_make_grid(ltn_data,
 grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
                            geometry = grid))
 
-rnet2 = st_join(ltn_data, grid)
-rnet2 = group_by(rnet2, gridid)
-rnet2 = group_split(rnet2)
+rnet2 = st_join(ltn_centroid, grid)
+ltn_aggregated = rnet2 %>%
+  st_drop_geometry() %>%
+  group_by(gridid) %>%
+  summarise(
+    length_ltn = sum(length[which(ratrun == "no")]),
+    length_ratrun = sum(length[which(ratrun == "yes")]),
+    length_calmed = sum(length[which(ratrun == "calmed")]),
+    length_main = sum(length[which(ratrun == "main")])
+  )
 
-names(rnet2) <- sapply(rnet2, function(x){
-  x$gridid[1]
-})
-
-rnet2 <- rnet2[!is.na(names(rnet2))]
+ltn_grid = left_join(grid, ltn_aggregated)
+plot(ltn_grid)
+mapview(ltn_grid["length_main"])
 
 
-grid_split <- group_by(grid, gridid)
-grid_split <- group_split(grid_split)
 
-names(grid_split) <- sapply(grid_split, function(x){
-  x$gridid[1]
-})
 
 
 identical(names(rnet2), names(grid_split))
