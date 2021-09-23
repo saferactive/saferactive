@@ -42,6 +42,9 @@ gam_results = readRDS("gam-full-results-grid-national-2020-2.Rds")
 # piggyback::pb_download("region-populations.Rds")
 region_populations = readRDS("region-populations.Rds")
 
+# TfL counters (2015 - 2020)
+tfl_counts = readRDS("tfl-counts-by-site-2020.Rds")
+
 
 # Single dataset trends ---------------------------------------------------
 
@@ -233,7 +236,8 @@ dft_uppertier = dft_counts %>%
   st_drop_geometry() %>%
   group_by(ctyua19nm, year) %>%
   summarise(dft_cycles = mean(pedal_cycles),
-            dft_change_cycles = mean(change_min_cycles)
+            dft_change_cycles = mean(change_min_cycles),
+            n_counts = n()
             # , change_min_cycles_norm = mean(change_min_cycles_norm)
   ) %>%
   mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
@@ -242,6 +246,20 @@ dft_uppertier = dft_counts %>%
   )
 
 saveRDS(dft_uppertier, "dft_uppertier.Rds")
+
+
+# TfL counts --------------------------------------------------------------
+
+tfl_counts = tfl_counts %>%
+  group_by(year) %>%
+  summarise(tfl_cycles = mean(mean_site))
+
+tfl_counts %>%
+  ggplot() +
+  geom_line(aes(year, tfl_cycles), lwd = 0.8) +
+  labs(y = "Mean cycle count", x  = "Year") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2020), limits = c(2015, 2020))
 
 # NTS results -------------------------------------------------------------
 

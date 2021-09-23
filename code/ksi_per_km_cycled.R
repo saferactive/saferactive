@@ -120,6 +120,8 @@ lookup_la_lad = crash %>%
   group_by(la_code, LAD19NM, ctyua19nm) %>%
   summarise()
 
+saveRDS(lookup_la_lad, "lookup_la_lad.Rds")
+
 # Match cycle_km to upper tier LA
 cycle_km_uppertier = inner_join(cycle_km, lookup_la_lad, by = "la_code")
 
@@ -152,15 +154,15 @@ annual_changes = inner_join(dft_wide, cycle_km_uppertier, by = "ctyua19nm")
 # Calculate adjustments to other years based on 2011 cycling levels and DfT counts
 annual_changes = annual_changes %>%
   mutate(
-    km_cycle_2010 = km_cycle_2011 * (dft_count_2010 / dft_count_2011),
-    km_cycle_2012 = km_cycle_2011 * (dft_count_2012 / dft_count_2011),
-    km_cycle_2013 = km_cycle_2011 * (dft_count_2013 / dft_count_2011),
-    km_cycle_2014 = km_cycle_2011 * (dft_count_2014 / dft_count_2011),
-    km_cycle_2015 = km_cycle_2011 * (dft_count_2015 / dft_count_2011),
-    km_cycle_2016 = km_cycle_2011 * (dft_count_2016 / dft_count_2011),
-    km_cycle_2017 = km_cycle_2011 * (dft_count_2017 / dft_count_2011),
-    km_cycle_2018 = km_cycle_2011 * (dft_count_2018 / dft_count_2011),
-    km_cycle_2019 = km_cycle_2011 * (dft_count_2019 / dft_count_2011),
+    km_cycle_2010 = km_cycle_2011 * (dft_count_2010 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2012 = km_cycle_2011 * (dft_count_2012 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2013 = km_cycle_2011 * (dft_count_2013 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2014 = km_cycle_2011 * (dft_count_2014 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2015 = km_cycle_2011 * (dft_count_2015 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2016 = km_cycle_2011 * (dft_count_2016 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2017 = km_cycle_2011 * (dft_count_2017 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2018 = km_cycle_2011 * (dft_count_2018 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2019 = km_cycle_2011 * (dft_count_2019 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012)))
   )
 
 # Filter to peak hours only and group by LA --------------------------------------------------
@@ -285,7 +287,7 @@ saveRDS(la_pf, "cycle-collision-risk-pf-dft.Rds")
 
 # Read in results ---------------------------------------------------------
 
-la = readRDS("cycle-collision-risk_dft-counters.Rds")
+la = readRDS("cycle-collision-risk-dft-counters.Rds")
 la_pf = readRDS("cycle-collision-risk-pf-dft.Rds")
 
 # remove extra columns
@@ -323,11 +325,27 @@ pop2 = pop1 %>%
     population_2019 = sum(population_2019),
   )
 
-la = left_join(la, pop2, by = c("la_code" = "ladcode20"))
+pop3 = inner_join(lookup_la_lad, pop2, by = c("la_code" = "ladcode20"))
+pop3 = pop3 %>%
+  group_by(ctyua19nm) %>%
+  summarise(
+    population_2010 = sum(population_2010),
+    population_2011 = sum(population_2011),
+    population_2012 = sum(population_2012),
+    population_2013 = sum(population_2013),
+    population_2014 = sum(population_2014),
+    population_2015 = sum(population_2015),
+    population_2016 = sum(population_2016),
+    population_2017 = sum(population_2017),
+    population_2018 = sum(population_2018),
+    population_2019 = sum(population_2019)
+    )
+
+la = left_join(la, pop3, by = "ctyua19nm")
 
 # check for NAs
 xx = la %>%
-  filter(is.na(laname20))
+  filter(is.na(ctyua19nm))
 
 # Calculate km_cycled per capita in each year
 la = la %>%
@@ -349,11 +367,11 @@ la = la %>%
 # piggyback::pb_download("pf_lookup.Rds")
 pf_lookup = readRDS("pf_lookup.Rds")
 
-pf_pop = left_join(pop2, pf_lookup, by = c("ladcode20" = "la_code"))
+pf_pop = left_join(pop3, pf_lookup, by = "ctyua19nm")
 
 # check for NAs
 xx = pf_pop %>%
-  filter(is.na(LAD19NM))
+  filter(is.na(ctyua19nm))
 
 pf_pop = pf_pop %>%
   group_by(police_force) %>%
@@ -388,34 +406,34 @@ la_pf = la_pf %>%
   )
 
 
-# Workday population ------------------------------------------------------
-# (workplace population plus residents who don't work)
-# Repeat analyses using this. km_percap will decrease for inner london and increase for outer london / rural areas
-# from https://www.nomisweb.co.uk/census/2011/wd102ew
-
-# piggyback::pb_download("workday-population.csv", tag = "0.1.4")
-workday_pop = read_csv("workday-population.csv")
-
-la = left_join(la, workday_pop, by = c("la_code" = "lad_code"))
-
-# check for NAs
-xx = la %>%
-  filter(is.na(wdpop_2011))
-
-# Calculate km_cycled per workday capita in each year (based on 2011 workday population)
-la = la %>%
-  mutate(
-    km_perwd_2010 = km_cycle_2010 / wdpop_2011,
-    km_perwd_2011 = km_cycle_2011 / wdpop_2011,
-    km_perwd_2012 = km_cycle_2012 / wdpop_2011,
-    km_perwd_2013 = km_cycle_2013 / wdpop_2011,
-    km_perwd_2014 = km_cycle_2014 / wdpop_2011,
-    km_perwd_2015 = km_cycle_2015 / wdpop_2011,
-    km_perwd_2016 = km_cycle_2016 / wdpop_2011,
-    km_perwd_2017 = km_cycle_2017 / wdpop_2011,
-    km_perwd_2018 = km_cycle_2018 / wdpop_2011,
-    km_perwd_2019 = km_cycle_2019 / wdpop_2011
-    )
+# # Workday population ------------------------------------------------------
+# # (workplace population plus residents who don't work)
+# # Repeat analyses using this. km_percap will decrease for inner london and increase for outer london / rural areas
+# # from https://www.nomisweb.co.uk/census/2011/wd102ew
+#
+# # piggyback::pb_download("workday-population.csv", tag = "0.1.4")
+# workday_pop = read_csv("workday-population.csv")
+#
+# la = left_join(la, workday_pop, by = c("la_code" = "lad_code"))
+#
+# # check for NAs
+# xx = la %>%
+#   filter(is.na(wdpop_2011))
+#
+# # Calculate km_cycled per workday capita in each year (based on 2011 workday population)
+# la = la %>%
+#   mutate(
+#     km_perwd_2010 = km_cycle_2010 / wdpop_2011,
+#     km_perwd_2011 = km_cycle_2011 / wdpop_2011,
+#     km_perwd_2012 = km_cycle_2012 / wdpop_2011,
+#     km_perwd_2013 = km_cycle_2013 / wdpop_2011,
+#     km_perwd_2014 = km_cycle_2014 / wdpop_2011,
+#     km_perwd_2015 = km_cycle_2015 / wdpop_2011,
+#     km_perwd_2016 = km_cycle_2016 / wdpop_2011,
+#     km_perwd_2017 = km_cycle_2017 / wdpop_2011,
+#     km_perwd_2018 = km_cycle_2018 / wdpop_2011,
+#     km_perwd_2019 = km_cycle_2019 / wdpop_2011
+#     )
 
 # Calculate rates ---------------------------------------------------------
 
