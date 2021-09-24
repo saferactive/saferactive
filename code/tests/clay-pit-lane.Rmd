@@ -16,9 +16,16 @@ knitr::opts_chunk$set(echo = FALSE)
 Clay Pit Lane is major road near Central Leeds.
 
 ```{r}
-
-clay_pit_osm = 
+et = c("ref")
+osm_west_yorkshire = osmextract::oe_get("west yorkshire", extra_tags = et)
+clay_pit_osm = osm_west_yorkshire %>% 
+  filter(name == "Clay Pit Lane") %>% 
+  filter(str_detect(string = ref, pattern = "A58"))
+table(clay_pit_osm$ref)
+qtm(clay_pit_osm)
 ```
 
+
+Follow-up tweet: https://twitter.com/robinlovelace/status/1441367227622625280
 
 
