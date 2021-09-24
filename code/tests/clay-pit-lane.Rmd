@@ -1,0 +1,24 @@
+---
+output: html_document
+---
+
+```{r, include=FALSE}
+# packages
+library(tidyverse)
+library(tmap)
+tmap_mode("view")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+# Exploration of Clay pit lane.
+
+Clay Pit Lane is major road near Central Leeds.
+
+```{r}
+
+clay_pit_osm = 
+```
+
+
+

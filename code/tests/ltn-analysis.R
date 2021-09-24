@@ -1,15 +1,61 @@
+# Aim: get data from cyclestreets on ltns
+
+remotes::install_github("cyclestreets/cyclestreets-r")
 library(cyclestreets)
 library(tidyverse)
 library(sf)
+library(tmap)
+tmap_mode("view")
 
+u = "https://api.cyclestreets.net/v2/advocacydata.ltns?bbox=0.101131,52.195807,0.170288,52.209719&zoom=15"
+browseURL(u) # requires api key
+
+# try with API key
 u = paste0("https://api.cyclestreets.net/v2/advocacydata.ltns?key=",
            Sys.getenv("CYCLESTREETS"),
            "&bbox=0.101131,52.195807,0.170288,52.209719&zoom=15")
 browseURL(u)
 ltn_data = sf::read_sf(u)
+
+# get data for 3km radius surrounding Leeds
+z = zonebuilder::zb_zone(x = "Leeds", n_circles = 2)
+z = sf::st_transform(z, 27700)
+grid = st_make_grid(z,
+                    what = "polygons",
+                    cellsize = c(500, 500))
+qtm(z) + qtm(grid)
+grid_wgs = sf::st_transform(grid, 4326)
+
+# get for leeds
+ltn_data = cyclestreets::ltns(grid_wgs[1]) # works for one but patchy
+ltn_data = purrr::map_dfr(grid_wgs, cyclestreets::ltns)
+nrow(ltn_data) # 11k
 mapview::mapview(ltn_data["ratrun"])
 
+# get for all PCT regions...
+regions = pct::pct_regions
+i = "isle-of-wight"
+grid_ew = sf::read_sf("https://github.com/charlesroper/OSGB_Grids/raw/master/GeoJSON/OSGB_Grid_1km.geojson")
+length(grid_ew$geometry) # 286000
+# [1] 336168
+grid_ew_centroids = sf::st_centroid(grid_ew)
+region_names_ordered = regions$region_name[c(44:1, 45)]
+for(i in region_names_ordered[31:length(region_names_ordered)]) {
+  message("building for ", i)
+  z = regions[regions$region_name == i, ]
+  gzc = grid_ew_centroids[z, ]
+  qtm(z) + qtm(gz)
+  gz = grid_ew[gzc, ]
+  ltn_data = purrr::map_dfr(gz$geometry, cyclestreets::ltns)
+  f = paste0("lnt_data_", i, ".Rds")
+  # plot(ltn_data["ratrun"])
+  saveRDS(ltn_data, f)
+  piggyback::pb_upload(f)
+}
+
 ltn_data = st_transform(ltn_data, 27700)
+
+
 
 # Find the length of each segment and its
 ltn_data = ltn_data %>%
