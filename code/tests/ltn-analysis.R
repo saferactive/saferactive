@@ -7,32 +7,32 @@ library(sf)
 library(tmap)
 tmap_mode("view")
 
-u = "https://api.cyclestreets.net/v2/advocacydata.ltns?bbox=0.101131,52.195807,0.170288,52.209719&zoom=15"
-browseURL(u) # requires api key
+# u = "https://api.cyclestreets.net/v2/advocacydata.ltns?bbox=0.101131,52.195807,0.170288,52.209719&zoom=15"
+# browseURL(u) # requires api key
+#
+# # try with API key
+# u = paste0("https://api.cyclestreets.net/v2/advocacydata.ltns?key=",
+#            Sys.getenv("CYCLESTREETS"),
+#            "&bbox=0.101131,52.195807,0.170288,52.209719&zoom=15")
+# browseURL(u)
+# ltn_data = sf::read_sf(u)
+#
+# # get data for 3km radius surrounding Leeds
+# z = zonebuilder::zb_zone(x = "Leeds", n_circles = 2)
+# z = sf::st_transform(z, 27700)
+# grid = st_make_grid(z,
+#                     what = "polygons",
+#                     cellsize = c(500, 500))
+# qtm(z) + qtm(grid)
+# grid_wgs = sf::st_transform(grid, 4326)
+#
+# # get for leeds
+# ltn_data = cyclestreets::ltns(grid_wgs[1]) # works for one but patchy
+# ltn_data = purrr::map_dfr(grid_wgs, cyclestreets::ltns)
+# nrow(ltn_data) # 11k
+# mapview::mapview(ltn_data["ratrun"])
 
-# try with API key
-u = paste0("https://api.cyclestreets.net/v2/advocacydata.ltns?key=",
-           Sys.getenv("CYCLESTREETS"),
-           "&bbox=0.101131,52.195807,0.170288,52.209719&zoom=15")
-browseURL(u)
-ltn_data = sf::read_sf(u)
-
-# get data for 3km radius surrounding Leeds
-z = zonebuilder::zb_zone(x = "Leeds", n_circles = 2)
-z = sf::st_transform(z, 27700)
-grid = st_make_grid(z,
-                    what = "polygons",
-                    cellsize = c(500, 500))
-qtm(z) + qtm(grid)
-grid_wgs = sf::st_transform(grid, 4326)
-
-# get for leeds
-ltn_data = cyclestreets::ltns(grid_wgs[1]) # works for one but patchy
-ltn_data = purrr::map_dfr(grid_wgs, cyclestreets::ltns)
-nrow(ltn_data) # 11k
-mapview::mapview(ltn_data["ratrun"])
-
-# get for all PCT regions...
+# get LTN data on 1km grid for all PCT regions...
 regions = pct::pct_regions
 i = "isle-of-wight"
 grid_ew = sf::read_sf("https://github.com/charlesroper/OSGB_Grids/raw/master/GeoJSON/OSGB_Grid_1km.geojson")
@@ -56,8 +56,15 @@ for(i in region_names_ordered[31:length(region_names_ordered)]) {
 ltn_data = st_transform(ltn_data, 27700)
 
 
+ltn_data = readRDS(url("https://github.com/saferactive/saferactive/releases/download/0.1.4/lnt_data_west-yorkshire.Rds"))
+# mapview::mapview(sample_n(ltn_data, 1000))
 
-# Find the length of each segment and its
+# Remove duplicates and motorways
+ltn_data = distinct(ltn_data)
+ltn_data = ltn_data %>%
+  filter(! name %in% c("M62", "M1", "A1(M)", "M621", "M606"))
+
+# Find the length of each segment
 ltn_data = ltn_data %>%
   mutate(length = st_length(ltn_data))
 
@@ -68,26 +75,37 @@ ltn_data = ltn_data %>%
 # Find centroid of each segment
 ltn_centroid = st_centroid(ltn_data)
 
-# Assign segments to a spatial grid
-grid = st_make_grid(ltn_data,
-                    what = "polygons",
-                    cellsize = c(500,500))
+# # Assign segments to a spatial grid
+# grid = st_make_grid(ltn_data,
+#                     what = "polygons",
+#                     cellsize = c(500,500))
+#
+# grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
+#                            geometry = grid))
 
-grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
-                           geometry = grid))
+lad2018 = ukboundaries::lad2018
+westyorks = lad2018 %>%
+  filter(lau118nm %in% c("Leeds", "Bradford", "Wakefield", "Kirklees", "Calderdale"))
+# grid_leeds = grid_ew[ukboundaries::leeds,]
+grid_westyorks = grid_ew[westyorks,]
 
-rnet2 = st_join(ltn_centroid, grid)
+rnet2 = st_join(ltn_centroid, grid_westyorks)
 ltn_aggregated = rnet2 %>%
   st_drop_geometry() %>%
-  group_by(gridid) %>%
+  group_by(PLAN_NO) %>%
   summarise(
     length_ltn = sum(length[which(ratrun == "no")]),
     length_ratrun = sum(length[which(ratrun == "yes")]),
     length_calmed = sum(length[which(ratrun == "calmed")]),
-    length_main = sum(length[which(ratrun == "main")])
+    length_main = sum(length[which(ratrun == "main")]),
+    length_total = sum(length),
+    perc_ltn = length_ltn/length_total,
+    perc_ratrun = length_ratrun/length_total,
+    perc_calmed = length_calmed/length_total,
+    perc_main = length_main/length_total
   )
 
-ltn_grid = left_join(grid, ltn_aggregated)
+ltn_grid = left_join(grid_westyorks, ltn_aggregated)
 plot(ltn_grid)
 mapview(ltn_grid["length_main"])
 
