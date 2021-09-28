@@ -71,7 +71,6 @@ ltn_data = ltn_data %>%
 # Split segments that are longer than 500m
 # Not needed for now
 
-
 # Find centroid of each segment
 ltn_centroid = st_centroid(ltn_data)
 
@@ -83,13 +82,16 @@ ltn_centroid = st_centroid(ltn_data)
 # grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
 #                            geometry = grid))
 
+# Get West Yorkshire definition
 lad2018 = ukboundaries::lad2018
 westyorks = lad2018 %>%
   filter(lau118nm %in% c("Leeds", "Bradford", "Wakefield", "Kirklees", "Calderdale"))
 # grid_leeds = grid_ew[ukboundaries::leeds,]
 grid_westyorks = grid_ew[westyorks,]
 
+# Aggregate LTN data using spatial grid
 rnet2 = st_join(ltn_centroid, grid_westyorks)
+
 ltn_aggregated = rnet2 %>%
   st_drop_geometry() %>%
   group_by(PLAN_NO) %>%
@@ -105,15 +107,59 @@ ltn_aggregated = rnet2 %>%
     perc_main = length_main/length_total
   )
 
+# Get and aggregate stats19 data
+crashes = readRDS("stats19_2010_2019.Rds")
+crashes_westyorks = crashes[westyorks,]
+
+rnet_crashes = st_join(crashes_westyorks, grid_westyorks)
+
+crashes_aggregated = rnet_crashes %>%
+  st_drop_geometry() %>%
+  group_by(PLAN_NO) %>%
+  summarise(
+    ksi_cycle = sum(casualty_serious_cyclist) + sum(casualty_fatal_cyclist),
+    ksi_walk = sum(casualty_serious_pedestrian) + sum(casualty_fatal_pedestrian)
+  )
+
+# Join LTN and crash data with grid
 ltn_grid = left_join(grid_westyorks, ltn_aggregated)
+ltn_grid = left_join(ltn_grid, crashes_aggregated)
+
+ltn_grid$ksi_cycle[is.na(ltn_grid$ksi_cycle)] = 0
+ltn_grid$ksi_walk[is.na(ltn_grid$ksi_walk)] = 0
+
+ltn_grid = ltn_grid %>%
+  mutate(
+    cycle_ksi_per_km = ksi_cycle / length_total / 1000,
+    walk_ksi_per_km = ksi_walk / length_total / 1000
+    )
+
 plot(ltn_grid)
+mapview(ltn_grid["length_total"])
 mapview(ltn_grid["length_main"])
+mapview(ltn_grid2["perc_main"])
+mapview(ltn_grid["perc_ratrun"])
+mapview(ltn_grid["perc_calmed"])
+mapview(ltn_grid["perc_ltn"])
+mapview(ltn_grid["ksi_cycle"])
+mapview(ltn_grid["ksi_walk"])
+mapview(ltn_grid["cycle_ksi_per_km"])
+mapview(ltn_grid["walk_ksi_per_km"])
+
+ggplot(ltn_grid, aes(units::drop_units(length_total/1000) , ksi_walk)) +
+  geom_point() +
+  labs(x = "Road length (km)", y = "Pedestrian KSI")
+
+ggplot(ltn_grid, aes(units::drop_units(length_total/1000) , ksi_cycle)) +
+  geom_point() +
+  labs(x = "Road length (km)", y = "Cycle KSI")
+
+# Get PCT rnet and aggregate cycle flows to grid
 
 
 
 
 
-identical(names(rnet2), names(grid_split))
 
 croproads <- function(x, y){
   sf::st_crop(x, sf::st_bbox(y))
