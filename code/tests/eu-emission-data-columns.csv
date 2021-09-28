@@ -1,0 +1,37 @@
+Field name ,Field Definition ,Data type ,Primary key 
+ID,Identification number,integer,Yes
+MS,Member state,varchar(2),No
+Mp,Manufacturer pooling,varchar(50),No
+VFN,Vehicle family identification number,varchar(25),No
+Mh,"Manufacturer name
+EU standard denomination",varchar(50),No
+Man,Manufacturer name OEM declaration,varchar(50),No
+MMS,"Manufacturer name
+MS registry denomination",varchar(125),No
+TAN,Type approval number,varchar(50),No
+T,Type,varchar(25),No
+Va,Variant,varchar(25),No
+Ve,Version,varchar(35),No
+Mk,Make,varchar(25),No
+Cn,Commercial name,varchar(50),No
+Ct,Category of the vehicle type approved,varchar(5),No
+Cr,Category of the vehicle registered,varchar(5),No
+m (kg),"Mass in running order
+Completed/complete vehicle",integer,No
+Mt,WLTP test mass,integer,No
+Enedc (g/km),Specific CO2 Emissions (NEDC),integer,No
+Ewltp (g/km),Specific CO2 Emissions (WLTP),integer,No
+W (mm),Wheel Base,integer,No
+At1 (mm),Axle width steering axle,integer,No
+At2 (mm),Axle width other axle,integer,No
+Ft,Fuel type,varchar(25),No
+Fm,Fuel mode,varchar(1),No
+ec (cm3),Engine capacity,integer,No
+ep (KW),Engine power,integer,No
+z (Wh/km),Electric energy consumption,integer,No
+IT,Innovative technology or group of innovative technologies,varchar(25),No
+Ernedc (g/km),Emissions reduction through innovative technologies,float,No
+Erwltp (g/km),Emissions reduction through innovative technologies (WLTP),float,No
+De,Deviation factor,float,No
+Vf,Verification factor,integer,No
+r,Total new registrations,integer,No

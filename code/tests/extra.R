@@ -42,21 +42,25 @@ skimr::skim(ch)
 table(ch$c20lab)
 table(ch$c16lab)
 
-
 # vt ----------------------------------------------------------------------
 
+# see https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-20/co2-emissions-cars-2017-provisional
 u = "https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2017-provisional/co2_passengers_cars_v15_csv/at_download/file"
-download.file(u, "~/hd/data/stats19-private/co2.zip")
+download.file(u, "~/hd/data/stats19-private/co2-2021.zip")
 dir.create("~/hd/data/stats19-private/co2")
 unzip("~/hd/data/stats19-private/co2.zip", exdir = "~/hd/data/stats19-private/co2")
 (f = list.files("~/hd/data/stats19-private/co2", full.names = TRUE))
 # every single car type
 # co2_ue = readr::read_tsv(f[2], locale = locale(encoding="UTF-16LE"))
-co2_ue = readr::read_tsv(f[2])
-co2_ue = data.table::fread(f)
+# co2_ue = readr::read_tsv(f[2])
+co2_ue = data.table::fread(f[2])
+summary(co2_ue[, 19]) # results in correct encoding
+names(co2_ue)
+summary(co2_ue$`m (kg)`) # the mass of the car
+summary(co2_ue$`W (mm)`) # the width of the car
+summary(co2_ue$`W (mm)`) # the width of the car
 
 # https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2019-provisional
-
 
 vt = read_csv("~/onedrive/projects-all/saferactive/make-model-data/genmodel_classification.csv")
 vt
