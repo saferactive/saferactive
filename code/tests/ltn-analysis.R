@@ -87,7 +87,7 @@ ltn_data = ltn_data %>%
 
 # Find the length of each segment
 ltn_data = ltn_data %>%
-  mutate(length = st_length(ltn_data))
+  mutate(length = units::drop_units(st_length(ltn_data)))
 
 saveRDS(ltn_data, "ltn_updated_west-yorkshire.Rds")
 
@@ -146,7 +146,7 @@ pct_rnet = pct::get_pct_rnet(region = "west-yorkshire", geography = "lsoa", purp
 pct_rnet = pct_rnet %>%
   st_transform(27700) %>%
   mutate(
-    length = st_length(pct_rnet),
+    length = units::drop_units(st_length(pct_rnet)),
     cycle_km = bicycle * length / 1000
     )
 
@@ -167,14 +167,17 @@ ltn_grid = left_join(ltn_grid, pct_aggregated)
 
 ltn_grid$ksi_cycle[is.na(ltn_grid$ksi_cycle)] = 0
 ltn_grid$ksi_walk[is.na(ltn_grid$ksi_walk)] = 0
-# ltn_grid$cycle_km[is.na(ltn_grid$cycle_km)] = 0
+ltn_grid$cycle_km[is.na(ltn_grid$cycle_km)] = 1 # prevent NaN
+ltn_grid$cycle_km[ltn_grid$cycle_km < 1] = 1 # prevent NaN
 
 ltn_grid = ltn_grid %>%
   mutate(
-    cycle_ksi_per_km = ksi_cycle / length_total / 1000,
-    walk_ksi_per_km = ksi_walk / length_total / 1000,
-    cycle_ksi_per_Bkm = ksi_cycle / cycle_km / 1000000000
+    cycle_ksi_per_km_road = ksi_cycle / length_total * 1000,
+    walk_ksi_per_km_road = ksi_walk / length_total * 1000,
+    cycle_ksi_per_km_cycled = ksi_cycle / cycle_km
     )
+
+ltn_grid_full = ltn_grid[! is.na(ltn_grid$length_total), ]
 
 plot(ltn_grid)
 mapview(ltn_grid["length_total"])
@@ -186,23 +189,33 @@ mapview(ltn_grid["perc_ltn"])
 mapview(ltn_grid["ksi_cycle"])
 mapview(ltn_grid["ksi_walk"])
 mapview(ltn_grid["cycle_km"])
-mapview(ltn_grid["cycle_ksi_per_km"])
-mapview(ltn_grid["walk_ksi_per_km"])
-mapview(ltn_grid["cycle_ksi_per_Bkm"])
+mapview(ltn_grid["cycle_ksi_per_km_road"])
+mapview(ltn_grid["walk_ksi_per_km_road"])
+mapview(ltn_grid["cycle_ksi_per_km_cycled"])
 
-ggplot(ltn_grid, aes(units::drop_units(length_total/1000) , ksi_walk)) +
+ggplot(ltn_grid, aes(length_total/1000, ksi_walk)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Pedestrian KSI")
 
-ggplot(ltn_grid, aes(units::drop_units(length_total/1000) , ksi_cycle)) +
+ggplot(ltn_grid, aes(length_total/1000 , ksi_cycle)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Cycle KSI")
 
-ggplot(ltn_grid, aes(units::drop_units(cycle_km) , ksi_cycle)) +
+ggplot(ltn_grid, aes(cycle_km , ksi_cycle)) +
   geom_point() +
   labs(x = "Km cycled (travel to work)", y = "Cycle KSI")
 
+ggplot(ltn_grid_full, aes(perc_ltn, cycle_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
+  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km road")
 
+ggplot(ltn_grid_full, aes(perc_ltn, cycle_ksi_per_km_cycled)) +
+  geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
+  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km cycled")
+
+ggplot(ltn_grid_full, aes(perc_ltn, walk_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
+  labs(x = "% low traffic neighbourhood", y = "Pedestrian KSI per km road")
 
 
 ##############################
