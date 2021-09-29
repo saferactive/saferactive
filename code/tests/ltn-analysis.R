@@ -32,21 +32,43 @@ tmap_mode("view")
 # nrow(ltn_data) # 11k
 # mapview::mapview(ltn_data["ratrun"])
 
-# get LTN data on 1km grid for all PCT regions...
-regions = pct::pct_regions
-i = "isle-of-wight"
+
+# Get West Yorkshire definition
+lad2018 = ukboundaries::lad2018
+centroid_lad2018 = lad2018 %>%
+  st_centroid()
+# grid_leeds = grid_ew[ukboundaries::leeds,]
+
+westyorks = lad2018 %>%
+  filter(lau118nm %in% c("Leeds", "Bradford", "Wakefield", "Kirklees", "Calderdale")) # These boundaries are more accurate
+
+# Get national grid
 grid_ew = sf::read_sf("https://github.com/charlesroper/OSGB_Grids/raw/master/GeoJSON/OSGB_Grid_1km.geojson")
 length(grid_ew$geometry) # 286000
 # [1] 336168
 grid_ew_centroids = sf::st_centroid(grid_ew)
+
+cent_westyorks = grid_ew_centroids[westyorks, ]
+grid_westyorks = grid_ew[cent_westyorks, ] %>%
+  st_transform(27700)
+
+
+# get LTN data on 1km grid for all PCT regions...
+regions = pct::pct_regions
+i = "isle-of-wight"
 region_names_ordered = regions$region_name[c(44:1, 45)]
+
 for(i in region_names_ordered[31:length(region_names_ordered)]) {
   message("building for ", i)
-  z = regions[regions$region_name == i, ]
-  gzc = grid_ew_centroids[z, ]
-  qtm(z) + qtm(gz)
+  z = regions[regions$region_name == i, ] #These boundaries are supergeneralised, meaning they miss Knottingley and other bits
+  z2 = st_join(z, centroid_lad2018)
+  z3 = lad2018[lad2018$lau118cd %in% z2$lau118cd, ] # These boundaries are more accurate
+  gzc = grid_ew_centroids[z3, ]
   gz = grid_ew[gzc, ]
+  # qtm(z3) + qtm(gz)
   ltn_data = purrr::map_dfr(gz$geometry, cyclestreets::ltns)
+  ltn_data = distinct(ltn_data)
+  pct_rnet = purrr::map_dfr(gz$geometry, pct::get_pct_rnet)
   f = paste0("lnt_data_", i, ".Rds")
   # plot(ltn_data["ratrun"])
   saveRDS(ltn_data, f)
@@ -68,6 +90,8 @@ ltn_data = ltn_data %>%
 ltn_data = ltn_data %>%
   mutate(length = st_length(ltn_data))
 
+saveRDS(ltn_data, "ltn_updated_west-yorkshire.Rds")
+
 # Split segments that are longer than 500m
 # Not needed for now
 
@@ -82,12 +106,6 @@ ltn_centroid = st_centroid(ltn_data)
 # grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
 #                            geometry = grid))
 
-# Get West Yorkshire definition
-lad2018 = ukboundaries::lad2018
-westyorks = lad2018 %>%
-  filter(lau118nm %in% c("Leeds", "Bradford", "Wakefield", "Kirklees", "Calderdale"))
-# grid_leeds = grid_ew[ukboundaries::leeds,]
-grid_westyorks = grid_ew[westyorks,]
 
 # Aggregate LTN data using spatial grid
 rnet2 = st_join(ltn_centroid, grid_westyorks)
@@ -109,7 +127,8 @@ ltn_aggregated = rnet2 %>%
 
 # Get and aggregate stats19 data
 crashes = readRDS("stats19_2010_2019.Rds")
-crashes_westyorks = crashes[westyorks,]
+crashes_westyorks = crashes[westyorks,] %>%
+  st_transform(27700)
 
 rnet_crashes = st_join(crashes_westyorks, grid_westyorks)
 
