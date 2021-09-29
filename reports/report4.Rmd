@@ -156,6 +156,19 @@ https://github.com/saferactive/saferactive/releases/download/0.1.4/ksi-pf.csv
 
 # Low Traffic Neighbourhoods and rat-runs
 
+For West Yorkshire, we see a clear correlation between total road length within each 1km grid cell and the number of pedestrian KSI over the period 2010-2019.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/135123458-55ad4dd2-7719-41c4-8df7-cfc50712d7a6.png")
+```
+
+
+The link between road length and cycle KSI is weaker, likely reflecting the fact that the cycling distribution is more uneven than the pedestrian distribution.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/135123502-9bc9dc1a-e028-4a68-b22e-1e6207f7585e.png")
+```
+
 # Data visualisation
 
 # Web application
