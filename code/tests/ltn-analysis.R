@@ -113,8 +113,9 @@ res = qgis_run_algorithm(
 )
 
 rnet_split_qgis = sf::read_sf(res$output)
-nrow(rnet_split_qgis) / nrow(rnet)
+nrow(rnet_split_qgis) / nrow(rnet_projected)
 summary(sf::st_length(rnet_split_qgis))
+saveRDS(rnet_split_qgis, "ltn_all_distinct_27700_split.Rds")
 # in system CLI:
 
 
