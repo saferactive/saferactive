@@ -131,38 +131,33 @@ saveRDS(rnet_split_qgis, "ltn_all_distinct_27700_split.Rds")
 # # 0.693   31.899   65.432  159.348  153.453 8062.397
 ltn_data = st_transform(ltn_data, 27700)
 
+# Read in LTN data for west yorkshire
 
-ltn_data = readRDS(url("https://github.com/saferactive/saferactive/releases/download/0.1.4/lnt_data_west-yorkshire.Rds"))
+# Previous version with separate files for each pct region
+# ltn_data = readRDS(url("https://github.com/saferactive/saferactive/releases/download/0.1.4/lnt_data_west-yorkshire.Rds"))
+# ltn_data = distinct(ltn_data)
+# ltn_data = ltn_data %>%
+#   mutate(length = units::drop_units(st_length(ltn_data)))
+# saveRDS(ltn_data, "ltn_updated_west-yorkshire.Rds")
+
+# backup sanity check (not split)
+# ltn_data = readRDS("ltn_all_distinct_wgs84.Rds")
+
+# correct version
+ltn_data = readRDS("ltn_all_distinct_27700_split.Rds")
+st_crs(ltn_data) = 27700
 # mapview::mapview(sample_n(ltn_data, 1000))
 
-# Remove duplicates and motorways
-ltn_data = distinct(ltn_data)
+# Remove motorways
 ltn_data = ltn_data %>%
   filter(! name %in% c("M62", "M1", "A1(M)", "M621", "M606"))
-
-# Find the length of each segment
-ltn_data = ltn_data %>%
-  mutate(length = units::drop_units(st_length(ltn_data)))
-
-saveRDS(ltn_data, "ltn_updated_west-yorkshire.Rds")
-
-# Split segments that are longer than 500m
-# Not needed for now
 
 # Find centroid of each segment
 ltn_centroid = st_centroid(ltn_data)
 
-# # Assign segments to a spatial grid
-# grid = st_make_grid(ltn_data,
-#                     what = "polygons",
-#                     cellsize = c(500,500))
-#
-# grid = st_as_sf(data.frame(gridid = seq(1, length(grid)),
-#                            geometry = grid))
-
-
 # Aggregate LTN data using spatial grid
 ltn_westyorks = st_join(ltn_centroid, grid_westyorks)
+ltn_westyorks = ltn_westyorks[! is.na(ltn_westyorks$PLAN_NO), ]
 
 ltn_aggregated = ltn_westyorks %>%
   st_drop_geometry() %>%
@@ -266,8 +261,8 @@ ggplot(ltn_grid, aes(length_total/1000 , ksi_cycle)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Cycle KSI")
 
-ggplot(ltn_grid, aes(cycle_km_cleaned , ksi_cycle)) +
-  geom_point() +
+ggplot(ltn_grid_ck, aes(cycle_km_cleaned , ksi_cycle)) +
+  geom_point(alpha = ltn_grid_ck$length_total/max(ltn_grid_ck$length_total)) +
   labs(x = "Km cycled (travel to work)", y = "Cycle KSI")
 
 ggplot(ltn_grid_full, aes(perc_ltn, cycle_ksi_per_km_road)) +
