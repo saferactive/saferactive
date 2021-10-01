@@ -74,6 +74,60 @@ for(i in region_names_ordered[31:length(region_names_ordered)]) {
   piggyback::pb_upload(f)
 }
 
+
+# Clean and combine data --------------------------------------------------
+
+
+for(i in region_names_ordered) {
+  message("building for ", i)
+  f = paste0("lnt_data_", i, ".Rds")
+  ltn_data = readRDS(f)
+  ltn_data_unique = distinct(ltn_data)
+  nrow(ltn_data_unique) / nrow(ltn_data) # more than 10% duplicates in iow
+  f = paste0("lnt_data_distinct", i, ".Rds")
+  # piggyback::pb_delete(f)
+  # plot(ltn_data["ratrun"])
+  saveRDS(ltn_data_unique, f)
+  # piggyback::pb_upload(f)
+}
+
+# f_all = paste0("lnt_data_distinct", region_names_ordered, ".Rds")[1:3] # for testing
+f_all = paste0("lnt_data_distinct", region_names_ordered, ".Rds")
+
+ltn_all = purrr::map_dfr(f_all, readRDS)
+saveRDS(ltn_all, "ltn_all_distinct_wgs84.Rds")
+sf::write_sf(ltn_all, "ltn_all_distinct_wgs84.gpkg")
+# then transform in qgis...
+# docker run -d -p 8785:8787 -e DISABLE_AUTH=TRUE -v $(pwd):/home/rstudio/geocompr  geocompr/geocompr:qgis
+library(sf)
+browseURL("http://localhost:8785/")
+remotes::install_github("paleolimbot/qgisprocess")
+library(qgisprocess)
+qgisprocess::qgis_configure()
+# rnet_projected = sf::st_transform(rnet, 27700)
+rnet_projected = sf::read_sf("ltn_all_distinct_27700.gpkg")
+res = qgis_run_algorithm(
+  algorithm = "grass7:v.split",
+  input = rnet_projected,
+  length = 500
+)
+
+rnet_split_qgis = sf::read_sf(res$output)
+nrow(rnet_split_qgis) / nrow(rnet)
+summary(sf::st_length(rnet_split_qgis))
+# in system CLI:
+
+
+# # tests:
+# nrow(ltn_all) # 3.1m segments
+# ltn_all %>%
+#   sample_n(10000) %>%
+#   qtm()
+# class(ltn_all)
+# saveRDS(ltn_all, "~/repos/stplanr/ltn_all.Rds")
+# summary(sf::st_length(ltn_all))
+# # Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+# # 0.693   31.899   65.432  159.348  153.453 8062.397
 ltn_data = st_transform(ltn_data, 27700)
 
 

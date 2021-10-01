@@ -45,6 +45,8 @@ table(ch$c16lab)
 # vt ----------------------------------------------------------------------
 
 # see https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-20/co2-emissions-cars-2017-provisional
+vt_variable_names = read_csv("code/tests/eu-emission-data-columns.csv")
+View(vt_variable_names)
 u = "https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2017-provisional/co2_passengers_cars_v15_csv/at_download/file"
 download.file(u, "~/hd/data/stats19-private/co2-2021.zip")
 dir.create("~/hd/data/stats19-private/co2")
@@ -54,11 +56,17 @@ unzip("~/hd/data/stats19-private/co2.zip", exdir = "~/hd/data/stats19-private/co
 # co2_ue = readr::read_tsv(f[2], locale = locale(encoding="UTF-16LE"))
 # co2_ue = readr::read_tsv(f[2])
 co2_ue = data.table::fread(f[2])
+nrow(co2_ue)
 summary(co2_ue[, 19]) # results in correct encoding
 names(co2_ue)
 summary(co2_ue$`m (kg)`) # the mass of the car
-summary(co2_ue$`W (mm)`) # the width of the car
-summary(co2_ue$`W (mm)`) # the width of the car
+summary(co2_ue$`W (mm)`) # the wheel base of the car
+summary(co2_ue$`At1 (mm)`) # the width of the car
+co2_ue %>%
+  sample_n(10000) %>%
+  ggplot(aes(`W (mm)`, `At1 (mm)`)) +
+  geom_point()
+
 
 # https://www.eea.europa.eu/data-and-maps/data/co2-cars-emission-18/co2-emissions-cars-2019-provisional
 
