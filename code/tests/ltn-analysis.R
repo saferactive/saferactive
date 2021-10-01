@@ -141,17 +141,19 @@ crashes_aggregated = grid_crashes %>%
 
 # Get PCT rnet and aggregate cycle flows to grid
 # Need to split the rnet to avoid segments >1km in length
-pct_rnet = pct::get_pct_rnet(region = "west-yorkshire", geography = "lsoa", purpose = "commute")
+# pct_rnet = pct::get_pct_rnet(region = "west-yorkshire", geography = "lsoa", purpose = "commute")
+rnet_split = st_read("rnet_split.gpkg")
 
-pct_rnet = pct_rnet %>%
-  st_transform(27700) %>%
+rnet_split = rnet_split %>%
+  # st_transform(27700) %>%
   mutate(
-    length = units::drop_units(st_length(pct_rnet)),
+    length = units::drop_units(st_length(rnet_split)),
     cycle_km = bicycle * length / 1000
-    )
+  )
 
-rnet_centroids = st_centroid(pct_rnet)
+rnet_centroids = st_centroid(rnet_split)
 pct_westyorks = st_join(rnet_centroids, grid_westyorks)
+pct_westyorks = pct_westyorks[! is.na(pct_westyorks$PLAN_NO), ]
 
 pct_aggregated = pct_westyorks %>%
   st_drop_geometry() %>%
