@@ -3,6 +3,8 @@
 library(tidyverse)
 library(pct)
 desire_lines_national = pct::get_pct(layer = "l", national = TRUE)
+
+# Join by local authority
 las = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp")
 las_minimal = las %>%
   select(ctyua19nm)
@@ -20,6 +22,9 @@ las_distance = desire_lines_joined %>%
   summarise(
     distance_walked = sum(foot * rf_dist_km)
   )
+
+saveRDS(las_distance, "km_walked.Rds")
+piggyback::pb_upload("km_walked.Rds")
 
 # Test code - starting with OD not desire lines ---------------------------
 
