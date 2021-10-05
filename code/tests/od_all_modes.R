@@ -3,18 +3,20 @@
 library(tidyverse)
 library(pct)
 desire_lines_national = pct::get_pct(layer = "l", national = TRUE)
-las = readRDS("path_to_la_dataset")
+las = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp")
 las_minimal = las %>%
-  select(name_of_id)
+  select(ctyua19nm)
 desire_lines_centroids = sf::st_centroid(desire_lines_national)
+desire_lines_centroids = desire_lines_centroids %>%
+  st_transform(27700)
 desire_lines_joined = sf::st_join(
   desire_lines_centroids,
   las_minimal
 )
 
-las_distance = desire_lines_national %>%
+las_distance = desire_lines_joined %>%
   sf::st_drop_geometry() %>%
-  group_by(updated_la_name) %>%
+  group_by(ctyua19nm) %>%
   summarise(
     distance_walked = sum(foot * rf_dist_km)
   )
