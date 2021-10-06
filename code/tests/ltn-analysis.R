@@ -6,6 +6,7 @@ library(tidyverse)
 library(sf)
 library(tmap)
 tmap_mode("view")
+library(mapview)
 
 # u = "https://api.cyclestreets.net/v2/advocacydata.ltns?bbox=0.101131,52.195807,0.170288,52.209719&zoom=15"
 # browseURL(u) # requires api key
@@ -131,7 +132,10 @@ saveRDS(rnet_split_qgis, "ltn_all_distinct_27700_split.Rds")
 # # 0.693   31.899   65.432  159.348  153.453 8062.397
 ltn_data = st_transform(ltn_data, 27700)
 
-# Read in LTN data for west yorkshire
+
+# New method using split LTN data -----------------------------------------
+
+# Read in LTN data using new method
 
 # Previous version with separate files for each pct region
 # ltn_data = readRDS(url("https://github.com/saferactive/saferactive/releases/download/0.1.4/lnt_data_west-yorkshire.Rds"))
@@ -149,11 +153,21 @@ st_crs(ltn_data) = 27700
 # mapview::mapview(sample_n(ltn_data, 1000))
 
 # Remove motorways
+# Can now do this for whole country
+# ltn_data = ltn_data %>%
+#   filter(! name %in% c("M62", "M1", "A1(M)", "M621", "M606"))
+ltn_data = ltn_data[! grepl("M[123456789]", x = ltn_data$name), ]
+ltn_data = ltn_data[! grepl("\\(M)", x = ltn_data$name), ]
+
 ltn_data = ltn_data %>%
-  filter(! name %in% c("M62", "M1", "A1(M)", "M621", "M606"))
+  mutate(length = units::drop_units(st_length(ltn_data)))
 
 # Find centroid of each segment
 ltn_centroid = st_centroid(ltn_data)
+
+saveRDS(ltn_centroid, "ltn_centroid.Rds")
+
+# Do it for west yorkshire
 
 # Aggregate LTN data using spatial grid
 ltn_westyorks = st_join(ltn_centroid, grid_westyorks)
@@ -202,6 +216,8 @@ rnet_split = rnet_split %>%
   )
 
 rnet_centroids = st_centroid(rnet_split)
+saveRDS(rnet_centroids, "rnet_centroids.Rds")
+
 pct_westyorks = st_join(rnet_centroids, grid_westyorks)
 pct_westyorks = pct_westyorks[! is.na(pct_westyorks$PLAN_NO), ]
 
@@ -239,6 +255,7 @@ ltn_grid_full = ltn_grid[! is.na(ltn_grid$length_total), ]
 # Grid only including cells with > 0 cycling on PCT rnet
 ltn_grid_ck = ltn_grid_full[ltn_grid_full$cycle_km > 0, ]
 
+# change to tmap with log scales for better discrimination
 plot(ltn_grid)
 mapview(ltn_grid["length_total"])
 mapview(ltn_grid["length_main"])
@@ -248,10 +265,10 @@ mapview(ltn_grid["perc_calmed"])
 mapview(ltn_grid["perc_ltn"])
 mapview(ltn_grid["ksi_cycle"])
 mapview(ltn_grid["ksi_walk"])
-mapview(ltn_grid["cycle_km_cleaned"])
+mapview(ltn_grid_ck["cycle_km_cleaned"])
 mapview(ltn_grid["cycle_ksi_per_km_road"])
 mapview(ltn_grid["walk_ksi_per_km_road"])
-mapview(ltn_grid_full["cycle_ksi_per_km_cycled"])
+mapview(ltn_grid_ck["cycle_ksi_per_km_cycled"])
 
 ggplot(ltn_grid, aes(length_total/1000, ksi_walk)) +
   geom_point() +
