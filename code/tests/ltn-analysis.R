@@ -59,20 +59,36 @@ regions = pct::pct_regions
 i = "isle-of-wight"
 region_names_ordered = regions$region_name[c(44:1, 45)]
 
-for(i in region_names_ordered[31:length(region_names_ordered)]) {
+# for(i in region_names_ordered[1:length(region_names_ordered)]) {
+#   message("building for ", i)
+#   z = regions[regions$region_name == i, ] #These boundaries are supergeneralised, meaning they miss Knottingley and other bits
+#   z2 = st_join(z, centroid_lad2018)
+#   z3 = lad2018[lad2018$lau118cd %in% z2$lau118cd, ] # These boundaries are more accurate
+#   gzc = grid_ew_centroids[z3, ]
+#   gz = grid_ew[gzc, ]
+#   # qtm(z3) + qtm(gz)
+#   ltn_data = purrr::map_dfr(gz$geometry, cyclestreets::ltns)
+#   ltn_data = distinct(ltn_data)
+#   f = paste0("lnt_data_", i, ".Rds")
+#   # plot(ltn_data["ratrun"])
+#   saveRDS(ltn_data, f)
+#   piggyback::pb_upload(f)
+# }
+
+# get more accurate grid for each region (as long as centroids are within regions - may not work for western isles / isles of scilly)
+for(i in region_names_ordered) {
   message("building for ", i)
   z = regions[regions$region_name == i, ] #These boundaries are supergeneralised, meaning they miss Knottingley and other bits
   z2 = st_join(z, centroid_lad2018)
   z3 = lad2018[lad2018$lau118cd %in% z2$lau118cd, ] # These boundaries are more accurate
   gzc = grid_ew_centroids[z3, ]
   gz = grid_ew[gzc, ]
-  # qtm(z3) + qtm(gz)
-  ltn_data = purrr::map_dfr(gz$geometry, cyclestreets::ltns)
-  ltn_data = distinct(ltn_data)
-  f = paste0("lnt_data_", i, ".Rds")
-  # plot(ltn_data["ratrun"])
-  saveRDS(ltn_data, f)
-  piggyback::pb_upload(f)
+  gz = gz %>% st_transform(27700)
+  for_name = gsub(x = i, pattern = "-", replacement = "_")
+  assign(paste0("grid_", for_name), gz)
+  f = paste0("grid_", for_name)
+  saveRDS(gz, f)
+  # piggyback::pb_upload(f)
 }
 
 
