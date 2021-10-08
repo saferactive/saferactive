@@ -269,7 +269,7 @@ ltn_grid = ltn_grid %>%
     cycle_ksi_per_km_road = ksi_cycle / length_total * 1000,
     walk_ksi_per_km_road = ksi_walk / length_total * 1000,
     cycle_ksi_per_km_cycled = ksi_cycle / cycle_km_cleaned,
-    cycle_ksi_per_Bkm_cycled = cycle_ksi_per_km_cycled/365/10*1000000000*0.35
+    cycle_ksi_per_Bkm_cycled = cycle_ksi_per_km_cycled/255/2/10*1000000000*0.35 # pct rnet flows are uni-directional only and need to be multiplied by the number of working days per year. KSI data cover 10 years. In 2010-2019, according to NTS table 0409 a mean of 35% of cycle journeys were for commuting
     )
 
 # Grid only including cells that contain roads
@@ -293,24 +293,24 @@ mapview(ltn_grid["cycle_ksi_per_km_road"])
 mapview(ltn_grid["walk_ksi_per_km_road"])
 mapview(ltn_grid_ck["cycle_ksi_per_km_cycled"])
 
-a = tm_shape(ltn_grid) +
+a = tm_shape(ltn_grid_full) +
   tm_fill("length_total", title = "Road length", alpha = 0.8)
-b = tm_shape(ltn_grid) +
+b = tm_shape(ltn_grid_full) +
   tm_fill("perc_main", title = "% main roads", alpha = 0.8)
-c = tm_shape(ltn_grid) +
+c = tm_shape(ltn_grid_full) +
   tm_fill("perc_ltn", title = "% LTN", alpha = 0.8)
-d = tm_shape(ltn_grid) +
+d = tm_shape(ltn_grid_full) +
   tm_fill("perc_ratrun", title = "% ratrun", alpha = 0.8)
-e = tm_shape(ltn_grid) +
+e = tm_shape(ltn_grid_full) +
   tm_fill("perc_calmed", title = "% calmed ratrun", alpha = 0.8
           , breaks = c(0, 0.02, 0.05, 0.1, 0.2, 1))
 tmap_arrange(a, b, c, d, e, ncol = 5, nrow = 1)
 
 
-a = tm_shape(ltn_grid) +
+a = tm_shape(ltn_grid_full) +
   tm_fill("ksi_cycle", title = "Cycle KSI", alpha = 0.8
           , breaks = c(0, 1, 2, 5, 10, 30))
-b = tm_shape(ltn_grid) +
+b = tm_shape(ltn_grid_full) +
   tm_fill("ksi_walk", title = "Walk KSI", alpha = 0.8
           , breaks = c(0, 5, 10, 20, 50, 120)
           )
@@ -318,17 +318,17 @@ c = tm_shape(ltn_grid_ck) +
   tm_fill("cycle_km_cleaned", title = "Cycle commute km", alpha = 0.8
           , breaks = c(0, 50, 100, 200, 500, 1000)
   )
-d = tm_shape(ltn_grid) +
+d = tm_shape(ltn_grid_full) +
   tm_fill("cycle_ksi_per_km_road", title = "Cycle KSI per km road", alpha = 0.8
           , breaks = c(0, 0.05, 0.1, 0.2, 0.5, 2)
   )
-e = tm_shape(ltn_grid) +
+e = tm_shape(ltn_grid_full) +
   tm_fill("walk_ksi_per_km_road", title = "Walk KSI per km road", alpha = 0.8
           , breaks = c(0, 0.1, 0.2, 0.5, 1, 5)
   )
 f = tm_shape(ltn_grid_ck) +
   tm_fill("cycle_ksi_per_Bkm_cycled", title = "KSI per Bkm cycled", alpha = 0.8
-          , breaks = c(0, 2000, 5000, 10000, 50000, 250000)
+          , breaks = c(0, 2000, 5000, 10000, 50000, 200000)
           )
 tmap_arrange(a, b, c, nrow = 1, ncol = 3)
 tmap_arrange(d, e, f, nrow = 1, ncol = 3)

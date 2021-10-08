@@ -156,17 +156,46 @@ https://github.com/saferactive/saferactive/releases/download/0.1.4/ksi-pf.csv
 
 # Low Traffic Neighbourhoods and rat-runs
 
-For West Yorkshire, we see a clear correlation between total road length within each 1km grid cell and the number of pedestrian KSI over the period 2010-2019.
+Traffic levels on minor roads has increased dramatically in recent years...
 
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/135123458-55ad4dd2-7719-41c4-8df7-cfc50712d7a6.png")
+Although the phrase 'Low Traffic Neighbourhood' is a recent invention, the concept is not new. Modal filters preventing vehicle movement along a street while allowing passage to pedestrians and cyclists have existed for many decades. They can take a wide range of forms, such as bollards, gaps, and continuations of pavement across the entrances of side streets. 
+
+It can also be argued that any street, or any network of streets, which does not provide a vehicle connection between two main roads, is in effect part of a low traffic neighbourhood. These streets do not provide worthwhile opportunities for ratrunning, so they are likely to be used mainly by residents and those wishing to access destinations on the street itself. This includes cul-de-sacs and wider networks of streets for which all of the access points are on the same main road.
+
+Using this definition of low traffic neighbourhoods, CycleStreets.net have created a nationwide beta map of LTNs. All roads are assigned as main roads, low traffic neighbourhood roads, ratruns, or ratruns with traffic calming measures. Main roads are those classified as 'A', 'B' or 'C' roads. Data on traffic calming measures are obtained from OSM.
+
+We have used this beta map with West Yorkshire as a case study region, to assess the impact of Low Traffic Neighbourhoods on road safety.
+
+## Active travel KSI, road length and commuter cycling in West Yorkshire
+
+For this case study we have divided the West Yorkshire road network into a set of 1km grid cells. We see a clear correlation between total road length within each 1km cell and the number of pedestrian KSI over the period 2010-2019.
+
+```{r ped-ksi, fig.cap="Pedestrian KSI over the years 2010-2019 against road length in km. Each point represents a 1km grid cell"}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136543444-d574755c-eb0d-4d4b-9981-a22fc18756ea.png")
 ```
 
+There is also a positive association between road length and cycle KSI but it is weaker, likely reflecting the fact that the cycling distribution is more uneven than the pedestrian distribution.
 
-The link between road length and cycle KSI is weaker, likely reflecting the fact that the cycling distribution is more uneven than the pedestrian distribution.
+```{r, fig.cap="Cycle KSI over the years 2010-2019 against road length in km. Each point represents a 1km grid cell"}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136543521-220b0a1d-432d-46dd-b796-ddbd20309573.png")
+```
 
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/135123502-9bc9dc1a-e028-4a68-b22e-1e6207f7585e.png")
+We can see a positive correlation between distance cycled for travel to work and cycle KSI.
+
+```{r, fig.cap="Cycle KSI over the years 2010-2019 against km cycled for travel to work according to the 2011 Census, using the fast route network derived from the PCT. Each point represents a 1km grid cell, with colour weighted by total road length within the grid cell"}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136543609-0a2e5e82-af09-4a97-85d8-bed82f4fb72f.png")
+```
+
+Switching to maps, we can see how these patterns play out across West Yorkshire. The greatest concentration of cycle and walking KSI are found in the urban areas such as Leeds and Bradford. Cycle commute km are strongly concentrated within Leeds.
+
+```{r, fig.cap="Cycle and pedestrian KSI for the period 2010-2019 and km cycled for travel to work in West Yorkshire. The map of km cycled only includes cells that form part of the PCT-derived fast route network for the 2011 Census"}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136542999-d7e2d3dd-568a-4e71-bf1d-28176f1e0055.png")
+```
+
+Now looking at the distribution of KSI risk, we see that for walking, KSI risk per km road remains highest in the urban areas, especially Bradford. For cycling, KSI risk per km road has a slightly more scattered distribution with high values in Leeds. However, when we use Bkm cycled as the denominator, the map is very different. Now some of the lowest rates are found in Leeds. This map shows very high KSI rates in some of the Pennine fringes of West Yorkshire, but these are probably artefacts of the fact that we are using commuter cycling as the denominator, while leisure and sport cycling dominate in these areas. A more reliable finding is that KSI risk appears higher in Bradford than in Leeds.
+
+```{r, fig.cap="Cycle and pedestrian KSI risk for the period 2010-2019 and KSI per Bkm cycled for travel to work in West Yorkshire, assuming 35% of cycle journeys are commutes (NTS mean for England in 2010-2019). The third map only includes cells that form part of the PCT-derived fast route network for the 2011 Census"}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136543119-5548f711-49d6-4fa3-946d-80c5887f40c2.png")
 ```
 
 # Data visualisation
