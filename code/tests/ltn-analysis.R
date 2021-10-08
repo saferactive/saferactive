@@ -183,10 +183,14 @@ ltn_centroid = st_centroid(ltn_data)
 
 saveRDS(ltn_centroid, "ltn_centroid.Rds")
 
-# Do it for west yorkshire
+ltn_centroid = readRDS("ltn_centroid.Rds")
+
+# Do it for west yorkshire (or other regions)
+region = "west_yorkshire"
+grid_region = get(paste0("grid_", region))
 
 # Aggregate LTN data using spatial grid
-ltn_westyorks = st_join(ltn_centroid, grid_westyorks)
+ltn_westyorks = st_join(ltn_centroid, grid_region)
 ltn_westyorks = ltn_westyorks[! is.na(ltn_westyorks$PLAN_NO), ]
 
 ltn_aggregated = ltn_westyorks %>%
@@ -209,7 +213,7 @@ crashes = readRDS("stats19_2010_2019.Rds")
 crashes_westyorks = crashes[westyorks,] %>%
   st_transform(27700)
 
-grid_crashes = st_join(crashes_westyorks, grid_westyorks)
+grid_crashes = st_join(crashes_westyorks, grid_region)
 
 crashes_aggregated = grid_crashes %>%
   st_drop_geometry() %>%
@@ -234,7 +238,9 @@ rnet_split = rnet_split %>%
 rnet_centroids = st_centroid(rnet_split)
 saveRDS(rnet_centroids, "rnet_centroids.Rds")
 
-pct_westyorks = st_join(rnet_centroids, grid_westyorks)
+rnet_centroids = readRDS("rnet_centroids.Rds")
+
+pct_westyorks = st_join(rnet_centroids, grid_region)
 pct_westyorks = pct_westyorks[! is.na(pct_westyorks$PLAN_NO), ]
 
 pct_aggregated = pct_westyorks %>%
@@ -245,7 +251,7 @@ pct_aggregated = pct_westyorks %>%
   )
 
 # Join LTN and crash data with grid (the left joins ensure only grid cells within west yorkshire are included)
-ltn_grid = left_join(grid_westyorks, ltn_aggregated)
+ltn_grid = left_join(grid_region, ltn_aggregated)
 ltn_grid = left_join(ltn_grid, crashes_aggregated)
 ltn_grid = left_join(ltn_grid, pct_aggregated)
 
@@ -262,7 +268,8 @@ ltn_grid = ltn_grid %>%
   mutate(
     cycle_ksi_per_km_road = ksi_cycle / length_total * 1000,
     walk_ksi_per_km_road = ksi_walk / length_total * 1000,
-    cycle_ksi_per_km_cycled = ksi_cycle / cycle_km_cleaned
+    cycle_ksi_per_km_cycled = ksi_cycle / cycle_km_cleaned,
+    cycle_ksi_per_Bkm_cycled = cycle_ksi_per_km_cycled/365/10*1000000000*0.35
     )
 
 # Grid only including cells that contain roads
@@ -286,6 +293,46 @@ mapview(ltn_grid["cycle_ksi_per_km_road"])
 mapview(ltn_grid["walk_ksi_per_km_road"])
 mapview(ltn_grid_ck["cycle_ksi_per_km_cycled"])
 
+a = tm_shape(ltn_grid) +
+  tm_fill("length_total", title = "Road length", alpha = 0.8)
+b = tm_shape(ltn_grid) +
+  tm_fill("perc_main", title = "% main roads", alpha = 0.8)
+c = tm_shape(ltn_grid) +
+  tm_fill("perc_ltn", title = "% LTN", alpha = 0.8)
+d = tm_shape(ltn_grid) +
+  tm_fill("perc_ratrun", title = "% ratrun", alpha = 0.8)
+e = tm_shape(ltn_grid) +
+  tm_fill("perc_calmed", title = "% calmed ratrun", alpha = 0.8
+          , breaks = c(0, 0.02, 0.05, 0.1, 0.2, 1))
+tmap_arrange(a, b, c, d, e, ncol = 5, nrow = 1)
+
+
+a = tm_shape(ltn_grid) +
+  tm_fill("ksi_cycle", title = "Cycle KSI", alpha = 0.8
+          , breaks = c(0, 1, 2, 5, 10, 30))
+b = tm_shape(ltn_grid) +
+  tm_fill("ksi_walk", title = "Walk KSI", alpha = 0.8
+          , breaks = c(0, 5, 10, 20, 50, 120)
+          )
+c = tm_shape(ltn_grid_ck) +
+  tm_fill("cycle_km_cleaned", title = "Cycle commute km", alpha = 0.8
+          , breaks = c(0, 50, 100, 200, 500, 1000)
+  )
+d = tm_shape(ltn_grid) +
+  tm_fill("cycle_ksi_per_km_road", title = "Cycle KSI per km road", alpha = 0.8
+          , breaks = c(0, 0.05, 0.1, 0.2, 0.5, 2)
+  )
+e = tm_shape(ltn_grid) +
+  tm_fill("walk_ksi_per_km_road", title = "Walk KSI per km road", alpha = 0.8
+          , breaks = c(0, 0.1, 0.2, 0.5, 1, 5)
+  )
+f = tm_shape(ltn_grid_ck) +
+  tm_fill("cycle_ksi_per_Bkm_cycled", title = "KSI per Bkm cycled", alpha = 0.8
+          , breaks = c(0, 2000, 5000, 10000, 50000, 250000)
+          )
+tmap_arrange(a, b, c, nrow = 1, ncol = 3)
+tmap_arrange(d, e, f, nrow = 1, ncol = 3)
+
 ggplot(ltn_grid, aes(length_total/1000, ksi_walk)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Pedestrian KSI")
@@ -300,51 +347,17 @@ ggplot(ltn_grid_ck, aes(cycle_km_cleaned , ksi_cycle)) +
 
 ggplot(ltn_grid_full, aes(perc_ltn, cycle_ksi_per_km_road)) +
   geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
-  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km road")
+  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km road") +
+  geom_smooth(method = "gam", mapping = aes(weight = length_total))
 
 ggplot(ltn_grid_ck, aes(perc_ltn, cycle_ksi_per_km_cycled)) +
   geom_point(alpha = ltn_grid_ck$length_total/max(ltn_grid_ck$length_total)) +
-  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km cycled")
+  labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km cycled") +
+  geom_smooth(method = "gam", mapping = aes(weight = length_total))
 
 ggplot(ltn_grid_full, aes(perc_ltn, walk_ksi_per_km_road)) +
   geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
-  labs(x = "% low traffic neighbourhood", y = "Pedestrian KSI per km road")
+  labs(x = "% low traffic neighbourhood", y = "Pedestrian KSI per km road") +
+  geom_smooth(method = "gam", mapping = aes(weight = length_total))
 
 
-##############################
-
-
-croproads <- function(x, y){
-  sf::st_crop(x, sf::st_bbox(y))
-}
-
-
-
-library(furrr)
-library(future)
-plan(multisession)
-rnet_split <- future_map2(.x = rnet2, .y = grid_split, .f = croproads)
-plan(sequential)
-
-rnet_split <- bind_rows(rnet_split)
-saveRDS(rnet_split, "data/pct_rnet_split_GAM_grid.Rds")
-
-#rnet_split <- readRDS("data/pct_rnet_split_GAM_grid.Rds")
-
-rnet_split$length <- as.numeric(st_length(rnet_split))
-rnet_split$km_cycle_2011 <- rnet_split$length / 1000 * rnet_split$bicycle
-rnet_split$km_cycle_govtarget <- rnet_split$length / 1000 * rnet_split$govtarget_slc
-rnet_split$km_cycle_dutch <- rnet_split$length / 1000 * rnet_split$dutch_slc
-
-rnet_summary <- rnet_split %>%
-  st_drop_geometry() %>%
-  group_by(gridid) %>%
-  summarise(road_km = sum(length / 1000),
-            km_cycle_2011 = sum(km_cycle_2011, na.rm = TRUE),
-            km_cycle_govtarget = sum(km_cycle_govtarget, na.rm = TRUE),
-            km_cycle_dutch = sum(km_cycle_dutch, na.rm = TRUE)
-  )
-
-
-
-# Assign stats19 crashes to the same spatial grid
