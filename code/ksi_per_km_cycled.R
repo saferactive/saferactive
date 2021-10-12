@@ -276,6 +276,14 @@ pf_lookup = crash %>%
 
 saveRDS(pf_lookup, "pf_lookup.Rds")
 
+# Get 2020 crashes by police force
+pf_2020 = inner_join(stats19_compare, pf_lookup)
+pf_2020 = pf_2020 %>%
+  group_by(police_force) %>%
+  summarise(bicycle_2019 = sum(bicycle_2019),
+            bicycle_2020 = sum(bicycle_2020)) %>%
+  mutate(pchange = bicycle_2020/bicycle_2019) %>%
+  select(police_force, pchange)
 
 cycle_km_pf = inner_join(annual_changes, pf_lookup, by = "ctyua19nm")
 cycle_km_pf = cycle_km_pf %>%
@@ -291,9 +299,15 @@ cycle_km_pf = cycle_km_pf %>%
     km_cycle_2017 = sum(km_cycle_2017),
     km_cycle_2018 = sum(km_cycle_2018),
     km_cycle_2019 = sum(km_cycle_2019),
+    km_cycle_2020 = sum(km_cycle_2020)
             )
 
 la_pf = left_join(crash_pf, cycle_km_pf, by = c("police_force"))
+
+la_pf = inner_join(la_pf, pf_2020)
+la_pf = la_pf %>%
+  mutate(ksi_2020 = ksi_2019 * pchange)
+la_pf$pchange = NULL
 
 la_pf$ksi_perBkm_2010 = la_pf$ksi_2010 / la_pf$km_cycle_2010 * 1000000
 la_pf$ksi_perBkm_2011 = la_pf$ksi_2011 / la_pf$km_cycle_2011 * 1000000
@@ -305,6 +319,7 @@ la_pf$ksi_perBkm_2016 = la_pf$ksi_2016 / la_pf$km_cycle_2016 * 1000000
 la_pf$ksi_perBkm_2017 = la_pf$ksi_2017 / la_pf$km_cycle_2017 * 1000000
 la_pf$ksi_perBkm_2018 = la_pf$ksi_2018 / la_pf$km_cycle_2018 * 1000000
 la_pf$ksi_perBkm_2019 = la_pf$ksi_2019 / la_pf$km_cycle_2019 * 1000000
+la_pf$ksi_perBkm_2020 = la_pf$ksi_2020 / la_pf$km_cycle_2020 * 1000000
 
 saveRDS(la_pf, "cycle-collision-risk-pf-dft.Rds")
 
@@ -463,17 +478,17 @@ la_pf = la_pf %>%
 # Calculate rates ---------------------------------------------------------
 
 # mean rates in each LA
-la$mean_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,1:10], 1, mean, na.rm = TRUE)
 la$early_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_risk = apply(la[,names(la)[grepl("ksi_perBkm_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_risk = (la$late_risk / la$early_risk -1) * 100
 
-la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]][,1:10], 1, mean, na.rm = TRUE)
 la$early_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_km_cycled = apply(la[,names(la)[grepl("km_cycle_",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_km_cycled = (la$late_km_cycled / la$early_km_cycled -1) * 100
 
-la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]], 1, mean, na.rm = TRUE)
+la$mean_cycle_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,1:10], 1, mean, na.rm = TRUE)
 la$early_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,1:5], 1, mean, na.rm = TRUE)
 la$late_ksi = apply(la[,names(la)[grepl("ksi_20",names(la))]][,6:10], 1, mean, na.rm = TRUE)
 la$diff_ksi = (la$late_ksi / la$early_ksi -1) * 100
@@ -489,17 +504,17 @@ la$late_km_perwd = apply(la[,names(la)[grepl("km_perwd_",names(la))]][,6:10], 1,
 la$diff_cycle_wd = (la$late_km_perwd / la$early_km_perwd - 1) * 100
 
 # mean rates in each Police Force area
-la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$mean_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,1:10], 1, mean, na.rm = TRUE)
 la_pf$early_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_risk = apply(la_pf[,names(la_pf)[grepl("ksi_perBkm_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diff_risk = la_pf$late_risk - la_pf$early_risk
 
-la_pf$mean_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$mean_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]][,1:10], 1, mean, na.rm = TRUE)
 la_pf$early_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_km_cycled = apply(la_pf[,names(la_pf)[grepl("km_cycle_",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diff_km_cycled = (la_pf$late_km_cycled / la_pf$early_km_cycled -1) * 100
 
-la_pf$mean_cycle_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]], 1, mean, na.rm = TRUE)
+la_pf$mean_cycle_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]][,1:10], 1, mean, na.rm = TRUE)
 la_pf$early_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]][,1:5], 1, mean, na.rm = TRUE)
 la_pf$late_ksi = apply(la_pf[,names(la_pf)[grepl("ksi_20",names(la_pf))]][,6:10], 1, mean, na.rm = TRUE)
 la_pf$diff_ksi = (la_pf$late_ksi / la_pf$early_ksi -1) * 100
@@ -587,10 +602,10 @@ ggplot(maj_con, aes(x = mean_km_percap, y = mean_risk)) +
 
 # select interesting LAs
 top_la = unique(c(
-  top_n(la, 4, mean_risk)$LAD19NM, # greatest mean casualty rate
-  top_n(la, -4, mean_risk)$LAD19NM, # lowest mean casualty rate
-  top_n(la, 4, diff_risk)$LAD19NM, # greatest increase in casualty rate from early years to late years
-  top_n(la, -4, diff_risk)$LAD19NM # greatest decrease in casualty rate from early years to late years
+  top_n(la, 4, mean_risk)$ctyua19nm, # greatest mean casualty rate
+  top_n(la, -4, mean_risk)$ctyua19nm, # lowest mean casualty rate
+  top_n(la, 4, diff_risk)$ctyua19nm, # greatest increase in casualty rate from early years to late years
+  top_n(la, -4, diff_risk)$ctyua19nm # greatest decrease in casualty rate from early years to late years
   ))
 
 top_la_pf = unique(c(
@@ -616,9 +631,9 @@ la_pf_long = pivot_longer(la_pf,
 )
 
 # allow the interesting LAs to be highlighted in the plot
-la_long$sel = la_long$LAD19NM %in% top_la
+la_long$sel = la_long$ctyua19nm %in% top_la
 la_long$year = as.integer(la_long$year)
-la_long$LAD19NM_plot = ifelse(la_long$sel, la_long$LAD19NM, NA)
+la_long$ctyua19nm_plot = ifelse(la_long$sel, la_long$ctyua19nm, NA)
 head(la_long)
 
 la_pf_long$sel = la_pf_long$police_force %in% top_la_pf
@@ -629,7 +644,7 @@ head(la_pf_long)
 # save la_long for future reference
 saveRDS(la_long, "la_long.Rds")
 
-ggplot(la_long, aes(year, ksi_perBkm, colour = LAD19NM_plot, group = LAD19NM)) +
+ggplot(la_long, aes(year, ksi_perBkm, colour = ctyua19nm_plot, group = ctyua19nm)) +
   geom_line(data = subset(la_long, sel == FALSE), aes(size = sel)) +
   geom_line(data = subset(la_long, sel == TRUE), aes(size = sel)) +
   ylab("KSI per 1000 km cycled") +
@@ -766,38 +781,115 @@ tm_shape(pf_geom) +
 ####
 tmap_options(check.and.fix = TRUE)
 t1 = tm_shape(bounds) +
-  tm_fill("mean_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2010-19") +
-  tm_borders(lwd = 0.1)
-  # + tm_layout(title = "Cycle KSI/Bkm 2010-19")
-
-t2 = tm_shape(bounds) +
-  tm_fill("early_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2010-14") +
+  tm_fill("early_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "Mean KSI per Bkm 2010-14") +
   tm_borders(lwd = 0.1)
  # + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
-t3 = tm_shape(bounds) +
-  tm_fill("late_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "2015-19") +
+t2 = tm_shape(bounds) +
+  tm_fill("late_risk", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "Mean KSI per Bkm 2015-19") +
   tm_borders(lwd = 0.1)
   # + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
-tmap_arrange(t1, t2, t3)
-
-####
-t1 = tm_shape(pf_geom) +
-  tm_fill("mean_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-19") +
+t3 = tm_shape(bounds) +
+  tm_fill("ksi_perBkm_2020", breaks = c(0, 500, 1000, 1500, 2000, 3000, 4000), title = "KSI per Bkm 2020") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 
-t2 = tm_shape(pf_geom) +
-  tm_fill("early_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2010-14") +
+tmap_arrange(t1, t2, t3)
+
+
+####
+
+t1 = tm_shape(bounds) +
+  tm_fill("early_ksi", breaks = c(0, 2, 5, 10, 20, 40, 80), title = "Mean cycle KSI 2010-14") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2010-14")
 
-t3 = tm_shape(pf_geom) +
-  tm_fill("late_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "2015-19") +
+t2 = tm_shape(bounds) +
+  tm_fill("late_ksi", breaks = c(0, 2, 5, 10, 20, 40, 80), title = "Mean cycle KSI 2015-19") +
   tm_borders(lwd = 0.1)
 # + tm_layout(title = "Cycle KSI/Bkm 2015-19")
 
+t3 = tm_shape(bounds) +
+  tm_fill("ksi_2020", breaks = c(0, 2, 5, 10, 20, 40, 80), title = "Cycle KSI 2020") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
+
+tmap_arrange(t1, t2, t3)
+
+
+####
+tmap_options(check.and.fix = TRUE)
+t1 = tm_shape(bounds) +
+  tm_fill("early_km_cycled", breaks = c(0, 2000, 5000, 10000, 20000, 50000, 120000), title = "Mean km cycled 2010-14") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-14")
+
+t2 = tm_shape(bounds) +
+  tm_fill("late_km_cycled", breaks = c(0, 2000, 5000, 10000, 20000, 50000, 120000), title = "Mean km cycled 2015-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2015-19")
+
+t3 = tm_shape(bounds) +
+  tm_fill("km_cycle_2020", breaks = c(0, 2000, 5000, 10000, 20000, 50000, 120000), title = "Km cycled 2020") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
+
+tmap_arrange(t1, t2, t3)
+
+
+####
+tmap_options(check.and.fix = TRUE)
+t1 = tm_shape(pf_geom) +
+  tm_fill("early_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "Mean KSI per Bkm 2010-14") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-14")
+
+t2 = tm_shape(pf_geom) +
+  tm_fill("late_risk", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "Mean KSI per Bkm 2015-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2015-19")
+
+t3 = tm_shape(pf_geom) +
+  tm_fill("ksi_perBkm_2020", breaks = c(0, 400, 800, 1200, 1600, 2000), title = "KSI per Bkm 2020") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
+tmap_arrange(t1, t2, t3)
+
+####
+tmap_options(check.and.fix = TRUE)
+t1 = tm_shape(pf_geom) +
+  tm_fill("early_ksi", breaks = c(0, 10, 20, 50, 100, 400), title = "Mean cycle KSI 2010-14") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-14")
+
+t2 = tm_shape(pf_geom) +
+  tm_fill("late_ksi", breaks = c(0, 10, 20, 50, 100, 400), title = "Mean cycle KSI 2015-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2015-19")
+
+t3 = tm_shape(pf_geom) +
+  tm_fill("ksi_2020", breaks = c(0, 10, 20, 50, 100, 400), title = "Cycle KSI 2020") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
+tmap_arrange(t1, t2, t3)
+
+####
+tmap_options(check.and.fix = TRUE)
+t1 = tm_shape(pf_geom) +
+  tm_fill("early_km_cycled", breaks = c(0, 20000, 50000, 100000, 200000, 600000), title = "Mean km cycled 2010-14") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-14")
+
+t2 = tm_shape(pf_geom) +
+  tm_fill("late_km_cycled", breaks = c(0, 20000, 50000, 100000, 200000, 600000), title = "Mean km cyled 2015-19") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2015-19")
+
+t3 = tm_shape(pf_geom) +
+  tm_fill("km_cycle_2020", breaks = c(0, 20000, 50000, 100000, 200000, 600000), title = "Km cycled 2020") +
+  tm_borders(lwd = 0.1)
+# + tm_layout(title = "Cycle KSI/Bkm 2010-19")
 tmap_arrange(t1, t2, t3)
 
 # Map change in cycle uptake and risk
