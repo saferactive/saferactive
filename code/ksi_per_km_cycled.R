@@ -928,7 +928,7 @@ greatest_decrease = arrange(top_n(la, 10, -diff_risk),diff_risk) # greatest decr
 
 # Create clean object for TGVE
 bounds_clean = bounds %>%
-  select(ctyua19nm, ksi_perBkm_2011, diff_risk, km_cycle_2011, diff_km_cycled, ksi_2011, diff_ksi, ctyua19cd) %>%
+  select(ctyua19nm,  mean_risk, diff_risk, ksi_perBkm_2020, mean_km_cycled, diff_km_cycled, km_cycle_2020, mean_cycle_ksi, diff_ksi, ksi_2020, ctyua19cd) %>%
   mutate_if(is.numeric, round, digits = 2) %>%
   sf::st_drop_geometry()
 
@@ -938,7 +938,7 @@ piggyback::pb_upload("ksi.csv")
 
 # Create clean object for TGVE
 pf_clean = pf_geom %>%
-  select(pfa18nm, ksi_perBkm_2011, diff_risk, km_cycle_2011, diff_km_cycled, ksi_2011, diff_ksi, pfa18cd) %>%
+  select(pfa18nm, mean_risk, diff_risk, ksi_perBkm_2020, mean_km_cycled, diff_km_cycled, km_cycle_2020, mean_cycle_ksi, diff_ksi, ksi_2020, pfa18cd) %>%
   mutate_if(is.numeric, round, digits = 2) %>%
   sf::st_drop_geometry()
 
