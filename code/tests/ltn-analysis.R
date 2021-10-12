@@ -210,8 +210,9 @@ ltn_aggregated = ltn_westyorks %>%
 
 # Get and aggregate stats19 data
 crashes = readRDS("stats19_2010_2019.Rds")
-crashes_westyorks = crashes[westyorks,] %>%
+crashes = crashes %>%
   st_transform(27700)
+crashes_westyorks = crashes[grid_region, ]
 
 grid_crashes = st_join(crashes_westyorks, grid_region)
 
@@ -275,8 +276,8 @@ ltn_grid = ltn_grid %>%
 # Grid only including cells that contain roads
 ltn_grid_full = ltn_grid[! is.na(ltn_grid$length_total), ]
 
-# Grid only including cells with > 0 cycling on PCT rnet
-ltn_grid_ck = ltn_grid_full[ltn_grid_full$cycle_km > 0, ]
+# Grid only including cells with >= 1km cycling on PCT rnet
+ltn_grid_ck = ltn_grid_full[ltn_grid_full$cycle_km >= 1, ]
 
 # change to tmap with log scales for better discrimination
 plot(ltn_grid)
@@ -333,6 +334,13 @@ f = tm_shape(ltn_grid_ck) +
 tmap_arrange(a, b, c, nrow = 1, ncol = 3)
 tmap_arrange(d, e, f, nrow = 1, ncol = 3)
 
+ltn_grid_cut = ltn_grid %>%
+  filter(length_total > 1000)
+ltn_grid_full_cut = ltn_grid_full %>%
+  filter(length_total > 1000)
+ltn_grid_ck_cut = ltn_grid_ck %>%
+  filter(length_total > 1000)
+
 ggplot(ltn_grid, aes(length_total/1000, ksi_walk)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Pedestrian KSI")
@@ -341,23 +349,49 @@ ggplot(ltn_grid, aes(length_total/1000 , ksi_cycle)) +
   geom_point() +
   labs(x = "Road length (km)", y = "Cycle KSI")
 
-ggplot(ltn_grid_ck, aes(cycle_km_cleaned , ksi_cycle)) +
-  geom_point(alpha = ltn_grid_ck$length_total/max(ltn_grid_ck$length_total)) +
+ggplot(ltn_grid_ck_cut, aes(cycle_km_cleaned , ksi_cycle)) +
+  geom_point(alpha = ltn_grid_ck_cut$length_total/max(ltn_grid_ck_cut$length_total)) +
   labs(x = "Km cycled (travel to work)", y = "Cycle KSI")
 
-ggplot(ltn_grid_full, aes(perc_ltn, cycle_ksi_per_km_road)) +
-  geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
+# Graphs with % ltn
+ltn_ck_filter = ltn_grid_ck_cut %>%
+  filter(perc_ltn > 0.2, perc_ltn < 0.95)
+ltn_full_filter = ltn_grid_full_cut %>%
+  filter(perc_ltn > 0.2, perc_ltn < 0.95)
+
+ggplot(ltn_grid_full_cut, aes(perc_ltn, cycle_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full_cut$length_total/max(ltn_grid_full_cut$length_total)) +
   labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km road") +
-  geom_smooth(method = "gam", mapping = aes(weight = length_total))
+  geom_smooth(data = ltn_full_filter, method = "gam", mapping = aes(weight = length_total))
 
-ggplot(ltn_grid_ck, aes(perc_ltn, cycle_ksi_per_km_cycled)) +
-  geom_point(alpha = ltn_grid_ck$length_total/max(ltn_grid_ck$length_total)) +
+ggplot(ltn_grid_ck_cut, aes(perc_ltn, cycle_ksi_per_km_cycled)) +
+  geom_point(alpha = ltn_grid_ck_cut$length_total/max(ltn_grid_ck_cut$length_total)) +
   labs(x = "% low traffic neighbourhood", y = "Cycle KSI per km cycled") +
-  geom_smooth(method = "gam", mapping = aes(weight = length_total))
+  geom_smooth(data = ltn_ck_filter, method = "gam", mapping = aes(weight = length_total))
 
-ggplot(ltn_grid_full, aes(perc_ltn, walk_ksi_per_km_road)) +
-  geom_point(alpha = ltn_grid_full$length_total/max(ltn_grid_full$length_total)) +
+ggplot(ltn_grid_full_cut, aes(perc_ltn, walk_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full_cut$length_total/max(ltn_grid_full_cut$length_total)) +
   labs(x = "% low traffic neighbourhood", y = "Pedestrian KSI per km road") +
-  geom_smooth(method = "gam", mapping = aes(weight = length_total))
+  geom_smooth(data = ltn_full_filter, method = "gam", mapping = aes(weight = length_total))
 
+# Graphs with % main
+main_ck_filter = ltn_grid_ck_cut %>%
+  filter(perc_main < 0.5)
+main_full_filter = ltn_grid_full_cut %>%
+  filter(perc_main < 0.5)
+
+ggplot(ltn_grid_full_cut, aes(perc_main, cycle_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full_cut$length_total/max(ltn_grid_full_cut$length_total)) +
+  labs(x = "% main road", y = "Cycle KSI per km road") +
+  geom_smooth(data = main_full_filter, method = "gam", mapping = aes(weight = length_total))
+
+ggplot(ltn_grid_ck_cut, aes(perc_main, cycle_ksi_per_km_cycled)) +
+  geom_point(alpha = ltn_grid_ck_cut$length_total/max(ltn_grid_ck_cut$length_total)) +
+  labs(x = "% main road", y = "Cycle KSI per km cycled") +
+  geom_smooth(data = main_ck_filter, method = "gam", mapping = aes(weight = length_total))
+
+ggplot(ltn_grid_full_cut, aes(perc_main, walk_ksi_per_km_road)) +
+  geom_point(alpha = ltn_grid_full_cut$length_total/max(ltn_grid_full_cut$length_total)) +
+  labs(x = "% main road", y = "Pedestrian KSI per km road") +
+  geom_smooth(data = main_full_filter, method = "gam", mapping = aes(weight = length_total))
 
