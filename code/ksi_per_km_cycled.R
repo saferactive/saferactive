@@ -113,6 +113,8 @@ crash$ctyua19nm = case_when(
   TRUE ~ crash$local_authority_highway
   )
 
+saveRDS(crash, "crash_1019_uppertier.Rds")
+
 # Get lookup to use with PCT rnet data
 lookup_la_lad = crash %>%
   st_drop_geometry() %>%
@@ -162,7 +164,8 @@ annual_changes = annual_changes %>%
     km_cycle_2016 = km_cycle_2011 * (dft_count_2016 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
     km_cycle_2017 = km_cycle_2011 * (dft_count_2017 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
     km_cycle_2018 = km_cycle_2011 * (dft_count_2018 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
-    km_cycle_2019 = km_cycle_2011 * (dft_count_2019 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012)))
+    km_cycle_2019 = km_cycle_2011 * (dft_count_2019 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012))),
+    km_cycle_2020 = km_cycle_2011 * (dft_count_2020 / mean(c(dft_count_2010, dft_count_2011, dft_count_2012)))
   )
 
 # Filter to peak hours only and group by LA --------------------------------------------------
@@ -190,6 +193,8 @@ annual_changes = annual_changes %>%
 
 # Group by upper tier ctyua19nm
 # use KSI from peak hours on weekdays only (to match the PCT travel to work flows as closely as possible)
+crash = readRDS("crash_1019_uppertier.Rds")
+
 crash_wide = crash %>%
   st_drop_geometry() %>%
   filter(
@@ -205,6 +210,23 @@ crash_wide = crash %>%
               values_from = c("ksi_cycle"),
               names_prefix = "ksi_")
 
+# Join with 2020 data (can't specify peak hours)
+stats19_compare = readRDS("stats19_compare.Rds")
+
+# a = crash_wide$ctyua19nm
+# b = stats19_compare$ctyua19nm
+# a[! a %in% b]
+# b[! b %in% a]
+
+join_2020 = stats19_compare %>%
+  st_drop_geometry() %>%
+  select(ctyua19nm, pchange)
+
+crash_wide = inner_join(crash_wide, join_2020)
+crash_wide = crash_wide %>%
+  mutate(ksi_2020 = ksi_2019 * pchange)
+crash_wide$pchange = NULL
+
 # Join with estimates of km cycled
 la = left_join(crash_wide, annual_changes, by = "ctyua19nm")
 
@@ -218,6 +240,7 @@ la$ksi_perBkm_2016 = la$ksi_2016 / la$km_cycle_2016 * 1000000
 la$ksi_perBkm_2017 = la$ksi_2017 / la$km_cycle_2017 * 1000000
 la$ksi_perBkm_2018 = la$ksi_2018 / la$km_cycle_2018 * 1000000
 la$ksi_perBkm_2019 = la$ksi_2019 / la$km_cycle_2019 * 1000000
+la$ksi_perBkm_2020 = la$ksi_2020 / la$km_cycle_2020 * 1000000
 
 saveRDS(la, "cycle-collision-risk-dft-counters.Rds")
 
