@@ -19,29 +19,29 @@ stats19_2014 = read_csv("stats19_2014.csv")
 stats19_2013 = read_csv("stats19_2013.csv")
 
 stats19_2019 = stats19_2019 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2019 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2019 = Cyclist, foot_2019 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2020 = stats19_2020 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2020 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2020 = Cyclist, foot_2020 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2018 = stats19_2018 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2018 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2018 = Cyclist, foot_2018 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2017 = stats19_2017 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2017 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2017 = Cyclist, foot_2017 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2016 = stats19_2016 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2016 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2016 = Cyclist, foot_2016 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2015 = stats19_2015 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2015 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2015 = Cyclist, foot_2015 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2014 = stats19_2014 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2014 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2014 = Cyclist, foot_2014 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 stats19_2013 = stats19_2013 %>%
-  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
-  rename(bicycle_2013 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2013 = Cyclist, foot_2013 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 
 stats19_compare = inner_join(stats19_2020, stats19_2019, by = c("ONS_Code", "Region")) %>%
   inner_join(stats19_2018, by = c("ONS_Code", "Region")) %>%
@@ -58,8 +58,15 @@ stats19_compare_regions = stats19_compare %>%
 stats19_compare_regions$region = gsub("Eastern", "East of England", stats19_compare_regions$region)
 stats19_compare_regions$region = gsub("Yorkshire/Humberside", "Yorkshire and The Humber", stats19_compare_regions$region)
 
-stats19_compare_regions = pivot_longer(stats19_compare_regions, cols = bicycle_2020:bicycle_2013, names_to = "year", names_prefix = "bicycle_", values_to = "ksi_cycle")
-stats19_compare_regions$year = as.numeric(stats19_compare_regions$year)
+stats19_compare_cycle = pivot_longer(stats19_compare_regions, cols = c(bicycle_2020, bicycle_2019, bicycle_2018, bicycle_2017, bicycle_2016, bicycle_2015, bicycle_2014, bicycle_2013), names_to = "year", names_prefix = "bicycle_", values_to = "ksi_cycle")
+stats19_compare_foot = pivot_longer(stats19_compare_regions, cols = c(foot_2020, foot_2019, foot_2018, foot_2017, foot_2016, foot_2015, foot_2014, foot_2013), names_to = "year", names_prefix = "foot_", values_to = "ksi_foot")
+stats19_compare_cycle$year = as.numeric(stats19_compare_cycle$year)
+stats19_compare_foot$year = as.numeric(stats19_compare_foot$year)
+stats19_compare_cycle = stats19_compare_cycle %>%
+  select(ONS_Code, region, year, ksi_cycle)
+stats19_compare_foot = stats19_compare_foot %>%
+  select(ONS_Code, region, year, ksi_foot)
+stats19_compare_regions = inner_join(stats19_compare_cycle, stats19_compare_foot, by = c("ONS_Code", "region", "year"))
 
 # correct LA names and codes
 stats19_compare$Region = gsub( "&", "and", stats19_compare$Region)

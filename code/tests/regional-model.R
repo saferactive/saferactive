@@ -563,18 +563,18 @@ stats19_compare_regions
 
 
 all_regional = inner_join(
-  # stats19_compare_regions,
-  stats19_regional,
-                          dft_rt_codes,
-                          # dft_regional_all,
+  stats19_compare_regions,
+  # stats19_regional,
+                          # dft_rt_codes,
+                          dft_regional_all,
                           by = c("year", "region")) %>%
   left_join(nts_regional, by = c("year", "region")) %>%
   left_join(gam_regional_trend, by = c("year", "region"))
 
 all_regional = all_regional %>%
   mutate(
-    # ksi_per_dft = ksi_cycle / dft_cycles,
-    ksi_per_dft = ksi_cycle / pedal_cycles_Bkm,
+    ksi_per_dft = ksi_cycle / dft_cycles,
+    # ksi_per_dft = ksi_cycle / pedal_cycles_Bkm,
     # ksi_per_gam = ksi_cycle / change_cycles,
     ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
   )
@@ -584,9 +584,9 @@ all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_per_dft, colour = region)) +
-  ylab("KSI per Bkm cycled") +
+  ylab("KSI risk per mean cycle count") +
   labs(x = "Year", colour = "Region") +
-  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020)) +
   scale_color_brewer(type = "qual", palette = 3)
 
 # Regional risk - NTS
@@ -610,6 +610,15 @@ all_regional %>%
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
   scale_color_brewer(type = "qual", palette = 3)
 
+all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_foot, colour = region), lwd = 0.8) +
+  # geom_smooth(aes(year, ksi_per_dft, colour = region)) +
+  ylab("Sum pedestrian KSI") +
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
+  scale_color_brewer(type = "qual", palette = 3)
+
 # Compare NTS and DfT data at regional level
 
 
@@ -621,6 +630,10 @@ sum(all_regional$ksi_per_dft[which(all_regional$year == 2019 & all_regional$regi
 sum(all_regional$ksi_per_dft[which(all_regional$year == 2019 & all_regional$region != "Scotland" & all_regional$region != "Wales")])/sum(all_regional$ksi_per_dft[which(all_regional$year == 2011 & all_regional$region != "Scotland" & all_regional$region != "Wales")])
 
 sum(all_regional$ksi_per_nts[which(all_regional$year == 2019 & !is.na(all_regional$ksi_per_nts))])/sum(all_regional$ksi_per_nts[which(all_regional$year == 2011 & !is.na(all_regional$ksi_per_nts))])
+
+sum(stats19_compare_regions$ksi_foot[which(stats19_compare_regions$year == 2019)])/sum(stats19_compare_regions$ksi_foot[which(stats19_compare_regions$year == 2013)])
+
+sum(stats19_compare_regions$ksi_foot[which(stats19_compare_regions$year == 2020)])/sum(stats19_compare_regions$ksi_foot[which(stats19_compare_regions$year == 2019)])
 
 
 # Raw DfT counts v collisions
