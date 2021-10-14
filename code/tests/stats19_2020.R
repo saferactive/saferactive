@@ -11,6 +11,12 @@ library(stats19)
 # The data is for adjusted KSI
 stats19_2020 = read_csv("stats19_2020.csv")
 stats19_2019 = read_csv("stats19_2019.csv")
+stats19_2018 = read_csv("stats19_2018.csv")
+stats19_2017 = read_csv("stats19_2017.csv")
+stats19_2016 = read_csv("stats19_2016.csv")
+stats19_2015 = read_csv("stats19_2015.csv")
+stats19_2014 = read_csv("stats19_2014.csv")
+stats19_2013 = read_csv("stats19_2013.csv")
 
 stats19_2019 = stats19_2019 %>%
   select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
@@ -18,8 +24,42 @@ stats19_2019 = stats19_2019 %>%
 stats19_2020 = stats19_2020 %>%
   select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
   rename(bicycle_2020 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2018 = stats19_2018 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2018 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2017 = stats19_2017 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2017 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2016 = stats19_2016 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2016 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2015 = stats19_2015 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2015 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2014 = stats19_2014 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2014 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+stats19_2013 = stats19_2013 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist) %>%
+  rename(bicycle_2013 = Cyclist, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
 
-stats19_compare = inner_join(stats19_2019, stats19_2020, by = c("ONS_Code", "Region"))
+stats19_compare = inner_join(stats19_2020, stats19_2019, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2018, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2017, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2016, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2015, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2014, by = c("ONS_Code", "Region")) %>%
+  inner_join(stats19_2013, by = c("ONS_Code", "Region"))
+
+####
+stats19_compare_regions = stats19_compare %>%
+  rename(region = Region)
+
+stats19_compare_regions$region = gsub("Eastern", "East of England", stats19_compare_regions$region)
+stats19_compare_regions$region = gsub("Yorkshire/Humberside", "Yorkshire and The Humber", stats19_compare_regions$region)
+
+stats19_compare_regions = pivot_longer(stats19_compare_regions, cols = bicycle_2020:bicycle_2013, names_to = "year", names_prefix = "bicycle_", values_to = "ksi_cycle")
+stats19_compare_regions$year = as.numeric(stats19_compare_regions$year)
 
 # correct LA names and codes
 stats19_compare$Region = gsub( "&", "and", stats19_compare$Region)
@@ -40,7 +80,11 @@ stats19_compare = stats19_compare %>%
 
 # Calculate % change
 stats19_compare = stats19_compare %>%
-  mutate(pchange = bicycle_2020/bicycle_2019)
+  mutate(pchange = case_when(
+    bicycle_2020 == 0 ~ 1,
+    bicycle_2019 == 0 ~ 1,
+    TRUE ~ bicycle_2020/bicycle_2019
+    ))
 
 # Prepare to join with spatial data
 bounds = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp")
@@ -54,3 +98,5 @@ bounds = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK
 stats19_compare = inner_join(bounds, stats19_compare, by = c("ctyua19cd" = "ONS_Code"))
 
 saveRDS(stats19_compare, "stats19_compare.Rds")
+
+

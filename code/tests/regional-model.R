@@ -45,6 +45,8 @@ region_populations = readRDS("region-populations.Rds")
 # TfL counters (2015 - 2020)
 tfl_counts = readRDS("tfl-counts-by-site-2020.Rds")
 
+# DfT Regional traffic
+dft_rt = read_csv("region_traffic_by_vehicle_type.csv")
 
 # Single dataset trends ---------------------------------------------------
 
@@ -215,7 +217,7 @@ dft_regional_5yr %>%
 dft_regional_all %>%
   # filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_change_cycles_norm, colour = region), lwd = 0.8) +
+  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
   labs(y = "Mean change in cycle AADF (relative to 2011)", x  = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +
@@ -246,6 +248,34 @@ dft_uppertier = dft_counts %>%
   )
 
 saveRDS(dft_uppertier, "dft_uppertier.Rds")
+
+
+# DfT regional csv --------------------------------------------------------
+
+dft_rt = dft_rt %>%
+  select(year, region_id, ons_code, pedal_cycles)
+
+dft_rt_codes = inner_join(dft_rt, stats19_2020, by = c("ons_code" = "ONS_Code"))
+dft_rt_codes = dft_rt_codes %>%
+  select(year, ons_code, pedal_cycles, Region) %>%
+  rename(region = Region) %>%
+  filter(year > 2009) %>%
+  mutate(pedal_cycles_Bkm = pedal_cycles / 1000000000)
+
+dft_rt_codes$region = gsub("Eastern", "East of England", dft_rt_codes$region)
+dft_rt_codes$region = gsub("Yorkshire/Humberside", "Yorkshire and The Humber", dft_rt_codes$region)
+
+# dft_rt_codes = dft_rt_codes %>%
+#   group_by(region, year) %>%
+#   summarise(pedal_cycles = mean(pedal_cycles)) %>%
+#   mutate(dft_cycles_norm = pedal_cycles / pedal_cycles[which(year == 2011)])
+
+dft_rt_codes %>%
+  ggplot() +
+  geom_line(aes(year, pedal_cycles_Bkm, colour = region), lwd = 0.8) +
+  labs(y = "Total distance cycled (Bkm)", x  = "Year", colour = "Region") +
+  scale_color_brewer(type = "qual", palette = 3) +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
 
 
 # TfL counts --------------------------------------------------------------
@@ -320,10 +350,15 @@ nts_regional %>%
 
 # Collisions --------------------------------------------------------------
 
+# stats19_compare = readRDS("stats19_compare.Rds") # for 2020 data
+
 stats19_national = collision_data %>%
   st_drop_geometry() %>%
   group_by(year) %>%
   summarise(ksi_cycle = sum(ksi_cycle))
+
+# stats19_2020_national = data.frame(year = 2020, ksi_cycle = 4356) # from ras30043
+# stats19_national = rbind(stats19_national, )
 
 stats19_national %>%
   ggplot() +
@@ -342,14 +377,17 @@ stats19_national %>%
 # piggyback::pb_upload("stats19_regional.Rds")
 stats19_regional = readRDS("stats19_regional.Rds")
 
-stats19_regional %>%
+all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_cycle, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_cycle)) +
   ylab("Sum cycle KSI") +
   labs(x = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +
-  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020), limits = c(2010, 2020))
+  scale_x_continuous(breaks = c(2012, 2014, 2016, 2018, 2020), limits = c(2012, 2020))
+
+
+# Join with 2020 stats19 data
 
 
 # GAM results -------------------------------------------------------------
@@ -518,14 +556,25 @@ comparisons3 %>%
 #   ylab("KSI rate relative to 2011") +
 #   xlim(2010, 2020)
 
-# Regional
-all_regional = left_join(stats19_regional, dft_regional_all, by = c("year", "region")) %>%
+
+# Regional ----------------------------------------------------------------
+
+stats19_compare_regions
+
+
+all_regional = inner_join(
+  # stats19_compare_regions,
+  stats19_regional,
+                          dft_rt_codes,
+                          # dft_regional_all,
+                          by = c("year", "region")) %>%
   left_join(nts_regional, by = c("year", "region")) %>%
   left_join(gam_regional_trend, by = c("year", "region"))
 
 all_regional = all_regional %>%
   mutate(
-    ksi_per_dft = ksi_cycle / dft_cycles,
+    # ksi_per_dft = ksi_cycle / dft_cycles,
+    ksi_per_dft = ksi_cycle / pedal_cycles_Bkm,
     # ksi_per_gam = ksi_cycle / change_cycles,
     ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
   )
@@ -535,7 +584,7 @@ all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_per_dft, colour = region)) +
-  ylab("KSI risk per mean cycle count") +
+  ylab("KSI per Bkm cycled") +
   labs(x = "Year", colour = "Region") +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
   scale_color_brewer(type = "qual", palette = 3)
@@ -562,6 +611,16 @@ all_regional %>%
   scale_color_brewer(type = "qual", palette = 3)
 
 # Compare NTS and DfT data at regional level
+
+
+# total % change between years
+sum(all_regional$ksi_per_dft[which(all_regional$year == 2020)])/sum(all_regional$ksi_per_dft[which(all_regional$year == 2019)])
+
+sum(all_regional$ksi_per_dft[which(all_regional$year == 2019 & all_regional$region == "North West")])/sum(all_regional$ksi_per_dft[which(all_regional$year == 2011 & all_regional$region == "North West")])
+
+sum(all_regional$ksi_per_dft[which(all_regional$year == 2019 & all_regional$region != "Scotland" & all_regional$region != "Wales")])/sum(all_regional$ksi_per_dft[which(all_regional$year == 2011 & all_regional$region != "Scotland" & all_regional$region != "Wales")])
+
+sum(all_regional$ksi_per_nts[which(all_regional$year == 2019 & !is.na(all_regional$ksi_per_nts))])/sum(all_regional$ksi_per_nts[which(all_regional$year == 2011 & !is.na(all_regional$ksi_per_nts))])
 
 
 # Raw DfT counts v collisions
