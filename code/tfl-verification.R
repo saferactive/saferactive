@@ -293,7 +293,7 @@ counter_multiyear = lads_data %>%
   summarise(`Borough Mean` = mean(borough_mean))
 
 tm_shape(counter_multiyear) +
-  tm_polygons("Borough Mean", palette = "BrBG", n = 6, breaks = c(0, 200, 400, 600, 1000, 1600, 3200))
+  tm_polygons("Borough Mean", breaks = c(0, 100, 200, 500, 1000, 2000, 4000))
 
 counter_earlyyear = lads_data %>%
   filter(year %in% 2015:2017) %>%

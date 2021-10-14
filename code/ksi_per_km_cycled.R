@@ -591,12 +591,13 @@ b + scale_y_continuous(trans="log10")
 maj_con = la_urb %>%
   filter(RUC11CD == 6)
 
-ggplot(maj_con, aes(x = mean_km_percap, y = mean_risk)) +
-  geom_point() +
+ggplot(la, aes(x = mean_km_percap, y = mean_risk)) +
+  geom_point(aes(alpha = population_2015)) +
   xlim(0, 0.3) +
   ylim(0, 3000) +
   labs(x = "Mean km (1000s) cycled per capita (resident pop'n)", y = "Mean cycle KSI per Bkm cycled") +
-  geom_text(label = maj_con$LAD19NM, nudge_y = +0.1, cex = 2.5)
+  theme(legend.position = "none")
+  # geom_text(label = la$ctyua19nm, nudge_y = +0.3, cex = 2.5)
 
 # Generate figures --------------------------------------------------------
 
