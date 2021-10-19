@@ -235,7 +235,7 @@ dim(counter_year %>% filter(ProgID == "OUTCY")) #2247 #2474
 
 saveRDS(counter_year, "tfl-counts-by-site-2020.Rds")
 # saveRDS(counter_year, "tfl-counts-by-site-peak.Rds")
-
+counter_year = readRDS("tfl-counts-by-site-2020.Rds")
 
 # Group by borough --------------------------------------------------------
 
@@ -279,7 +279,43 @@ lads = spData::lnd %>% rename(Borough = NAME) %>%
 # lads$Borough[!lads$Borough %in% counter_la_results$Borough]
 lads_data = inner_join(lads, counter_la_results)
 
+# Test - not working
+# # Stat19
+# stats19_compare = readRDS("stats19_compare.Rds")
+#
+#
+# clondon = stats19_compare %>%
+#   st_drop_geometry() %>%
+#   filter(ctyua19nm %in% lads_data$Borough)
+# clondon = clondon %>%
+#   group_by(ctyua19nm, year) %>%
+#   summarise(ksi_cycle = sum(ksi_cycle))
+#
+# count_stat = inner_join(lads_data, clondon, by = c("year", "Borough" = "local_authority_district"))
+#
+#
+# counter_la_results = inner_join(counter_means_year, counter_means_2015)
+#
+# count_stat = count_stat %>%
+#   mutate(
+#     ksi_per_count = ksi_cycle / borough_mean)
+#
+# count_stat_2015 = count_stat %>%
+#   filter(year == 2015) %>%
+#   ungroup() %>%
+#   mutate(risk_2015 = ksi_per_count) %>%
+#   select(Borough, risk_2015) %>%
+#   st_drop_geometry()
+#
+# counter_la_results = inner_join(count_stat, count_stat_2015) %>%
+#   mutate(risk_relative_to_2015 = ksi_per_count / risk_2015)
+#
+# tm_shape(counter_la_results) +
+#   tm_polygons("risk_relative_to_2015", palette = "BrBG", n = 6) +
+#   tm_text(text = "Name", size = 0.7) +
+#   tm_facets("year")
 
+####
 
 library(tmap)
 tm_shape(lads_data) +
@@ -318,6 +354,8 @@ tm_shape(counter_lateyear) +
   tm_text(text = "Name", size = 0.7)
 
 tfl_early_v_late = rbind(counter_earlyyear, counter_lateyear)
+
+
 
 
 # Grouping the boroughs ---------------------------------------------------
