@@ -21,6 +21,29 @@ regions_bfc = read_sf("Regions_(December_2020)_EN_BFC.geojson") %>%
 # piggyback::pb_download("traffic_joined.Rds")
 dft_counts = readRDS("traffic_joined.Rds")
 
+
+# road categories by year
+cats = dft_5yr %>%
+  st_drop_geometry() %>%
+  group_by(year, road_category) %>%
+  count()
+# extra = data.frame(year = c(2019, 2019), road_category = c("PA", "TA"), n = c(0, 0))
+# cats = rbind(cats, extra)
+annual_totals = cats %>% group_by(year) %>%
+  summarise(n = sum(n)) %>% rename(total = n)
+cats = cats %>%
+  inner_join(annual_totals, by = "year") %>%
+  mutate(proportion = n/total)
+View(cats)
+
+ggplot(cats,
+       aes(x = year, y = n, fill = factor(road_category))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_discrete(name = "Road category",
+                      labels = c("'B' road", "'C' or unclassified", "Primary 'A' road", "Trunk 'A' road")) +
+  xlab("Year") + ylab("Number of counts") +
+  scale_x_continuous(limits = c(2009.5, 2020.5), breaks = c(2010, 2012, 2014, 2016, 2018, 2020))
+
 # NTS travel data 2003-2019 (England) - for all travel purposes
 nts_clean = read.csv("d_region_clean.csv")
 
@@ -174,10 +197,12 @@ dft_regional_5yr = dft_regional %>%
   group_by(region, year) %>%
   summarise(dft_cycles = mean(pedal_cycles),
             dft_change_cycles = mean(change_min_cycles),
-            change_min_cycles_norm = mean(change_min_cycles_norm)) %>%
+            # change_min_cycles_norm = mean(change_min_cycles_norm)
+            ) %>%
   mutate(dft_cycles_norm = dft_cycles / dft_cycles[which(year == 2011)],
          dft_change_cycles_norm = dft_change_cycles / dft_change_cycles[which(year == 2011)],
-         change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)])
+         # change_min_norm = change_min_cycles_norm / change_min_cycles_norm[which(year == 2011)]
+         )
 # summary(dft_regional)
 
 dft_regional_10yr = dft_regional %>%
@@ -208,7 +233,7 @@ dft_regional_all = dft_regional %>%
 dft_regional_5yr %>%
   # filter(region != "London") %>%
   ggplot() +
-  geom_line(aes(year, dft_change_cycles, colour = region), lwd = 0.8) +
+  geom_line(aes(year, dft_cycles_norm, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, dft_cycles)) +
   labs(y = "Mean cycle AADF (change relative to 2011)", x  = "Year", colour = "Region") +
   scale_color_brewer(type = "qual", palette = 3) +
