@@ -89,56 +89,56 @@ awareness of active travelers.
 This table lists the top 10 and bottom 10 LAs for Active Travel KSI per
 100,000 resident population.
 
-|     | la\_name                    | rank | active\_ksi\_per100k | total\_crash | crash\_fatal |
-|:----|:----------------------------|-----:|---------------------:|-------------:|-------------:|
-| 93  | City of London              |    1 |                  525 |          229 |            1 |
-| 125 | Westminster                 |    2 |                   73 |         1552 |            3 |
-| 112 | Kensington and Chelsea      |    3 |                   48 |          668 |            3 |
-| 42  | Portsmouth                  |    4 |                   46 |          485 |            3 |
-| 120 | Southwark                   |    5 |                   40 |         1237 |            3 |
-| 105 | Hammersmith and Fulham      |    6 |                   38 |          734 |            1 |
-| 104 | Hackney                     |    7 |                   38 |          906 |            2 |
-| 10  | Kingston upon Hull, City of |    8 |                   37 |          806 |            5 |
-| 9   | Blackpool                   |    9 |                   36 |          304 |            2 |
-| 41  | Brighton and Hove           |   10 |                   36 |          686 |            2 |
-| 157 | Na h-Eileanan Siar          |  196 |                    8 |           20 |            1 |
-| 194 | Neath Port Talbot           |  197 |                    8 |          164 |            3 |
-| 201 | Torfaen                     |  198 |                    8 |           77 |            1 |
-| 171 | Aberdeenshire               |  199 |                    8 |          238 |            8 |
-| 195 | Bridgend                    |  200 |                    7 |          165 |            5 |
-| 146 | Staffordshire               |  201 |                    6 |         1017 |           23 |
-| 196 | Vale of Glamorgan           |  202 |                    6 |          143 |            1 |
-| 34  | Bracknell Forest            |  203 |                    3 |          107 |            3 |
-| 162 | Moray                       |  204 |                    3 |           49 |            5 |
-| 50  | Isles of Scilly             |  205 |                    0 |            2 |            0 |
+|     | la_name                     | rank | active_ksi_per100k | total_crash | crash_fatal |
+|:----|:----------------------------|-----:|-------------------:|------------:|------------:|
+| 93  | City of London              |    1 |                525 |         229 |           1 |
+| 125 | Westminster                 |    2 |                 73 |        1552 |           3 |
+| 112 | Kensington and Chelsea      |    3 |                 48 |         668 |           3 |
+| 42  | Portsmouth                  |    4 |                 46 |         485 |           3 |
+| 120 | Southwark                   |    5 |                 40 |        1237 |           3 |
+| 105 | Hammersmith and Fulham      |    6 |                 38 |         734 |           1 |
+| 104 | Hackney                     |    7 |                 38 |         906 |           2 |
+| 10  | Kingston upon Hull, City of |    8 |                 37 |         806 |           5 |
+| 9   | Blackpool                   |    9 |                 36 |         304 |           2 |
+| 41  | Brighton and Hove           |   10 |                 36 |         686 |           2 |
+| 157 | Na h-Eileanan Siar          |  196 |                  8 |          20 |           1 |
+| 194 | Neath Port Talbot           |  197 |                  8 |         164 |           3 |
+| 201 | Torfaen                     |  198 |                  8 |          77 |           1 |
+| 171 | Aberdeenshire               |  199 |                  8 |         238 |           8 |
+| 195 | Bridgend                    |  200 |                  7 |         165 |           5 |
+| 146 | Staffordshire               |  201 |                  6 |        1017 |          23 |
+| 196 | Vale of Glamorgan           |  202 |                  6 |         143 |           1 |
+| 34  | Bracknell Forest            |  203 |                  3 |         107 |           3 |
+| 162 | Moray                       |  204 |                  3 |          49 |           5 |
+| 50  | Isles of Scilly             |  205 |                  0 |           2 |           0 |
 
 As mention above City of London and Westminster are probably distorted
 due to their high daytime population. This emphasizes the need to adjust
 for the level of active travel activity not just population. Ranking by
 workplace population gives slightly different results.
 
-|     | la\_name                    | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
-|:----|:----------------------------|-----:|---------------------------:|-------------:|-------------:|
-| 104 | Hackney                     |    1 |                        102 |          906 |            2 |
-| 42  | Portsmouth                  |    2 |                         91 |          485 |            3 |
-| 124 | Wandsworth                  |    3 |                         90 |          981 |            6 |
-| 9   | Blackpool                   |    4 |                         79 |          304 |            2 |
-| 106 | Haringey                    |    5 |                         79 |          832 |            2 |
-| 10  | Kingston upon Hull, City of |    6 |                         77 |          806 |            5 |
-| 41  | Brighton and Hove           |    7 |                         77 |          686 |            2 |
-| 8   | Blackburn with Darwen       |    8 |                         76 |          359 |            2 |
-| 43  | Southampton                 |    9 |                         74 |          537 |            3 |
-| 114 | Lambeth                     |   10 |                         74 |         1203 |            1 |
-| 201 | Torfaen                     |  164 |                         20 |           77 |            1 |
-| 84  | Solihull                    |  165 |                         20 |          259 |            5 |
-| 197 | Cardiff                     |  166 |                         19 |          362 |            5 |
-| 25  | South Gloucestershire       |  167 |                         18 |          432 |            5 |
-| 195 | Bridgend                    |  168 |                         17 |          165 |            5 |
-| 196 | Vale of Glamorgan           |  169 |                         17 |          143 |            1 |
-| 146 | Staffordshire               |  170 |                         15 |         1017 |           23 |
-| 93  | City of London              |  171 |                         14 |          229 |            1 |
-| 34  | Bracknell Forest            |  172 |                          6 |          107 |            3 |
-| 50  | Isles of Scilly             |  173 |                          0 |            2 |            0 |
+|     | la_name                     | rank | active_ksi_per100k_work | total_crash | crash_fatal |
+|:----|:----------------------------|-----:|------------------------:|------------:|------------:|
+| 104 | Hackney                     |    1 |                     102 |         906 |           2 |
+| 42  | Portsmouth                  |    2 |                      91 |         485 |           3 |
+| 124 | Wandsworth                  |    3 |                      90 |         981 |           6 |
+| 9   | Blackpool                   |    4 |                      79 |         304 |           2 |
+| 106 | Haringey                    |    5 |                      79 |         832 |           2 |
+| 10  | Kingston upon Hull, City of |    6 |                      77 |         806 |           5 |
+| 41  | Brighton and Hove           |    7 |                      77 |         686 |           2 |
+| 8   | Blackburn with Darwen       |    8 |                      76 |         359 |           2 |
+| 43  | Southampton                 |    9 |                      74 |         537 |           3 |
+| 114 | Lambeth                     |   10 |                      74 |        1203 |           1 |
+| 201 | Torfaen                     |  164 |                      20 |          77 |           1 |
+| 84  | Solihull                    |  165 |                      20 |         259 |           5 |
+| 197 | Cardiff                     |  166 |                      19 |         362 |           5 |
+| 25  | South Gloucestershire       |  167 |                      18 |         432 |           5 |
+| 195 | Bridgend                    |  168 |                      17 |         165 |           5 |
+| 196 | Vale of Glamorgan           |  169 |                      17 |         143 |           1 |
+| 146 | Staffordshire               |  170 |                      15 |        1017 |          23 |
+| 93  | City of London              |  171 |                      14 |         229 |           1 |
+| 34  | Bracknell Forest            |  172 |                       6 |         107 |           3 |
+| 50  | Isles of Scilly             |  173 |                       0 |           2 |           0 |
 
 # Historical Trends
 
@@ -227,19 +227,11 @@ suggesting that the darker winter evenings are playing a role here.
 Casualties during the hour 4-5pm are highest in Days 320-350, further
 backing up this observation.
 
-    ##     fiveday           hour         active_ksi    
-    ##  Min.   :  0.0   Min.   : 0.00   Min.   :  1.16  
-    ##  1st Qu.: 90.0   1st Qu.: 5.75   1st Qu.: 25.24  
-    ##  Median :182.5   Median :11.50   Median : 67.57  
-    ##  Mean   :182.5   Mean   :11.50   Mean   : 70.54  
-    ##  3rd Qu.:275.0   3rd Qu.:17.25   3rd Qu.: 99.47  
-    ##  Max.   :365.0   Max.   :23.00   Max.   :247.16
-
 ![](LA_trends_files/figure-gfm/heatmap-1.png)<!-- -->
 
 ## Hours of darkness
 
-Look at actual light levels crashes\_all$light\_conditions
+Look at actual light levels crashes_all$light_conditions
 
 # Focus on Cycling Commuting Times
 
@@ -260,28 +252,28 @@ Wandsworth, Hackney and Portsmouth.
     ##  [1] "#FFFFE5" "#FFF7C0" "#FEE79B" "#FECF66" "#FEAD3B" "#F5851E" "#E0630D"
     ##  [8] "#BF4602" "#923204" "#662506"
 
-|     | la\_name                     | rank | active\_ksi\_per100k\_work | total\_crash | crash\_fatal |
-|:----|:-----------------------------|-----:|---------------------------:|-------------:|-------------:|
-| 124 | Wandsworth                   |    1 |                         44 |          445 |            2 |
-| 104 | Hackney                      |    2 |                         37 |          338 |            1 |
-| 42  | Portsmouth                   |    3 |                         36 |          193 |            1 |
-| 119 | Richmond upon Thames         |    4 |                         36 |          217 |            0 |
-| 10  | Kingston upon Hull, City of  |    5 |                         35 |          347 |            2 |
-| 41  | Brighton and Hove            |    6 |                         34 |          297 |            1 |
-| 106 | Haringey                     |    7 |                         33 |          302 |            1 |
-| 9   | Blackpool                    |    8 |                         31 |          130 |            0 |
-| 103 | Greenwich                    |    9 |                         30 |          306 |            5 |
-| 69  | St. Helens                   |   10 |                         30 |           91 |            4 |
-| 48  | Shropshire                   |  164 |                          8 |          183 |            2 |
-| 193 | Swansea                      |  165 |                          7 |           98 |            0 |
-| 196 | Vale of Glamorgan            |  166 |                          7 |           49 |            0 |
-| 21  | Stoke-on-Trent               |  167 |                          7 |          156 |            0 |
-| 146 | Staffordshire                |  168 |                          7 |          393 |            4 |
-| 22  | Bath and North East Somerset |  169 |                          7 |          111 |            0 |
-| 53  | Central Bedfordshire         |  170 |                          6 |          258 |            4 |
-| 195 | Bridgend                     |  171 |                          4 |           60 |            1 |
-| 34  | Bracknell Forest             |  172 |                          2 |           51 |            1 |
-| 50  | Isles of Scilly              |  173 |                          0 |            1 |            0 |
+|     | la_name                      | rank | active_ksi_per100k_work | total_crash | crash_fatal |
+|:----|:-----------------------------|-----:|------------------------:|------------:|------------:|
+| 124 | Wandsworth                   |    1 |                      44 |         445 |           2 |
+| 104 | Hackney                      |    2 |                      37 |         338 |           1 |
+| 42  | Portsmouth                   |    3 |                      36 |         193 |           1 |
+| 119 | Richmond upon Thames         |    4 |                      36 |         217 |           0 |
+| 10  | Kingston upon Hull, City of  |    5 |                      35 |         347 |           2 |
+| 41  | Brighton and Hove            |    6 |                      34 |         297 |           1 |
+| 106 | Haringey                     |    7 |                      33 |         302 |           1 |
+| 9   | Blackpool                    |    8 |                      31 |         130 |           0 |
+| 103 | Greenwich                    |    9 |                      30 |         306 |           5 |
+| 69  | St. Helens                   |   10 |                      30 |          91 |           4 |
+| 48  | Shropshire                   |  164 |                       8 |         183 |           2 |
+| 193 | Swansea                      |  165 |                       7 |          98 |           0 |
+| 196 | Vale of Glamorgan            |  166 |                       7 |          49 |           0 |
+| 21  | Stoke-on-Trent               |  167 |                       7 |         156 |           0 |
+| 146 | Staffordshire                |  168 |                       7 |         393 |           4 |
+| 22  | Bath and North East Somerset |  169 |                       7 |         111 |           0 |
+| 53  | Central Bedfordshire         |  170 |                       6 |         258 |           4 |
+| 195 | Bridgend                     |  171 |                       4 |          60 |           1 |
+| 34  | Bracknell Forest             |  172 |                       2 |          51 |           1 |
+| 50  | Isles of Scilly              |  173 |                       0 |           1 |           0 |
 
 Commuter hours are classified as 07:00-10:00 and 16:00-19:00.
 

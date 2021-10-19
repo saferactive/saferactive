@@ -64,17 +64,17 @@ Next steps:
 The key datasets are available at:
 <https://github.com/ITSLeeds/roadsafetyvis/tree/master/data/clean>
 
-km\_cycled\_2010\_2019\_50m\_grid.Rds This is a 50m grid of km cycled
-per year 2010-2019. It is created using the PCT network (for England and
+km_cycled_2010_2019_50m_grid.Rds This is a 50m grid of km cycled per
+year 2010-2019. It is created using the PCT network (for England and
 Wales only), with flows adjusted according to the results of my GAM to
 estimate km cycled in each year. It’s missing the tip of Cornwall and
 Lowestoft.
 
 -   Highway authority = upper tier (normally) - for vehicle km
 -   stats19 = data at lower tier
--   la\_lower.Rds is the lookup table lower to upper
--   la\_lower\_for\_plot.Rds = super generalised spatial resolution.
-    useful for making quick maps.
+-   la_lower.Rds is the lookup table lower to upper
+-   la_lower_for_plot.Rds = super generalised spatial resolution. useful
+    for making quick maps.
 -   wideform = a summary selection of the variables, not all of them.
 
 Next steps:
