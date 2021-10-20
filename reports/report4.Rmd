@@ -87,6 +87,13 @@ Total distance cycled per year in each English region (based on NTS survey)
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133634243-6449b3c1-61dd-429c-bc41-562841968ff4.png")
 ```
 
+Total distance cycled per year in each region (including Scotland and Wales), based on DfT regional traffic data.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138102424-717a763f-1ec9-4675-80a1-38d9138e4fa0.png")
+```
+
+
 Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales). This is based on the raw flows per counter.
 
 ```{r}
@@ -99,11 +106,6 @@ Mean change in AADF cycle flow per DfT counter in each region (including Scotlan
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133624726-227a7114-0fb1-4f62-bd06-a139f7245b60.png")
 ```
 
-Mean AADF cycle flow per TfL counter
-
-# ```{r}
-# knitr::include_graphics("")
-# ```
 
 Estimated mean change in cycle flows, according to GAM model based on the DfT and TfL cycle counters
 
@@ -125,23 +127,18 @@ Trends in KSI risk per km cycled, using NTS journey data
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133631183-2f5e6454-f34b-4aa3-bcac-fad88503e896.png")
 ```
 
+Trends in KSI risk per km cycled, using DfT regional traffic data
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138102558-f4cda4ef-7815-4147-9787-761c59249c00.png")
+```
+
 Trends in KSI risk per DfT mean cycle count 
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132327377-8daceacf-2de6-4513-b776-b5593ec2d11a.png")
 ```
 
-Trends in KSI risk per TfL mean cycle count 
-
-# ```{r}
-# knitr::include_graphics("")
-# ```
-
-Trends in KSI risk for GAM outputs
-
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130441145-8a5edd19-6c34-4dda-8c78-4dd7bcb90ef7.png")
-```
 
 # Sub-regional trends in cycle KSI and risk
 
@@ -267,12 +264,13 @@ This map shows very high KSI rates in some of the Pennine fringes of West Yorksh
 A more reliable finding is that KSI risk appears higher in Bradford than in Leeds.
 
 ```{r, fig.cap="Cycle and pedestrian KSI risk for the period 2010-2019 and KSI per Bkm cycled for travel to work in West Yorkshire, assuming 35% of cycle journeys are commutes (NTS mean for England in 2010-2019). The third map only includes cells that form part of the PCT-derived fast route network for the 2011 Census"}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/136543119-5548f711-49d6-4fa3-946d-80c5887f40c2.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138101552-b834daf2-ae4d-4b4b-a4cf-031e316949c3.png")
 ```
 
 ## KSI and road types in West Yorkshire
 
-The next step is to investigate how these patterns relate to the distribution of road types. The total road length within each 1km grid cell varies greatly across the region, but so too does the distribution of types of road within each grid cell.
+The next step is to investigate how these patterns relate to the distribution of road types. 
+Unsurprisingly, the total road length within each 1km grid cell varies greatly across the region, being highest in towns and cities, but so too does the distribution of types of road within each grid cell.
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/137931151-74a946aa-11a8-4989-be58-db89206792c0.png")
