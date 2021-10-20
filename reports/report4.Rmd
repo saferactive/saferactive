@@ -17,9 +17,32 @@ library(sf)
 The Saferactive project is funded by the Department for Transport. 
 It aims to investigate spatial and temporal patterns in road safety for active travel. 
 
-We have used a range of nationally available datasets to estimate and visualise road safety, including stats19 collision data, DfT and TfL traffic counts, NTS survey returns and 2011 Census commute data.  
+High quality data is available on road safety through the Stats19 dataset.
+Published by the Department for Transport, this is a comprehensive dataset of road collision statistics, mainly as reported by police officers on the scene. 
+
+However, to estimate collision risk, we must also know the exposure, defined as the number of people walking and cycling on the road network.
+The exposure acts as the denominator in any estimate of road safety risk.
+The degree of uncertainty associated with estimates of exposure is high, and this uncertainty will be a key focus of the report.
+
+The majority of the report focuses on cycling rather than walking. 
+Firstly, this is because better data is available for cycle journeys, in particular journeys to work. 
+Travel to work is recorded in the 2011 Census, and according to the NTS survey in 2011 it comprised around 33% of all cycle journeys but only 7% of journeys on foot. 
+Therefore we decided it is acceptable to use travel to work as a proxy for cycling but not for walking.
+Networks of cycle counters from the DfT, TfL and others are also available, providing data on annual changes in cycle flows, while comparable data does not exist for walking.
+
+A second reason for focusing on cycling is that since 2020 there have been large changes in how we use our streets, with unprecedented increases in cycling during the lockdown periods, accompanied in some cases by a rise in cycle casualties. 
+It is important to take these changes in context and to recognise that an increase in casualties does not necessarily mean an increase in risk.
+This is why it is important to focus on exposure and the denominators of road safety.
+
+We have focused mainly on the decade from 2010 to 2020, but there is some variability in the years covered by different datasets...
+
+Where possible, we include data from England, Wales and Scotland. 
+The sub-regional analyses are only available for England and Wales since they are based on the Propensity to Cycle Tool.
+NTS data are available for England only.
 
 # Input data
+
+We have used a range of nationally available datasets to estimate and visualise road safety, including Stats19 collision data, DfT and TfL traffic counts, NTS survey returns and 2011 Census commute data.  
 
 TfL counter data (Central, Inner and Outer London count points only)
 
@@ -45,6 +68,8 @@ Mean count per LAD, over the period 2010 - 2020.
 # ```
 
 # National trends
+
+At national and regional scales we have more reliable estimates of cycle volume than at sub-regional geographic scales, but there still remains differences between data sources.
 
 ## National trends in cycle volume
 
@@ -78,6 +103,20 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1304
 ```
 
 # Regional trends
+
+## Regional trends in active travel casualties
+
+Sum of cycle KSI in each region (including Scotland and Wales)
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138121988-52a7e749-acda-4214-a4b7-c3f2b4f7f272.png")
+```
+
+Pedestrian KSI by region.
+
+```{r}
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138121368-e1cf201f-d773-4190-be9f-ac48c5b21b29.png")
+```
 
 ## Regional trends in cycle volume
 
@@ -113,13 +152,7 @@ Estimated mean change in cycle flows, according to GAM model based on the DfT an
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133447294-0143da9d-5d66-47ce-ab14-741cdbb04147.png")
 ```
 
-## Regional trends in collisions and collision risk
-
-Sum of cycle KSI in each region (including Scotland and Wales)
-
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132044428-c6f9e57c-478f-47d9-9247-5d338b9e2137.png")
-```
+## Regional trends in collision risk
 
 Trends in KSI risk per km cycled, using NTS journey data 
 
