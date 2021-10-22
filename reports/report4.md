@@ -9,11 +9,48 @@ The Saferactive project is funded by the Department for Transport. It
 aims to investigate spatial and temporal patterns in road safety for
 active travel.
 
-We have used a range of nationally available datasets to estimate and
-visualise road safety, including stats19 collision data, DfT and TfL
-traffic counts, NTS survey returns and 2011 Census commute data.
+High quality data is available on road safety through the Stats19
+dataset. Published by the Department for Transport, this is a
+comprehensive dataset of road collision statistics, mainly as reported
+by police officers on the scene.
+
+However, to estimate collision risk, we must also know the exposure,
+defined as the number of people walking and cycling on the road network.
+The exposure acts as the denominator in any estimate of road safety
+risk. The degree of uncertainty associated with estimates of exposure is
+high, and this uncertainty will be a key focus of the report.
+
+The majority of the report focuses on cycling rather than walking.
+Firstly, this is because better data is available for cycle journeys, in
+particular journeys to work. Travel to work is recorded in the 2011
+Census, and according to the NTS survey in 2011 it comprised around 38%
+of all cycle journeys but only 7% of journeys on foot. Therefore we
+decided it is acceptable to use travel to work as a proxy for cycling
+but not for walking. Networks of cycle counters from the DfT, TfL and
+others are also available, providing data on annual changes in cycle
+flows, while comparable data does not exist for walking.
+
+A second reason for focusing on cycling is that since 2020 there have
+been large changes in how we use our streets, with unprecedented
+increases in cycling during the lockdown periods, accompanied in some
+cases by a rise in cycle casualties. It is important to take these
+changes in context and to recognise that an increase in casualties does
+not necessarily mean an increase in risk. This is why it is important to
+focus on exposure and the denominators of road safety.
+
+We have focused mainly on the decade from 2010 to 2020, but there is
+some variability in the years covered by different datasets…
+
+Where possible, we include data from England, Wales and Scotland. The
+sub-regional analyses are only available for England and Wales since
+they are based on the Propensity to Cycle Tool. NTS data are available
+for England only.
 
 # 2 Input data
+
+We have used a range of nationally available datasets to estimate and
+visualise road safety, including Stats19 collision data, DfT and TfL
+traffic counts, NTS survey returns and 2011 Census commute data.
 
 TfL counter data (Central, Inner and Outer London count points only)
 
@@ -32,6 +69,10 @@ Mean count per LAD, over the period 2010 - 2020.
 # 3 `{r} # knitr::include_graphics("") #`
 
 # 4 National trends
+
+At national and regional scales we have more reliable estimates of cycle
+volume than at sub-regional geographic scales, but there still remains
+differences between data sources.
 
 ## 4.1 National trends in cycle volume
 
@@ -62,12 +103,27 @@ assessed using all three measures of cycle volume.
 
 # 6 Regional trends
 
-## 6.1 Regional trends in cycle volume
+## 6.1 Regional trends in active travel casualties
+
+Sum of cycle KSI in each region (including Scotland and Wales)
+
+![](https://user-images.githubusercontent.com/52210872/138121988-52a7e749-acda-4214-a4b7-c3f2b4f7f272.png)<!-- -->
+
+Pedestrian KSI by region.
+
+![](https://user-images.githubusercontent.com/52210872/138121368-e1cf201f-d773-4190-be9f-ac48c5b21b29.png)<!-- -->
+
+## 6.2 Regional trends in cycle volume
 
 Total distance cycled per year in each English region (based on NTS
 survey)
 
 ![](https://user-images.githubusercontent.com/52210872/133634243-6449b3c1-61dd-429c-bc41-562841968ff4.png)<!-- -->
+
+Total distance cycled per year in each region (including Scotland and
+Wales), based on DfT regional traffic data.
+
+![](https://user-images.githubusercontent.com/52210872/138102424-717a763f-1ec9-4675-80a1-38d9138e4fa0.png)<!-- -->
 
 Mean AADF cycle flow per DfT counter in each region (including Scotland
 and Wales). This is based on the raw flows per counter.
@@ -81,38 +137,26 @@ counter.
 
 ![](https://user-images.githubusercontent.com/52210872/133624726-227a7114-0fb1-4f62-bd06-a139f7245b60.png)<!-- -->
 
-Mean AADF cycle flow per TfL counter
-
-# 7 `{r} # knitr::include_graphics("") #`
-
 Estimated mean change in cycle flows, according to GAM model based on
 the DfT and TfL cycle counters
 
 ![](https://user-images.githubusercontent.com/52210872/133447294-0143da9d-5d66-47ce-ab14-741cdbb04147.png)<!-- -->
 
-## 7.1 Regional trends in collisions and collision risk
-
-Sum of cycle KSI in each region (including Scotland and Wales)
-
-![](https://user-images.githubusercontent.com/52210872/132044428-c6f9e57c-478f-47d9-9247-5d338b9e2137.png)<!-- -->
+## 6.3 Regional trends in collision risk
 
 Trends in KSI risk per km cycled, using NTS journey data
 
 ![](https://user-images.githubusercontent.com/52210872/133631183-2f5e6454-f34b-4aa3-bcac-fad88503e896.png)<!-- -->
 
+Trends in KSI risk per km cycled, using DfT regional traffic data
+
+![](https://user-images.githubusercontent.com/52210872/138102558-f4cda4ef-7815-4147-9787-761c59249c00.png)<!-- -->
+
 Trends in KSI risk per DfT mean cycle count
 
 ![](https://user-images.githubusercontent.com/52210872/132327377-8daceacf-2de6-4513-b776-b5593ec2d11a.png)<!-- -->
 
-Trends in KSI risk per TfL mean cycle count
-
-# 8 `{r} # knitr::include_graphics("") #`
-
-Trends in KSI risk for GAM outputs
-
-![](https://user-images.githubusercontent.com/52210872/130441145-8a5edd19-6c34-4dda-8c78-4dd7bcb90ef7.png)<!-- -->
-
-# 9 Sub-regional trends in cycle KSI and risk
+# 7 Sub-regional trends in cycle KSI and risk
 
 We investigate trends in KSI, exposure and risk for commuter cycling at
 the geographical scales of Upper Tier Local Authorities and Police Force
@@ -141,7 +185,7 @@ geographical region in 2020; *A**A**D**F*<sub>2010</sub> = mean AADF in
 2010; *A**A**D**F*<sub>2011</sub> = mean AADF in 2011; and
 *A**A**D**F*<sub>2012</sub> = mean AADF in 2012.
 
-## 9.1 Upper Tier Local Authority trends
+## 7.1 Upper Tier Local Authority trends
 
 Change in KSI at LA level is seen below.
 
@@ -156,7 +200,7 @@ change in risk.
 
 ![](https://user-images.githubusercontent.com/52210872/136982364-660dbbba-6494-4aa5-9502-575a455b428a.png)<!-- -->
 
-## 9.2 Police Force area trends
+## 7.2 Police Force area trends
 
 Similarly, we investigate changes in peak hour KSI at Police Force
 level.
@@ -172,7 +216,7 @@ Force areas.
 
 ![](https://user-images.githubusercontent.com/52210872/136990471-f2dfd8a0-1319-44fb-8ed3-b7287d6be588.png)<!-- -->
 
-## 9.3 Data downloads
+## 7.3 Data downloads
 
 The Upper Tier Local Authority level trends in peak hour cycling and
 risk can be found at
@@ -182,7 +226,7 @@ The police force level trends in peak hour cycling and risk can be found
 at
 <https://github.com/saferactive/saferactive/releases/download/0.1.4/ksi-pf.csv>
 
-# 10 Low Traffic Neighbourhoods and rat-runs
+# 8 Low Traffic Neighbourhoods and rat-runs
 
 Traffic levels on minor roads have increased dramatically in recent
 years…
@@ -216,14 +260,14 @@ classified.
 We have used this beta map with West Yorkshire as a case study region,
 to assess the impact of Low Traffic Neighbourhoods on road safety.
 
-## 10.1 Active travel KSI, road length and commuter cycling in West Yorkshire
+## 8.1 Active travel KSI, road length and commuter cycling in West Yorkshire
 
 For this case study we have divided the West Yorkshire road network into
 a set of 1km grid cells. We see a clear correlation between total road
 length within each 1km cell and the number of pedestrian KSI over the
 period 2010-2019.
 
-![Figure 10.1: Pedestrian KSI over the years 2010-2019 against road
+![Figure 8.1: Pedestrian KSI over the years 2010-2019 against road
 length in km. Each point represents a 1km grid
 cell](https://user-images.githubusercontent.com/52210872/136543444-d574755c-eb0d-4d4b-9981-a22fc18756ea.png)
 
@@ -231,14 +275,14 @@ There is also a positive association between road length and cycle KSI
 but it is weaker, likely reflecting the fact that the cycling
 distribution is more uneven than the pedestrian distribution.
 
-![Figure 10.2: Cycle KSI over the years 2010-2019 against road length in
+![Figure 8.2: Cycle KSI over the years 2010-2019 against road length in
 km. Each point represents a 1km grid
 cell](https://user-images.githubusercontent.com/52210872/136543521-220b0a1d-432d-46dd-b796-ddbd20309573.png)
 
 We can see a positive correlation between distance cycled for travel to
 work and cycle KSI.
 
-![Figure 10.3: Cycle KSI over the years 2010-2019 against km cycled for
+![Figure 8.3: Cycle KSI over the years 2010-2019 against km cycled for
 travel to work according to the 2011 Census, using the fast route
 network derived from the PCT. Each point represents a 1km grid cell,
 with colour weighted by total road length within the grid
@@ -249,7 +293,7 @@ Yorkshire. The greatest concentration of cycle and walking KSI are found
 in the urban areas such as Leeds and Bradford. Cycle commute km are
 strongly concentrated within Leeds.
 
-![Figure 10.4: Cycle and pedestrian KSI for the period 2010-2019 and km
+![Figure 8.4: Cycle and pedestrian KSI for the period 2010-2019 and km
 cycled for travel to work in West Yorkshire. The map of km cycled only
 includes cells that form part of the PCT-derived fast route network for
 the 2011
@@ -267,19 +311,20 @@ denominator, while leisure and sport cycling dominate in these areas. A
 more reliable finding is that KSI risk appears higher in Bradford than
 in Leeds.
 
-![Figure 10.5: Cycle and pedestrian KSI risk for the period 2010-2019
-and KSI per Bkm cycled for travel to work in West Yorkshire, assuming
-35% of cycle journeys are commutes (NTS mean for England in 2010-2019).
-The third map only includes cells that form part of the PCT-derived fast
+![Figure 8.5: Cycle and pedestrian KSI risk for the period 2010-2019 and
+KSI per Bkm cycled for travel to work in West Yorkshire, assuming 35% of
+cycle journeys are commutes (NTS mean for England in 2010-2019). The
+third map only includes cells that form part of the PCT-derived fast
 route network for the 2011
-Census](https://user-images.githubusercontent.com/52210872/136543119-5548f711-49d6-4fa3-946d-80c5887f40c2.png)
+Census](https://user-images.githubusercontent.com/52210872/138101552-b834daf2-ae4d-4b4b-a4cf-031e316949c3.png)
 
-## 10.2 KSI and road types in West Yorkshire
+## 8.2 KSI and road types in West Yorkshire
 
 The next step is to investigate how these patterns relate to the
-distribution of road types. The total road length within each 1km grid
-cell varies greatly across the region, but so too does the distribution
-of types of road within each grid cell.
+distribution of road types. Unsurprisingly, the total road length within
+each 1km grid cell varies greatly across the region, being highest in
+towns and cities, but so too does the distribution of types of road
+within each grid cell.
 
 ![](https://user-images.githubusercontent.com/52210872/137931151-74a946aa-11a8-4989-be58-db89206792c0.png)<!-- -->
 
@@ -298,10 +343,69 @@ km cycled, with the proportion of roads classified as LTNs.
 
 ![](https://user-images.githubusercontent.com/52210872/137930345-8717150b-e99e-49a8-a77f-d234610db516.png)<!-- -->![](https://user-images.githubusercontent.com/52210872/137930392-c6aa4da3-6f9f-4d98-9a44-8cfaff4d7ebc.png)<!-- -->
 
-# 11 Data visualisation
+# 9 Data visualisation
 
-# 12 Web application
+# 10 Web application
 
-# 13 Discussion
+# 11 Discussion
 
-# 14 Conclusion
+Rather than one simple answer to the question of how to measure road
+safety risk, it is clear that there are many different ways of
+approaching this topic. We have focused mainly on risk related to cycle
+commuting, which has some of the best data quality, but even here
+different data sources will provide different interpretations.
+
+This uncertainty must be understood in the context that to assess risk,
+we need measures of both casualty rates and exposure. The casualty data
+is comprehensive and the core stats19 components (such as number of
+casualties) are highly reliable. Therefore it is uncertainty in the
+exposure, i.e. the number of km cycled on the roads, that is the most
+important factor.
+
+Casualty severity adjustment…
+
+## 11.1 Uncertainty in spatial trends
+
+When it comes to travel to work, we have comprehensive knowledge of
+spatial trends in cycling through the 2011 Census. Certain uncertainties
+remain even here, since we do not know the actual routes used to travel
+between origin and destination, but the CycleStreets.net fast algorithm
+provides a good approximation of these.
+
+More importantly, this only holds true for travel to work, which in 2011
+accounted for 38% of cycle journeys. Similarly comprehensive data exists
+for travel to school, but not for other purposes such as leisure,
+personal business and shopping. In particular, leisure cycling accounted
+for 34% of journeys in 2011 and is likely to have considerably different
+spatial patterns to commuter cycling. In addition, we do not yet have
+evidence relating to multimodal journeys such as combined cycle-rail
+journeys.
+
+For the analyses in this report, one of the most prominent impacts of
+the uncertainty in spatial trends relates to the lack of data for other
+journey purposes. We have tried to focus on travel to work by only
+counting collisions that occur during peak commute hours, but
+nevertheless, even during those hours not all journeys will be for
+commuting. Therefore we will have overestimated road safety risk in
+places where commuting is a relatively smaller proportion of total
+cycling, in comparison to places where commuting occupies a higher
+proportion of total journeys. This could potentially explain the high
+risk rates seen in areas such as rural Wales, the fringes of London, the
+South Coast and the Pennines, which may have relatively high proportions
+of leisure/sport cycling.
+
+## 11.2 Uncertainty in temporal trends
+
+The spatial trends described above hold true for 2011, when the Census
+was conducted. When analysing change through time before and after this
+date, there are other sources of uncertainty.
+
+Poor reliability of traffic counts.
+
+Lack of information on new build developments.
+
+## 11.3 Impact of low numbers
+
+Resampling and empirical Bayes…
+
+# 12 Conclusion

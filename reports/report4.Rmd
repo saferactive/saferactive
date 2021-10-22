@@ -346,26 +346,37 @@ Casualty severity adjustment...
 
 When it comes to travel to work, we have comprehensive knowledge of spatial trends in cycling through the 2011 Census. Certain uncertainties remain even here, since we do not know the actual routes used to travel between origin and destination, but the CycleStreets.net fast algorithm provides a good approximation of these.
 
-More importantly, this only holds true for travel to work, which in 2011 accounted for 38% of cycle journeys. 
+However, this only holds true for travel to work, which in 2011 accounted for 38% of cycle journeys. 
 Similarly comprehensive data exists for travel to school, but not for other purposes such as leisure, personal business and shopping. 
 In particular, leisure cycling accounted for 34% of journeys in 2011 and is likely to have considerably different spatial patterns to commuter cycling.
 In addition, we do not yet have evidence relating to multimodal journeys such as combined cycle-rail journeys.
 
-For the analyses in this report, one of the most prominent impacts of the uncertainty in spatial trends relates to the lack of data for other journey purposes.
-We have tried to focus on travel to work by only counting collisions that occur during peak commute hours, but nevertheless, even during those hours not all journeys will be for commuting.
-Therefore we will have overestimated road safety risk in places where commuting is a relatively smaller proportion of total cycling, in comparison to places where commuting occupies a higher proportion of total journeys.
+For the sub-regional analyses in this report, one of the most prominent impacts of the uncertainty in spatial trends relates to this lack of data on other journey purposes.
+We have focused on travel to work by only counting collisions that occur during peak commute hours, but nevertheless, even during those hours not all journeys will be for commuting.
+Therefore, in the sub-regional analyses we will have overestimated KSI risk everywhere, but especially in places where commuting is a relatively smaller proportion of total cycle journeys.
 This could potentially explain the high risk rates seen in areas such as rural Wales, the fringes of London, the South Coast and the Pennines, which may have relatively high proportions of leisure/sport cycling.
+
+The reliance on Census data which is now ten years old also means that spatial trends will not account for new build developments, although flows from these sites may be included in the traffic counter data for more recent years.  
 
 ## Uncertainty in temporal trends
 
 The spatial trends described above hold true for 2011, when the Census was conducted. 
-When analysing change through time before and after this date, there are other sources of uncertainty.
+When analysing change through time before and after this date, there is uncertainty related the measures used to assess change in cycling.
+At the regional level, it is possible to use DfT regional traffic data and NTS survey returns, but these are not available at higher geographic resolutions.
 
-Poor reliability of traffic counts.
+The sub-regional analyses rely on DfT traffic counters as a basis for estimating change through time.
+However, a key limitation is that the count locations are not consistent from year to year. 
+Some locations see counts every year, but most do not, leading to a proponderance of missing data which impacts on observed trends.
 
-Lack of information on new build developments.
+In addition, counts are undertaken on a variety of road types, from trunk 'A' roads to 'C' and unclassified roads. 
+Expected cycle flows differ by road type. 
+Both nationally and within a Local Authority, the proportion of counts that are located on roads of each type varies from year to year.  
+This causes inter-annual flux in observed cycle flows which can mask underlying trends.
 
-## Impact of low numbers
+
+## Impact of data scarcity
+
+Smaller Local Authority may have both few accidents per year and few DfT counter locations. 
 
 Resampling and empirical Bayes...
 
