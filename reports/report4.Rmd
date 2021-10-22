@@ -26,7 +26,7 @@ The degree of uncertainty associated with estimates of exposure is high, and thi
 
 The majority of the report focuses on cycling rather than walking. 
 Firstly, this is because better data is available for cycle journeys, in particular journeys to work. 
-Travel to work is recorded in the 2011 Census, and according to the NTS survey in 2011 it comprised around 33% of all cycle journeys but only 7% of journeys on foot. 
+Travel to work is recorded in the 2011 Census, and according to the NTS survey in 2011 it comprised around 38% of all cycle journeys but only 7% of journeys on foot. 
 Therefore we decided it is acceptable to use travel to work as a proxy for cycling but not for walking.
 Networks of cycle counters from the DfT, TfL and others are also available, providing data on annual changes in cycle flows, while comparable data does not exist for walking.
 
@@ -332,6 +332,43 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1379
 # Web application
 
 # Discussion
+
+Rather than one simple answer to the question of how to measure road safety risk, it is clear that there are many different ways of approaching this topic. 
+We have focused mainly on risk related to cycle commuting, which has some of the best data quality, but even here different data sources will provide different interpretations.
+
+This uncertainty must be understood in the context that to assess risk, we need measures of both casualty rates and exposure. 
+The casualty data is comprehensive and the core stats19 components (such as number of casualties) are highly reliable.
+Therefore it is uncertainty in the exposure, i.e. the number of km cycled on the roads, that is the most important factor.
+
+Casualty severity adjustment...
+
+## Uncertainty in spatial trends
+
+When it comes to travel to work, we have comprehensive knowledge of spatial trends in cycling through the 2011 Census. Certain uncertainties remain even here, since we do not know the actual routes used to travel between origin and destination, but the CycleStreets.net fast algorithm provides a good approximation of these.
+
+More importantly, this only holds true for travel to work, which in 2011 accounted for 38% of cycle journeys. 
+Similarly comprehensive data exists for travel to school, but not for other purposes such as leisure, personal business and shopping. 
+In particular, leisure cycling accounted for 34% of journeys in 2011 and is likely to have considerably different spatial patterns to commuter cycling.
+In addition, we do not yet have evidence relating to multimodal journeys such as combined cycle-rail journeys.
+
+For the analyses in this report, one of the most prominent impacts of the uncertainty in spatial trends relates to the lack of data for other journey purposes.
+We have tried to focus on travel to work by only counting collisions that occur during peak commute hours, but nevertheless, even during those hours not all journeys will be for commuting.
+Therefore we will have overestimated road safety risk in places where commuting is a relatively smaller proportion of total cycling, in comparison to places where commuting occupies a higher proportion of total journeys.
+This could potentially explain the high risk rates seen in areas such as rural Wales, the fringes of London, the South Coast and the Pennines, which may have relatively high proportions of leisure/sport cycling.
+
+## Uncertainty in temporal trends
+
+The spatial trends described above hold true for 2011, when the Census was conducted. 
+When analysing change through time before and after this date, there are other sources of uncertainty.
+
+Poor reliability of traffic counts.
+
+Lack of information on new build developments.
+
+## Impact of low numbers
+
+Resampling and empirical Bayes...
+
 
 # Conclusion
 
