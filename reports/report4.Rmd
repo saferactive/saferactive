@@ -63,10 +63,6 @@ DfT counter data
 
 Mean count per LAD, over the period 2010 - 2020. 
 
-# ```{r}
-# knitr::include_graphics("")
-# ```
-
 # National trends
 
 At national and regional scales we have more reliable estimates of cycle volume than at sub-regional geographic scales, but there still remains differences between data sources.
@@ -81,19 +77,7 @@ In 2020, the mean number of cyclists passing DfT traffic count points was three 
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/130480677-af7ea79d-94f8-4812-8ec6-9321a5b6b4e0.png")
 ```
 
-Estimated change since 2011 in cycle flows at a national level, based on a GAM generated using the DfT and TfL counter data
-
-```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133419356-5d57135f-29c8-4eb5-8237-95969387c352.png")
-```
-
 ## National trends in collisions and collision risk
-
-Change in cycle KSI 2010 - 2019
-
-# ```{r}
-# knitr::include_graphics("")
-# ```
 
 In the period 2010-2019, risk of cycle KSI has reduced. 
 This reduction has mainly occurred since 2014, and can be seen when casualty data are assessed using all three measures of cycle volume.
@@ -106,7 +90,7 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1304
 
 ## Regional trends in active travel casualties
 
-Sum of cycle KSI in each region (including Scotland and Wales)
+Change in cycle KSI in each region.
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138121988-52a7e749-acda-4214-a4b7-c3f2b4f7f272.png")
@@ -120,36 +104,44 @@ knitr::include_graphics("https://user-images.githubusercontent.com/52210872/1381
 
 ## Regional trends in cycle volume
 
-Total distance cycled per year in each English region (based on NTS survey)
+At the regional level, the most reliable data sources are the NTS and DfT regional traffic data.
+
+Total distance cycled per year in each English region 2003 - 2019 (based on NTS survey)
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133634243-6449b3c1-61dd-429c-bc41-562841968ff4.png")
 ```
 
-Total distance cycled per year in each region (including Scotland and Wales), based on DfT regional traffic data.
+Total distance cycled per year in each region 2010 - 2020 (including Scotland and Wales), based on DfT regional traffic data.
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138102424-717a763f-1ec9-4675-80a1-38d9138e4fa0.png")
 ```
 
-
-Mean AADF cycle flow per DfT counter in each region (including Scotland and Wales). This is based on the raw flows per counter.
+Data from individual DfT traffic counters, unlike the sources shown in the two previous figures, are available for analysis at sub-regional levels.
+Therefore, for comparative purposes we show regional aggregations of the traffic counter data.
+Firstly, we look at mean cycle flows per DfT counter in each region. 
+These are all Annual Average Daily Flows (AADF), calculated by the DfT to account for the impact of seasonality on the raw counter flows.
+To allow easy comparison between regions, we normalised these as percentage change since 2011. 
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/132316899-1bbc1cc9-687e-4df3-9c7a-3074778dd107.png")
 ```
 
-Mean change in AADF cycle flow per DfT counter in each region (including Scotland and Wales). This is based on the change in flow at each counter, calculated as the raw flow minus the minimum flow for the given counter.
+Count locations change from year to year, which could be causing some of observed flux in these regional mean values.
+As another approach, we look at mean change in AADF cycle flow per DfT counter in each region (including Scotland and Wales). 
+This is based on the change in flow at each counter, calculated as the flow for a particular year minus the minimum annual flow for the given counter.
+Again, these are normalised as percentage change since 2011.
 
 ```{r}
 knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133624726-227a7114-0fb1-4f62-bd06-a139f7245b60.png")
 ```
 
-
-Estimated mean change in cycle flows, according to GAM model based on the DfT and TfL cycle counters
+The low observed mean flows in 2018 and 2019 in the previous figure can be explained by the fact that many additional counts were undertaken on 'C' and Unclassified roads in these years.
+If these are new locations, the minimum flow for the count location will necessarily be recorded in one of these years.
 
 ```{r}
-knitr::include_graphics("https://user-images.githubusercontent.com/52210872/133447294-0143da9d-5d66-47ce-ab14-741cdbb04147.png")
+knitr::include_graphics("https://user-images.githubusercontent.com/52210872/138469693-3f6b4a20-8092-452b-8303-b129c4254608.png")
 ```
 
 ## Regional trends in collision risk
@@ -364,15 +356,15 @@ The spatial trends described above hold true for 2011, when the Census was condu
 When analysing change through time before and after this date, there is uncertainty related the measures used to assess change in cycling.
 At the regional level, it is possible to use DfT regional traffic data and NTS survey returns, but these are not available at higher geographic resolutions.
 
-The sub-regional analyses rely on DfT traffic counters as a basis for estimating change through time.
+The sub-regional analyses rely on Annual Average Daily Flows derived from DfT traffic counters as a basis for estimating change through time.
 However, a key limitation is that the count locations are not consistent from year to year. 
 Some locations see counts every year, but most do not, leading to a proponderance of missing data which impacts on observed trends.
 
 In addition, counts are undertaken on a variety of road types, from trunk 'A' roads to 'C' and unclassified roads. 
 Expected cycle flows differ by road type. 
-Both nationally and within a Local Authority, the proportion of counts that are located on roads of each type varies from year to year.  
+Both nationally and within a Local Authority, the number and proportion of counts that are located on roads of each type varies from year to year.  
 This causes inter-annual flux in observed cycle flows which can mask underlying trends.
-
+The result of these factors is that the mean AADF for counters within a given geographic area is inherently unstable from year to year. 
 
 ## Impact of data scarcity
 
