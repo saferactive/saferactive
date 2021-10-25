@@ -105,5 +105,6 @@ bounds = read_sf("Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK
 stats19_compare = inner_join(bounds, stats19_compare, by = c("ctyua19cd" = "ONS_Code"))
 
 saveRDS(stats19_compare, "stats19_compare.Rds")
+saveRDS(stats19_compare_regions, "stats19_compare_regions.Rds")
 
 

@@ -280,6 +280,11 @@ saveRDS(dft_uppertier, "dft_uppertier.Rds")
 dft_rt = dft_rt %>%
   select(year, region_id, ons_code, pedal_cycles)
 
+stats19_2020 = read_csv("stats19_2020.csv")
+stats19_2020 = stats19_2020 %>%
+  select(`ONS Code`, `Region/Local Authority`, Cyclist, Pedestrian) %>%
+  rename(bicycle_2020 = Cyclist, foot_2020 = Pedestrian, ONS_Code = `ONS Code`, Region = `Region/Local Authority`)
+
 dft_rt_codes = inner_join(dft_rt, stats19_2020, by = c("ons_code" = "ONS_Code"))
 dft_rt_codes = dft_rt_codes %>%
   select(year, ons_code, pedal_cycles, Region) %>%
@@ -375,7 +380,7 @@ nts_regional %>%
 
 # Collisions --------------------------------------------------------------
 
-# stats19_compare = readRDS("stats19_compare.Rds") # for 2020 data
+stats19_compare = readRDS("stats19_compare.Rds") # for 2020 data
 
 stats19_national = collision_data %>%
   st_drop_geometry() %>%
@@ -584,7 +589,7 @@ comparisons3 %>%
 
 # Regional ----------------------------------------------------------------
 
-stats19_compare_regions
+stats19_compare_regions = readRDS("stats19_compare_regions.Rds")
 
 
 all_regional = inner_join(
@@ -601,21 +606,22 @@ all_regional = all_regional %>%
     ksi_per_dft = ksi_cycle / dft_cycles,
     # ksi_per_dft = ksi_cycle / pedal_cycles_Bkm,
     # ksi_per_gam = ksi_cycle / change_cycles,
-    ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
+    # ksi_per_nts = ksi_cycle / nts_cycles * 1000000000
   )
 
 # Regional risk - DfT
-all_regional %>%
+a = all_regional %>%
   ggplot() +
   geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
   # geom_smooth(aes(year, ksi_per_dft, colour = region)) +
-  ylab("KSI risk per mean cycle count") +
+  # ylab("KSI risk per mean cycle count") +
+  ylab("KSI per Bkm cycled") +
   labs(x = "Year", colour = "Region") +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020)) +
   scale_color_brewer(type = "qual", palette = 3)
 
 # Regional risk - NTS
-all_regional %>%
+b = all_regional %>%
   filter(region != "Scotland", region != "Wales") %>%
   ggplot() +
   geom_line(aes(year, ksi_per_nts, colour = region), lwd = 0.8) +
@@ -624,6 +630,28 @@ all_regional %>%
   labs(x = "Year", colour = "Region") +
   scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018)) +
   scale_color_manual(values = my_palette)
+
+ggpubr::ggarrange(b, a)
+
+# Regional risk - DfT
+a = all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
+  ylab("KSI per Bkm cycled") +
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020)) +
+  scale_color_brewer(type = "qual", palette = 3)
+
+# Regional risk - DfT
+b = all_regional %>%
+  ggplot() +
+  geom_line(aes(year, ksi_per_dft, colour = region), lwd = 0.8) +
+  ylab("KSI risk per mean cycle count") +
+  labs(x = "Year", colour = "Region") +
+  scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020)) +
+  scale_color_brewer(type = "qual", palette = 3)
+
+ggpubr::ggarrange(a, b)
 
 # Regional risk - GAM
 all_regional %>%
