@@ -470,6 +470,9 @@ gam_regional_trend %>%
 
 # Plot trends together ----------------------------------------------------
 
+dft_national = dft_national %>%
+  filter(year >= 2010)
+
 # Old version still the best
 all_trends = right_join(stats19_national, dft_national, by = "year") %>%
   left_join(nts_national, by = "year") %>%
