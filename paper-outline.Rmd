@@ -1,0 +1,79 @@
+---
+title: "Trends in Road Safety for Cycling - Paper Outline"
+author: "Joey Talbot"
+date: "28/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Context of changes in last decade
+
+KSI as a measure of road safety
+
+Importance of the denominator in assessing risk
+
+Uncertainties in counter data
+
+
+# Methods
+
+## Collision data
+
+Injury severity correction
+
+## Estimating distance cycled
+
+Introduce the data sources
+
+Use of DfT counters
+
+Use of commute data for sub-regional analysis
+
+Resampling?
+
+Mixed models?
+
+# Results
+
+DfT counter variability and road type
+
+## Regional patterns
+
+KSI
+
+Distance cycled - calculate correlation between NTS, DfT regional stats and DfT counters (with resampling?)
+
+Risk - calculate correlation between NTS, DfT regional stats and DfT counters (with resampling?)
+
+## Sub-regional patterns
+
+KSI, distance cycled and risk for NUTS 3 regions
+
+KSI, distance cycled and risk for police forces
+
+## Safety in numbers  (to prevent any double counting, could assess this at the regional scale instead, using risk against % who cycle to work?)
+
+Risk against cycle distance per capita
+
+Risk against % who commute to work? (avoids using distance cycled on both axes)
+
+## Urbanisation
+
+Risk against cycle distance per capita, by rural-urban status (NUTS 3)
+
+# Discussion
+
+## Spatial trends
+
+Safety in numbers comparison between regions
+
+## Temporal trends
+
+Change in risk through time, including covid impact
+
+# Conclusion
