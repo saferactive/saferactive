@@ -567,6 +567,7 @@ comparisons3 = comparisons %>%
   pivot_longer(cols = c(dft_norm,
                         # gam_norm,
                         nts_norm), names_to = "cycle_volume")
+comparisons3 = comparisons3 %>% filter(year >= 2010)
 
 comparisons3 %>%
   ggplot(aes(year, value, colour = cycle_volume)) +
@@ -576,7 +577,8 @@ comparisons3 %>%
   labs(x= "Year", colour = "Cycle volume data") +
   scale_colour_discrete(labels = c("DfT counters",
                                    # "GAM",
-                                   "NTS"))
+                                   "NTS")) +
+scale_x_continuous(breaks = c(2010, 2012, 2014, 2016, 2018, 2020))
 
 # comparisons %>%
 #   ggplot() +
