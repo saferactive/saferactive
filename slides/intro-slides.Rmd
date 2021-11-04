@@ -8,7 +8,7 @@ output:
   xaringan::moon_reader:
     css: [default, robot, robot-fonts]
     lib_dir: libs
-    nature: 
+    nature:
       beforeInit: "https://platform.twitter.com/widgets.js"
       highlightStyle: github
       highlightLines: true
@@ -20,7 +20,7 @@ library(tidyverse)
 ```
 
 
-## Background
+### Background: quantifying changes in safety
 
 ![](https://raw.githubusercontent.com/saferactive/saferactive/master/README_files/figure-gfm/trend-1.png)
 
@@ -29,9 +29,13 @@ library(tidyverse)
   - Where have active travels levels increased and casualty rates fallen?
   - What are the characteristics of these places and can we learn from them?
 
+???
+Recent time: Very little change
+Need to disaggregate to do meaningful analysis
+
 ---
 
-## Longer term trends
+### Background: quantifying changes in safety
 
 ```{r, fig.height=3}
 # readRDS("../p1_ggplot_1979_2019.Rds") +
@@ -43,9 +47,31 @@ library(tidyverse)
 - Numbers of people killed/injured while walking and cycling have mostly 'flatlined' since around 2010
 - But what about the rate of casualties per unit time/population/distance?
 
+???
+
+Looks encouraging : but denominator neglect!
+
 ---
 
-## The pandemic
+### Denominator neglect
+
+--
+
+![](https://user-images.githubusercontent.com/1825120/133615412-bc3f3717-5512-4eef-aca2-d08822734b0f.png)
+
+--
+
+> The DfT thus calculated that the overall casualty rate for cyclists, the number of deaths or injuries per mile travelled, fell by 34% in 2020 against the year before, the biggest drop for any road user type.
+
+
+???
+
+- But this change in safety levels was not uniform
+
+---
+
+
+### Denominator neglect
 
 ![](https://user-images.githubusercontent.com/1825120/133615184-e1782729-9660-4508-8107-2e17ddb49904.png)
 
@@ -54,21 +80,11 @@ library(tidyverse)
 
 ---
 
-## Safety during the pandemic
-
-![](https://user-images.githubusercontent.com/1825120/133615412-bc3f3717-5512-4eef-aca2-d08822734b0f.png)
-
-> The DfT thus calculated that the overall casualty rate for cyclists, the number of deaths or injuries per mile travelled, fell by 34% in 2020 against the year before, the biggest drop for any road user type.
-
-- But this change in safety levels was not uniform
-
----
-
-#### Data on cycling levels
+### Denominator neglect : count data
 
 ![](https://raw.githubusercontent.com/saferactive/saferactive/master/code/tests/bradford-and-beyond_files/figure-gfm/unnamed-chunk-7-1.png)
 
-All counter values (black lines) and average counter values in sample of local authorities: Bradford, Derby, Leeds, Southampton 
+All counter values (black lines) and average counter values in sample of local authorities: Bradford, Derby, Leeds, Southampton
 
 <!-- Reproducible code:  -->
 <!-- See https://github.com/saferactive/saferactive/blob/master/code/tests/bradford-and-beyond.md -->
@@ -77,7 +93,7 @@ All counter values (black lines) and average counter values in sample of local a
 
 ---
 
-#### Road safety and inequality
+### Thematic analyses : Road safety and inequality
 
 ![](https://user-images.githubusercontent.com/1825120/134364522-e18b9140-5bbf-43ff-85b0-8374e7088694.png)
 
@@ -90,40 +106,8 @@ This relates to the levelling up agenda
 
 ---
 
-#### Approaches
 
-.pull-left[
-
-- Exploratory data analysis
-
-![](https://saferactive.github.io/trafficalmr/articles/spine_aspatial_who_hit_who.png)
-
-- Geographic analysis
-
-![](https://raw.githubusercontent.com/saferactive/saferactive/master/LA_trends_files/figure-gfm/crash_la_plot2-1.png)
-
-]
-
-.pull-right[
-
-- New visualisation techniques
-
-![](https://saferactive.github.io/trafficalmr/articles/rr_cots.png)
-
-- Interactive mapping
-
-![](https://user-images.githubusercontent.com/1825120/133634068-38623752-fc0a-4aab-925e-4b43ab746f73.png)
-
-]
-
---
-
-- Modelling - more needed in this area - relies on strong explanatory variables
-
-
----
-
-## Key project outputs
+### Key project outputs
 
 - Datasets
   - New geo datasets with change in active travel (currently cycling) over time
@@ -134,6 +118,43 @@ This relates to the levelling up agenda
 - New methods
   - Framework for exploratory analysis of complex datasets for informing policy
   - Route network processing
-  
+
 - Software development
-  - Development of the trafficalmr package
+  - Development of the `trafficalmr` package
+
+
+---
+
+### Agenda
+
+* 2:00 - 2:15 - Introduction to the Saferactive project : Roger
+
+* 2:15 - 2:45 - Key findings and discussion : Joey
+
+* 2:45 - 3:00 - Demo of interactive TGVE to visualize SaferActive outputs : Layik
+
+* 3:00 - 3:30 - Visualisation and public communication of road safety data : Roger
+
+* 3:30 - 3:45 - Coffee break
+
+* 3:45 - 4:15 - Reflections on road safety research
+
+* 4:15 - 4:30 - Closing thoughts
+
+
+???
+
+---
+
+## How could this research guide policy? What can we learn about contributory factors to road safety?
+
+---
+
+## As analysts, what do you see as common pitfalls of road safety data analysis?
+
+---
+## How do we come up with denominators post-covid without good census data?
+
+---
+
+## What are the priorities for improving road safety in a post-covid world, given recent shifts in behaviour? What should future work focus on?

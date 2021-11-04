@@ -1,0 +1,605 @@
+---
+title: "SaferActive"
+subtitle: "📉🚂🚅🚎🛴🚲🚶📈<br/>(Visual) analysis of road safety data"
+author: "The SaferActive Team"
+institute: "University of Leeds, [Institute for Transport Studies](https://environment.leeds.ac.uk/transport)"
+date: "University of Leeds, 2021-10-15 (updated: `r Sys.Date()`)\nReproducible source code: [github.com/saferactive/saferactive](https://github.com/saferactive/saferactive)"
+output:
+  xaringan::moon_reader:
+    css: [default, robot, robot-fonts]
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      beforeInit: "https://platform.twitter.com/widgets.js"
+      highlightStyle: github
+      highlightLines: false
+      countIncrementalSlides: false
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+```
+
+### Navigating the Stats19 data analysis space
+
+???
+
+starting point : hard to generate genuine/solid findings
+
+large-scale observational dataset -- analysis space large.
+So difficult to know where to start.
+
+*Are* examples of CDA aiming to establish specific things from known data.
+
+Here -- large set of variables; their structure not always known about; sometimes difficult to establish expectations.
+
+Data analysis to make decisions!
+
+--
+
+.pull-left[
+.right[**`accidents`**]
+.right[`accident_index ..`]
+]
+.pull-right[
+crash time, location (~10m resolution), admin location, road context and weather and light conditions
+]
+
+.pull-left[
+.right[**`casualties`**]
+.right[`accident_index  ..`]
+.right[`vehicle_reference  ..`]
+.right[`casualty_reference  ..`]
+]
+.pull-right[
+casualty sex, age, severity, passenger type, home area demogs
+]
+
+.pull-left[
+.right[**`vehicles`**]
+.right[`accident_index  ..`]
+.right[`vehicle_reference  ..`]
+]
+.pull-right[
+vehicles type, age, capacity, manoeuvre type, driver sex, age,  home area demogs, purpose
+]
+
+
+???
+
+So this is where exploratory analysis and vis approaches are suited -- but EDA and vis not all about *discovery* -- describing data, exploring patterns and deriving findings.
+
+---
+
+### Science reform and retiring the EDA/CDA distinction
+
+<img src = "img/challenges_eda.png", width = 55%, style = "position:absolute; top: 20%; left: 8%;"></img>
+
+<img src = "img/harvard_challenges_eda.png", width = 20%, style = "position:absolute; top: 20%; left: 70%;"></img>
+
+???
+
+That about visual data analysis as model formulation and critique : about helping to form comparisons and expectations -- and characterising variation from those expectations.
+
+Also about helping to guard against false discovery -- or at least that should be our ambition.
+
+---
+
+
+### Framework for formalising analysis
+
+
+<img src = "img/framework.png", width = 50%, style = "position:absolute; top: 18%; left: 10%;"></img>
+
+
+???
+
+Net of the dominant pattern
+
+Data analysis for decision-making
+
+---
+
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+???
+Research identifying diverging characteristics of drivers and those being hit by them.
+
+--
+
+
+.pull-left[
+.right[**`accidents`**]
+.right[`accident_index ..`]
+]
+.pull-right[
+crash time, **location (~10m resolution)**, admin location, road context and weather and light conditions
+]
+
+.pull-left[
+.right[**`casualties`**]
+.right[`accident_index  ..`]
+.right[`vehicle_reference  ..`]
+.right[`casualty_reference  ..`]
+]
+.pull-right[
+casualty sex, age, severity, passenger type, **home area demogs**
+]
+
+.pull-left[
+.right[**`vehicles`**]
+.right[`accident_index  ..`]
+.right[`vehicle_reference  ..`]
+]
+.pull-right[
+vehicles type, age, capacity, manoeuvre type, driver sex, age,  **home area demogs**, purpose
+]
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of crash location : {1 high; 5 low}
+* **`casualties`** : IMD class of pedestrian : {1 high; 5 low}
+* **`vehicles`** : IMD class of driver : {1 high; 5 low}
+
+
+--
+
+<img src = "img/imd-driver-cas-title.png", width = 50%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-driver-cas-obs.png", width = 15%, style = "position:absolute; top:46%; left: 10%;"></img>
+
+???
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of crash location : {1 high; 5 low}
+* **`casualties`** : IMD class of pedestrian : {1 high; 5 low}
+* **`vehicles`** : IMD class of driver : {1 high; 5 low}
+
+
+
+<img src = "img/imd-driver-cas-title.png", width = 50%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-driver-cas-obs.png", width = 13%, style = "position:absolute; top:46%; left: 10%;"></img>
+
+--
+
+<img src = "img/imd-driver-cas-full.png", width = 50%, style = "position:absolute; top: 70%; left: 10%;"></img>
+
+--
+
+<img src = "img/imd-driver-cas-resid.png", width = 16.5%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+???
+
+We expect independence in the relative number recorded crashes by IMD group of pedestrian and driver -- so given the row_totals -- the frequencies by each IMD of driver -- and col_totals -- the frequencies by each IMD  of pedestrian -- we spread expectation amongst the contingency table assuming that joint driver-cas frequencies by IMD are independent.
+
+When we do that -- try to control for dominant pattern -- we find that heavy association between demogs: those more demographically similar are more likely to crash with each other. Particularly true -- darker colour -- for low deprivation driver-cas and might suggest that sphere of circulation/mixing is more demographically narrow. Certainly cities tend not to contain so often very low deprivation.
+
+So controlling for dominant pattern helps us identify obvious confounder.
+
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of **crash location** : {1 high; 5 low}
+* **`casualties`** : IMD class of pedestrian : {1 high; 5 low}
+* **`vehicles`** : IMD class of driver : {1 high; 5 low}
+
+--
+
+<img src = "img/imd-driver-cas-crash-title.png", width = 55%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-driver-cas-crash-obs.png", width = 55%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+
+???
+
+Splitting by crash location exposes this
+
+Spread expectation across the contingency table in the same way -- independent of driver-casualty demographics.
+---
+
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of **crash location** : {1 high; 5 low}
+* **`casualties`** : IMD class of pedestrian : {1 high; 5 low}
+* **`vehicles`** : IMD class of driver : {1 high; 5 low}
+
+
+<img src = "img/imd-driver-cas-crash-title.png", width = 55%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-driver-cas-crash-resid.png", width = 55%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of **crash location** : {1 high; 5 low}
+* **`casualties`** : IMD class of **pedestrian** : {1 high; 5 low}
+* **`vehicles`** : IMD class of **driver** : {1 high; 5 low}
+
+<img src = "img/imd-geodemog-dist-title.png", width = 55%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-geodemog-dist.png", width = 55%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of **crash location** : {1 high; 5 low}
+* **`casualties`** : IMD class of **pedestrian** : {1 high; 5 low}
+* **`vehicles`** : IMD class of **driver** : {1 high; 5 low}
+
+<img src = "img/imd-geodemog-dist-title.png", width = 55%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+
+<img src = "img/imd-driver-cas-crash-dist-full.png", width = 55%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+---
+
+
+### Pedestrian-Vehicle crashes : who-hit-whom demographics
+
+Crash characteristics:
+
+* **`accidents`** : IMD class of **crash location** : {1 high; 5 low}
+* **`casualties`** : IMD class of **pedestrian** : {1 high; 5 low}
+* **`vehicles`** : IMD class of **driver** : {1 high; 5 low}
+
+<img src = "img/imd-geodemog-dist-title.png", width = 55%, style = "position:absolute; top: 38%; left: 10%;"></img>
+
+<img src = "img/imd-driver-cas-crash-dist-resid.png", width = 55%, style = "position:absolute; top: 46%; left: 10%;"></img>
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+--
+
+<img src = "img/bars-assoc-title.png", width = 25%, style = "position:absolute; top: 25%; left: 10%;"></img>
+
+<img src = "img/bar-freq.png", width = 25%, style = "position:absolute; top: 33%; left: 10%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+<img src = "img/bars-assoc-title.png", width = 25%, style = "position:absolute; top: 25%; left: 10%;"></img>
+
+<img src = "img/bars-assoc-stacked.png", width = 25%, style = "position:absolute; top: 32%; left: 10%;"></img>
+
+--
+
+<img src = "img/bars-assoc-exp.png", width = 22.2%, style = "position:absolute; top: 32%; left: 35.5%;"></img>
+
+--
+
+<img src = "img/bars-assoc-prop.png", width = 22.3%, style = "position:absolute; top: 32%; left: 35.5%;"></img>
+
+--
+
+<img src = "img/bars-assoc-mosaic.png", width = 26%, style = "position:absolute; top: 32%; left: 58%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity does not vary depending on vehicle type*
+
+--
+```{r tab-vehicle-severity-resids, echo=FALSE, message=FALSE, out.width="90%"}
+readr::read_csv("img/vehicle_severity_cross_resids.csv") %>%
+  kbl(caption = "") %>%
+  row_spec(9, bold=T) %>% column_spec(4,bold = T) %>%
+  add_header_above(c(" ", "Observed" = 3, "Expected" = 2, "Signed chi-scores"=2))
+```
+???
+
+Chi-square residuals
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+
+**Expectation**
+
+*---- Casualty severity **and crash frequency** does not vary depending on vehicle type **and location***
+
+--
+
+<img src = "img/mosaic_harrow_westminster.png", width = 55%, style = "position:absolute; top: 35%; left: 10%;"></img>
+
+
+--
+
+<img src = "img/mosaic_harrow_westminster_colour.png", width = 55%, style = "position:absolute; top: 35%; left: 10%;"></img>
+
+--
+
+<img src = "img/mosaic_harrow_westminster_colour_none.png", width = 55%, style = "position:absolute; top: 35%; left: 10%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity **and crash frequency** does not vary depending on vehicle type **and location***
+
+
+<img src = "img/anim_real_grid.gif", width = 45%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity **and crash frequency** does not vary depending on vehicle type **and location***
+
+<img src = "img/mosaic_boroughs_spatial.png", width = 42%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity **and crash frequency** does not vary depending on vehicle type **and location***
+
+<img src = "img/mosaic_boroughs_spatial_simp.png", width = 42%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity does not vary depending on location*
+
+<img src = "img/bars_boroughs_severity.png", width = 42%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity does not vary depending on location*
+
+<img src = "img/boroughs_car.png", width = 42%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+---
+
+### Pedestrian-Vehicle crashes : who-hit-whom severity
+
+**Expectation**
+
+*---- Casualty severity does not vary depending on location*
+
+<img src = "img/lineup.png", width = 55%, style = "position:absolute; top: 35%; left: 8%;"></img>
+
+---
+
+
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+--
+
+#### Where, and by how much, are injury severity rates high or low?
+
+--
+.pull-left[
+.right[risk-ratio<sub>lad</sub> = ksi<sub>lad</sub> / ksi<sub>nat</sub>]
+]
+--
+
+<img src = "img/rrs-title.png", width = 35%, style = "position:absolute; top: 14%; left: 60%;"></img>
+
+<img src = "img/rrs.png", width = 35%, style = "position:absolute; top: 20%; left: 60%;"></img>
+
+--
+<br><br><br>
+.pull-left[
+ .right[High : Uttlesford 83%]  <br>
+ .right[Low : Bromsgrove 4%]
+]
+???
+---
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+#### Where, and by how much, are injury severity rates high or low?
+
+.pull-left[
+.right[risk-ratio<sub>lad</sub> = ksi<sub>lad</sub> / ksi<sub>nat</sub>]
+]
+
+
+<img src = "img/rrs-title.png", width = 35%, style = "position:absolute; top: 14%; left: 60%;"></img>
+
+<img src = "img/rrs.png", width = 35%, style = "position:absolute; top: 20%; left: 60%;"></img>
+
+<br><br><br>
+.pull-left[
+ .right[High : Uttlesford 83% -- **12 crashes**]  <br>
+ .right[Low : Bromsgrove 4% -- **27 crashes**]
+]
+
+
+???
+
+---
+
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+#### Where, and by how much, are injury severity rates high or low?
+
+
+.pull-left[
+.right[risk-ratio<sub>lad</sub> = ksi<sub>lad</sub> / ksi<sub>nat</sub>]
+]
+
+
+<img src = "img/rrs-title-boot.png", width = 35%, style = "position:absolute; top: 14%; left: 60%;"></img>
+
+<img src = "img/rrs-boot.png", width = 35%, style = "position:absolute; top: 20%; left: 60%;"></img>
+
+<br><br><br>
+.pull-left[
+ .right[High : Uttlesford 83% -- **12 crashes**]  <br>
+ .right[Low : Bromsgrove 4% -- **27 crashes**]
+]
+
+--
+
+
+<img src = "img/empirical-bayes.png", width = 45%, style = "position:absolute; top: 40%; left: 30%;"></img>
+
+---
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+#### Where, and by how much, are injury severity rates high or low?
+
+.pull-left[
+.right[risk-ratio<sub>lad</sub> = ksi<sub>lad</sub> / ksi<sub>nat</sub>]
+]
+
+
+<img src = "img/rrs-title-boot.png", width = 35%, style = "position:absolute; top: 14%; left: 60%;"></img>
+
+<img src = "img/rrs-boot.png", width = 35%, style = "position:absolute; top: 20%; left: 60%;"></img>
+
+
+<br><br><br>
+.pull-left[
+ .right[High : Uttlesford 83% -- 12 crashes **> 58%**]  <br>
+ .right[Low : Bromsgrove 4% -- 27 crashes **> 13%**]
+]
+
+
+
+???
+
+---
+
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+#### Where, and by how much, are injury severity rates high or low?
+
+.pull-left[
+.right[risk-ratio<sub>lad</sub> = ksi<sub>lad</sub> / ksi<sub>nat</sub>]
+]
+
+
+<img src = "img/rrs-title-boot.png", width = 35%, style = "position:absolute; top: 14%; left: 60%;"></img>
+
+<img src = "img/rrs-boot.png", width = 35%, style = "position:absolute; top: 20%; left: 60%;"></img>
+
+
+<br><br><br>
+.pull-left[
+.right[High : Uttlesford 83% -- 12 crashes **> 58%**]  <br>
+.right[Low : Bromsgrove 4% -- 27 crashes **> 13%**]  <br> <br>
+ .right[**Multiple testing**?]
+]
+
+
+
+---
+
+
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+
+#### So how risky is it when a pedestrian is hit by a vehicle?
+
+--
+.pull-left[
+ .right[Bristol 15%, 228 crashes]
+]
+
+.pull-right[
+.left[Sheffield 50%, 248 crashes]
+]
+
+--
+
+<img src = "img/risk-theatre.jpg", width = 50%, style = "position:absolute; top: 45%; left: 25%;"></img>
+
+???
+
+2% | 15% | 28%
+
+It is notoriously difficult to develop intuition around these sorts of relative frequencies. In the STATS19 dataset, we might wish to compare the injury severity rate of pedestrain-vehicle road crashes – the proportion of all crashes that resulted in a serious injury or fatality (KSI) – taking place between two local authority areas, say Bristol and Sheffield. There is in fact quite a difference in the injury severity rate between these two local authority areas in 2019: 15% for Bristol (35 out of 228 reported crashes were KSI) versus 50% for Sheffield (124 out of 248 reported crashes were KSI).
+
+---
+
+
+### Pedestrian-Vehicle crashes : **monitoring** severity by area
+
+
+
+#### Where, and by how much, are injury severity rates high or low?
+
+#### So how risky is it when a pedestrian is hit by a vehicle?
+
+.pull-left[
+ .right[Bristol 15%, 228 crashes]
+]
+
+.pull-right[
+.left[Sheffield 50%, 248 crashes]
+]
+
+
+<img src = "img/icon-arrays.png", width = 45%, style = "position:absolute; top: 45%; left: 27%;"></img>
+
+---
+
+### Framework for formalising analysis
+
+
+<img src = "img/framework.png", width = 50%, style = "position:absolute; top: 18%; left: 10%;"></img>
+
+
+???
+
+Net of the dominant pattern
+
+Data analysis for decisions
